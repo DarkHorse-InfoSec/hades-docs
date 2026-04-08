@@ -1,0 +1,12 @@
+# IDE and tool configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Build artifacts
+site/

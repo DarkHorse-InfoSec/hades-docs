@@ -1,0 +1,120 @@
+site_name: HADES Documentation
+site_description: Hidden Artifact Detection & EXIF Scanner - Metadata Forensics Engine
+site_author: DarkHorse Information Security LLC
+site_url: https://darkhorse-security.github.io/HADES/
+
+repo_name: DarkHorse-Security/HADES
+repo_url: https://github.com/DarkHorse-Security/HADES
+
+copyright: Copyright &copy; DarkHorse Information Security LLC
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_bases: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: quick_start.md
+    - Installation: installation.md
+    - Your First Scan: first_scan.md
+  - User Guide:
+    - CLI Reference: cli_reference.md
+    - API Reference: api_reference.md
+    - Dashboard Guide: dashboard_guide.md
+    - Interpreting Results: interpreting_results.md
+  - Detection:
+    - YARA Rules Guide: yara_rules_guide.md
+    - ML Detection: ml_detection_guide.md
+    - Behavioral Analysis: behavioral_analysis_guide.md
+    - MITRE ATT&CK Mapping: mitre_mapping_guide.md
+    - Threat Intelligence: threat_intel_guide.md
+    - Deep Format Analysis: deep_format_guide.md
+    - Detection Depth Guide: detection_depth_guide.md
+    - Validation Report: detection_validation_report.md
+    - Forensic Detection:
+      - GAPGUIDE v1 (Techniques): GAPGUIDE.md
+      - GAPGUIDE v2 (Formats): GAPGUIDE_v2.md
+  - Enterprise:
+    - Deployment Guide: deployment_guide.md
+    - Enterprise Deployment: enterprise_deployment_guide.md
+    - SIEM Integration: siem_integration_guide.md
+    - SIEM Platform Setup: integration_guide.md
+    - Docker Guide: docker_guide.md
+    - Performance Tuning: performance_guide.md
+    - Scaling Guide: scaling_guide.md
+    - Observability: observability_guide.md
+    - Kubernetes: kubernetes_guide.md
+    - Troubleshooting: troubleshooting.md
+    - Production Checklist: production_checklist.md
+  - Development:
+    - Plugin Development: plugin_development_guide.md
+    - Plugin Authoring: plugin_authoring_guide.md
+    - Writing YARA Rules: yara_rule_writing_guide.md
+    - Python SDK (v1.0.0): sdk_design.md
+    - Testing Guide: testing_guide.md
+    - Contributing: contributing.md
+    - Architecture: architecture.md
+  - Community:
+    - YARA Repository: yara_repository.md
+    - Plugin Marketplace: plugin_marketplace.md
+    - Demo Walkthrough: demo_walkthrough.md
+    - Changelog: changelog.md
+    - Next Steps: next_steps.md
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/DarkHorse-Security/HADES
