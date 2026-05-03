@@ -10,9 +10,12 @@ Built and maintained by DarkHorse Information Security LLC.
 
 ## Quick Start
 
-### Install from PyPI
+### Install from Cloudsmith
 
 ```bash
+# Configure the private registry
+pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+
 # Basic installation
 pip install hades-scanner
 
@@ -126,9 +129,12 @@ hades-enhanced --license-info
 
 ## Installation Options
 
-### PyPI (Recommended)
+### Cloudsmith (Recommended)
 
 ```bash
+# Configure the private registry (one-time)
+pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+
 # Core scanner
 pip install hades-scanner
 
@@ -357,11 +363,11 @@ Copyright (c) 2024-2026 DarkHorse Information Security LLC. All rights reserved.
 
 ## Links
 
-- Repository: https://github.com/DarkHorse-Security/HADES
-- Documentation: https://github.com/DarkHorse-Security/HADES/tree/main/docs
-- Issue Tracker: https://github.com/DarkHorse-Security/HADES/issues
-- PyPI: https://pypi.org/project/hades-scanner/
-- Changelog: https://github.com/DarkHorse-Security/HADES/blob/main/CHANGELOG.md
+- Repository: https://github.com/DarkHorse-InfoSec/hades-docs
+- Documentation: https://github.com/DarkHorse-InfoSec/hades-docs/tree/main/docs
+- Issue Tracker: https://github.com/DarkHorse-InfoSec/hades-docs/issues
+- Package Registry: https://cloudsmith.io/~darkhorse/repos/hades/packages/
+- Changelog: https://github.com/DarkHorse-InfoSec/hades-docs/blob/main/CHANGELOG.md
 
 ---
 

@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/License-Proprietary-red)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
 
-Built by [DarkHorse Information Security LLC](https://github.com/DarkHorse-Security).
+Built by [DarkHorse Information Security LLC](https://github.com/DarkHorse-InfoSec).
 
 ---
 
@@ -46,7 +46,7 @@ HADES covers 32 forensic detection categories across images, documents, archives
 ## Quick Start
 
 ```bash
-pip install hades-scanner
+pip install hades-scanner --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
 
 # Scan a file
 hades scan suspicious_file.jpg
@@ -96,9 +96,12 @@ python cli/main.py serve --port 8666
 - Python 3.9+
 - [ExifTool](https://exiftool.org/) installed and on `PATH`
 
-### From PyPI
+### From Cloudsmith (Private Registry)
 
 ```bash
+# Configure the private registry
+pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+
 # Core product -- includes YARA, ML detection, API server
 pip install hades-scanner
 
@@ -122,7 +125,7 @@ pip install "hades-scanner[full]"
 ### From Source
 
 ```bash
-git clone https://github.com/DarkHorse-Security/HADES.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd HADES
 pip install -e ".[dev]"
 ```
@@ -130,7 +133,7 @@ pip install -e ".[dev]"
 ### Docker
 
 ```bash
-git clone https://github.com/DarkHorse-Security/HADES.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd HADES
 docker compose -f docker/docker-compose.yml up -d
 ```

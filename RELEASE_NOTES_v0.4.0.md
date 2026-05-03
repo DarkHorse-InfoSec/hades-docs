@@ -84,7 +84,7 @@ HADES v0.4.0 is a major release that transforms HADES from a CLI scanning tool i
 
 ### pip install
 ```bash
-git clone https://github.com/DarkHorseInfoSec/hades.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd hades && pip install -r requirements.txt
 python cli/hades_cli.py --help
 ```

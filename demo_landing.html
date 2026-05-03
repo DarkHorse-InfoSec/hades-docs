@@ -357,14 +357,14 @@
     <div class="container">
         <h2>Get Started</h2>
         <div class="install-cmd">
-            <span>pip install hades-scanner[full]</span>
+            <span>pip install "hades-scanner[full]" --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/</span>
             <button class="copy-btn" onclick="copyInstall()">Copy</button>
         </div>
         <p class="install-alt">
             Or with Docker: <code>docker pull darkhorse/hades-scanner:1.1.0</code>
         </p>
         <p class="install-alt" style="margin-top:12px;">
-            <a href="https://github.com/DarkHorse-Security/HADES" style="color:var(--accent);">Documentation</a>
+            <a href="https://github.com/DarkHorse-InfoSec/hades-docs" style="color:var(--accent);">Documentation</a>
             &bull;
             <a href="/docs" style="color:var(--accent);">API Reference</a>
             &bull;
@@ -530,7 +530,7 @@
     }
 
     window.copyInstall = function() {
-        var text = 'pip install hades-scanner[full]';
+        var text = 'pip install "hades-scanner[full]" --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/';
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text);
         } else {

@@ -57,7 +57,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Cloud Storage Scanning**: AWS S3, GCS, Azure Blob connectors.
 - **CI/CD Integration**: Pipeline scanner with SARIF 2.1.0 output.
 - **Chat Bots**: Slack and Teams bot integrations.
-- **PyPI Distribution**: `pip install hades-scanner` with optional dependency groups.
+- **Package Distribution**: `pip install hades-scanner` with optional dependency groups.
 - **Docker Production Image**: Multi-stage build, non-root user, health checks.
 - **Homebrew Formula**: macOS installation via Homebrew.
 - 760+ passing tests.

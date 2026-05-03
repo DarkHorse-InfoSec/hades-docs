@@ -33,6 +33,9 @@ You need three things installed before proceeding:
 ### Option 1: pip install (recommended)
 
 ```bash
+# Configure private registry (one-time)
+pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+
 pip install hades-scanner
 ```
 
@@ -49,7 +52,7 @@ pip install "hades-scanner[enterprise]"
 If you prefer not to install Python dependencies directly:
 
 ```bash
-git clone https://github.com/DarkHorse-Security/HADES.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd HADES
 docker compose -f docker/docker-compose.yml up -d
 ```
@@ -59,7 +62,7 @@ The API server will be available at `http://localhost:8666`. Skip ahead to the "
 ### Option 3: From source (development)
 
 ```bash
-git clone https://github.com/DarkHorse-Security/HADES.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd HADES
 pip install -e ".[dev]"
 ```

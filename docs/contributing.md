@@ -4,7 +4,7 @@ HADES is proprietary software developed and maintained by DarkHorse Information 
 
 ## Reporting Bugs
 
-Submit bug reports via the issue tracker at [https://github.com/DarkHorse-Security/HADES/issues](https://github.com/DarkHorse-Security/HADES/issues).
+Submit bug reports via the issue tracker at [https://github.com/DarkHorse-InfoSec/hades-docs/issues](https://github.com/DarkHorse-InfoSec/hades-docs/issues).
 
 When reporting a bug, include:
 
@@ -20,7 +20,7 @@ Please check existing issues to avoid duplicates before filing.
 
 ## Feature Requests
 
-Submit feature requests via the issue tracker at [https://github.com/DarkHorse-Security/HADES/issues](https://github.com/DarkHorse-Security/HADES/issues).
+Submit feature requests via the issue tracker at [https://github.com/DarkHorse-InfoSec/hades-docs/issues](https://github.com/DarkHorse-InfoSec/hades-docs/issues).
 
 Include a clear description of the desired capability, the use case it addresses, and any relevant examples or references.
 

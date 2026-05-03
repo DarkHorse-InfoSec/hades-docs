@@ -58,9 +58,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Community Docker Compose** (`docker/docker-compose.community.yml`): SQLite-only deployment with no external service dependencies. Single container with volume mounts for data persistence and custom rules.
 - **22 New MITRE ATT&CK Techniques**: Reconnaissance (T1595, T1592, T1589), Credential Access (T1552, T1555, T1556, T1110), Collection (T1560, T1119, T1213), Lateral Movement (T1021, T1570, T1080), Discovery (T1083, T1082, T1057, T1518), Persistence (T1137, T1176), Privilege Escalation (T1548, T1068), Impact (T1486). Total coverage expanded from 29 to 51+ techniques across 11 tactics.
 - **15 New Finding-to-Technique Mappings**: Identity forensics findings mapped to credential access and persistence techniques. Vulnerability findings mapped to privilege escalation and impact techniques. Log analysis findings mapped to collection and lateral movement techniques. Firmware findings mapped to additional persistence and defense evasion techniques.
-- **Production/Stable PyPI Classifier**: Development status changed from `4 - Beta` to `5 - Production/Stable`. Added `Framework :: FastAPI` classifier.
+- **Production/Stable Classifier**: Development status changed from `4 - Beta` to `5 - Production/Stable`. Added `Framework :: FastAPI` classifier.
 - **OCI Labels on Enterprise Docker Image**: Standard OCI labels (`org.opencontainers.image.*`) for source, documentation, version, vendor, title, and description on the enterprise Docker image.
-- **Distribution Validation Test Suite**: Tests verifying PyPI classifiers, Docker labels, Homebrew formula version, and distribution artifact integrity.
+- **Distribution Validation Test Suite**: Tests verifying package classifiers, Docker labels, Homebrew formula version, and distribution artifact integrity.
 - **SIEM Connector Config Section**: `siem_connectors` section in `cli/hades_config.json` with per-platform connection settings, retry parameters, batch sizes, and flush intervals.
 - **SIEM Connector Test Suite** (`core/siem_connectors/test_siem_connectors.py`): Tests covering base class interface, Splunk HEC token auth and batch sends, Elasticsearch Bulk API and rate limiting, Sentinel HMAC signing and payload chunking, connector store CRUD, delivery stats tracking, and API endpoints.
 - **Webhook Test Suite** (`core/test_webhook_routes.py`): Tests covering subscription CRUD, HMAC-SHA256 signature verification, event filtering, delivery retry, and API endpoints.
@@ -82,7 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **MITRE ATT&CK Coverage**: Expanded from 29 to 51+ techniques across 11 tactics (reconnaissance, credential access, collection, lateral movement, discovery, persistence, privilege escalation, impact, defense evasion, execution, exfiltration). Finding-to-technique mappings expanded from 37 to 52+.
 - **SDK Version**: Bumped from 1.0.0 to 1.1.0 with retry logic, webhook subscriptions, and SSE streaming.
 - **Enterprise Docker Image**: Now installs all 20 optional dependency groups for complete feature availability. Added OCI image labels.
-- **PyPI Classifiers**: Development status changed from `4 - Beta` to `5 - Production/Stable`. Added `Framework :: FastAPI`.
+- **Package Classifiers**: Development status changed from `4 - Beta` to `5 - Production/Stable`. Added `Framework :: FastAPI`.
 - **Playbook Engine**: Extended with `siem_forward_native` action type for native SIEM connector integration. Expanded from 15 to 15 built-in playbooks (no new default playbooks in v1.0.0, but existing playbooks can use the new action type).
 - **Dashboard Navigation**: Sidebar navigation expanded with Sanitize and Quarantine views.
 - **GPS Analysis**: `HeuristicAnalyzer._analyze_gps_clustering` now delegates to `GPSForensicsAnalyzer` with fallback to legacy counter-based analysis when module unavailable.
@@ -256,7 +256,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enterprise CLI Flags**: `--create-admin`, `--create-user`, `--user-role`, `--list-users`, `--license-info`, `--license-key`, `--db-backend`, `--db-dsn`, `--redis-url`, `--encrypt`, `--generate-encryption-key`, `--create-tenant`, `--list-tenants`, `--migrate-db`.
 - **Enterprise Config Sections**: `database`, `redis`, `encryption`, `auth`, and `tenants` sections added to `cli/hades_config.json`.
 - **Enterprise Docker Support**: PostgreSQL 16 and Redis 7 services in `docker-compose.yml` (enterprise profile). New environment variables: `HADES_DB_BACKEND`, `HADES_DB_DSN`, `HADES_REDIS_URL`, `HADES_ENCRYPTION_KEY`, `HADES_LICENSE_KEY`.
-- **PyPI Enterprise Extras**: `pip install "hades-scanner[enterprise]"` installs bcrypt, PyJWT, cryptography, psycopg2-binary, redis.
+- **Enterprise Extras**: `pip install "hades-scanner[enterprise]"` installs bcrypt, PyJWT, cryptography, psycopg2-binary, redis.
 - **Enterprise Deployment Guide** (`docs/enterprise_deployment_guide.md`): RBAC setup, SSO configuration (OIDC/SAML), PostgreSQL and Redis setup, encryption, multi-tenant setup, license management, Docker Compose production deployment, migration guide.
 - **Test Suites**: `core/test_auth.py` (RBAC, SSO, license tests), `core/test_storage.py` (database, scan store, audit store, case store, Redis, encryption, tenant tests), `core/test_enterprise_integration.py` (end-to-end integration tests) -- 183 new tests, 1050+ total passing.
 - **ML Ensemble Detector** (`core/ml_ensemble.py`): Multi-model anomaly detection combining Isolation Forest, Random Forest, and optional XGBoost with weighted voting. Extended feature extractor (25 features: 15 base + 10 security-focused). Labeled data manager with SQLite storage and CSV import/export. Auto-retrainer with contamination tuning.
@@ -310,7 +310,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI/CD Integration** (`core/integrations/cicd_scanner.py`): Pipeline file scanner with pass/fail thresholds, output formats (table, JSON, SARIF 2.1.0, GitHub PR comment, GitLab MR note). GitHub Actions workflow at `.github/workflows/hades-scan.yml`.
 - **Chat Bots** (`core/integrations/chat_bot.py`): Slack bot with slash commands and Block Kit UI, Microsoft Teams bot with Adaptive Cards, file upload scanning, and alert channel routing.
 - **Integration API Routes**: `network_email_routes.py`, `cloud_routes.py`, `cicd_chat_routes.py` wired into FastAPI at `/api/v1/integrations/` prefix.
-- **PyPI Distribution**: `pyproject.toml` and `MANIFEST.in` for `pip install hades-scanner` with optional dependency groups (`api`, `yara`, `ml`, `docker`, `cloud`, `email`, `chat`, `crypto`, `formats`, `full`, `dev`). Console entry points: `hades`, `hades-enhanced`, `hades-server`, `hades-benchmark`.
+- **Package Distribution**: `pyproject.toml` and `MANIFEST.in` for `pip install hades-scanner` with optional dependency groups (`api`, `yara`, `ml`, `docker`, `cloud`, `email`, `chat`, `crypto`, `formats`, `full`, `dev`). Console entry points: `hades`, `hades-enhanced`, `hades-server`, `hades-benchmark`.
 - **Docker Production Image** (`docker/hades-full.dockerfile`): Multi-stage build with python:3.12-slim, non-root user (UID 1000), YARA rules and dashboard bundled, health checks, environment variable configuration (`HADES_API_KEY`, `HADES_PORT`, `HADES_WORKERS`, `HADES_LOG_LEVEL`), OCI labels.
 - **Docker Compose** (`docker/docker-compose.yml`): Full stack deployment with named volumes, resource limits, health checks, and environment variable passthrough.
 - **Homebrew Formula** (`Formula/hades-scanner.rb`): macOS installation via Homebrew with python@3.12 and exiftool dependencies.

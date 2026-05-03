@@ -3,8 +3,8 @@ site_description: Hidden Artifact Detection & EXIF Scanner - Metadata Forensics 
 site_author: DarkHorse Information Security LLC
 site_url: https://darkhorse-security.github.io/HADES/
 
-repo_name: DarkHorse-Security/HADES
-repo_url: https://github.com/DarkHorse-Security/HADES
+repo_name: DarkHorse-InfoSec/hades-docs
+repo_url: https://github.com/DarkHorse-InfoSec/hades-docs
 
 copyright: Copyright &copy; DarkHorse Information Security LLC
 
@@ -117,4 +117,4 @@ extra:
     provider: mike
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/DarkHorse-Security/HADES
+      link: https://github.com/DarkHorse-InfoSec/hades-docs

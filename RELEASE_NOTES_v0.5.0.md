@@ -41,10 +41,10 @@ The `core/benchmarks.py` suite measures single-file scan latency, batch throughp
 
 ## Installation
 
-### pip (PyPI)
+### pip (Cloudsmith)
 
 ```bash
-pip install hades-scanner
+pip install hades-scanner --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
 hades --help
 hades-server --port 8666
 ```
@@ -52,7 +52,7 @@ hades-server --port 8666
 ### From Source
 
 ```bash
-git clone https://github.com/DarkHorseInfoSec/hades.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd hades && pip install -r requirements.txt
 python cli/hades_cli.py --help
 ```

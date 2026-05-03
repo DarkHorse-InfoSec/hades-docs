@@ -15,7 +15,13 @@ HADES supports multiple installation methods. Choose the one that fits your envi
 
 ---
 
-## From PyPI
+## From Cloudsmith (Private Registry)
+
+First, configure the registry (one-time):
+
+```bash
+pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+```
 
 === "Basic"
 
@@ -85,7 +91,7 @@ pip install "hades-scanner[api,yara,ml]"
 ## From Homebrew (macOS)
 
 ```bash
-brew tap DarkHorse-Security/tap
+brew tap DarkHorse-InfoSec/tap
 brew install hades-scanner
 ```
 
@@ -126,7 +132,7 @@ See the [Docker Guide](docker_guide.md) for production configuration, volume mou
 Clone the repository and install in editable mode:
 
 ```bash
-git clone https://github.com/DarkHorse-Security/HADES.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd HADES
 pip install -e ".[dev]"
 ```

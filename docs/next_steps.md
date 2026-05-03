@@ -57,7 +57,7 @@ These items should be completed before or shortly after the v1.0.0 public releas
 ### 2.1 Release Packaging
 
 - [ ] Tag `v1.0.0` in git and create GitHub release
-- [ ] Build and publish PyPI package (`pip install hades-scanner==1.0.0`)
+- [ ] Build and publish Cloudsmith package (`pip install hades-scanner==1.0.0`)
 - [ ] Build and push Docker image with OCI labels (`hades-scanner:1.0.0`)
 - [ ] Update Homebrew formula to v1.0.0
 - [ ] Verify all install paths: pip, Docker, Homebrew, from-source
@@ -208,7 +208,7 @@ See [Real-World Validation Guide](real_world_validation_guide.md) for step-by-st
 
 ### 5.3 CI/CD Pipeline Expansion
 
-- [ ] Add automated PyPI publishing on release tags
+- [ ] Add automated Cloudsmith publishing on release tags
 - [ ] Add Docker image building and pushing to container registry
 - [ ] Add SBOM generation (CycloneDX or SPDX)
 - [ ] Add dependency vulnerability scanning in CI
@@ -279,7 +279,7 @@ The technical product is feature-complete. The following business execution item
 
 | Priority | Item | Timeline |
 |----------|------|----------|
-| **P0 — Now** | Release packaging (PyPI, Docker, tag) | Week 1 |
+| **P0 — Now** | Release packaging (Cloudsmith, Docker, tag) | Week 1 |
 | **P0 — Now** | Documentation site deployment | Week 1 |
 | **P1 — Soon** | Real-world malware validation (50+ samples) | Weeks 2-4 |
 | **P1 — Soon** | Live SIEM connector testing | Weeks 2-4 |

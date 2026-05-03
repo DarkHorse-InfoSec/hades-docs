@@ -53,6 +53,9 @@ HADES analyzes hidden and malformed metadata across common file types -- images,
 ## Quick Install
 
 ```bash
+# Configure private registry (one-time)
+pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+
 pip install hades-scanner
 ```
 

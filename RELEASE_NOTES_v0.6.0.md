@@ -42,7 +42,7 @@ Multi-tenant support (`core/storage/tenant.py`) enables organization-level data 
 
 New CLI flags expose every enterprise feature: `--create-admin`, `--create-user`, `--user-role`, `--list-users`, `--license-info`, `--license-key`, `--db-backend`, `--db-dsn`, `--redis-url`, `--encrypt`, `--generate-encryption-key`, `--create-tenant`, `--list-tenants`, and `--migrate-db`. Docker Compose gains PostgreSQL 16 and Redis 7 services under the `enterprise` profile, with new environment variables for database, Redis, encryption, and license configuration.
 
-Install enterprise dependencies from PyPI:
+Install enterprise dependencies:
 
 ```bash
 pip install "hades-scanner[enterprise]"
@@ -131,11 +131,11 @@ A self-contained demo environment provides a rate-limited, pre-configured instan
 
 ## Installation
 
-### pip (PyPI)
+### pip (Cloudsmith)
 
 ```bash
 # Basic installation
-pip install hades-scanner
+pip install hades-scanner --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
 hades --help
 
 # Enterprise features
@@ -148,7 +148,7 @@ pip install "hades-scanner[full]"
 ### From Source
 
 ```bash
-git clone https://github.com/DarkHorseInfoSec/hades.git
+git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
 cd hades && pip install -r requirements.txt
 python cli/hades_cli.py --help
 python core/hades_enhanced_cli.py --help
