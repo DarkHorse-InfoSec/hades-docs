@@ -398,7 +398,7 @@
       "name": "DarkHorse Information Security",
       "url": "https://darkhorseinfosec.com"
     },
-    "downloadUrl": "https://cloudsmith.io/~darkhorse-infosec/repos/hades/packages/",
+    "downloadUrl": "https://portal.darkhorseinfosec.com/api/v1/download",
     "codeRepository": "https://github.com/DarkHorse-InfoSec/hades-docs",
     "featureList": [
       "Metadata extraction from 200+ file formats",
@@ -492,7 +492,7 @@
       <div class="hades-intro">
         <p>HADES is an enterprise metadata forensics engine built for security teams and incident responders. Validated against 15,855+ real-world malware samples with a 99.2% detection rate and zero crashes. Multi-layer detection combines 60+ YARA rules, ML ensemble models, behavioral analysis, 26 dedicated forensic analyzers, and deep format parsing across 45+ file types &mdash; without executing target files. Enterprise-grade two-axis scoring (confidence &times; severity) matches CrowdStrike/Palo Alto patterns, with court-ready evidence handling and automated response playbooks.</p>
         <div style="margin-top: 20px;">
-          <a href="https://cloudsmith.io/~darkhorse-infosec/repos/hades/packages/" class="cta-button" target="_blank" rel="noopener noreferrer">Install from Cloudsmith</a>
+          <a href="https://portal.darkhorseinfosec.com" class="cta-button" target="_blank" rel="noopener noreferrer">Get HADES</a>
           <a href="https://github.com/DarkHorse-InfoSec/hades-docs" class="cta-button secondary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
       </div>
@@ -500,17 +500,16 @@
       <!-- Quick Start -->
       <div class="quick-start">
         <h3>Get Started in 5 Minutes</h3>
-        <p>Python 3.8+ and ExifTool required. Optional dependencies unlock enterprise features.</p>
-        <div class="cli-command">$ pip install hades-scanner --index-url https://dl.cloudsmith.io/basic/darkhorse-infosec/hades/python/simple/    # Core engine</div>
-        <div class="cli-command">$ pip install "hades-scanner[enterprise]" --index-url ...    # + PostgreSQL, Redis, RBAC, SSO</div>
-        <div class="cli-command">$ pip install "hades-scanner[full]" --index-url ...           # Everything</div>
-        <div class="cli-command">$ hades scan suspicious_file.jpg               # Scan a file</div>
-        <div class="cli-command">$ hades scan -r /path/to/evidence/             # Recursive directory scan</div>
-        <div class="cli-command">$ hades serve --port 8666                      # Start API server + dashboard</div>
+        <p>HADES ships as a single Nuitka-compiled signed binary. Python interpreter, ExifTool, YARA engine, and ML model are all bundled inline; the host needs no pre-installed runtime. License key from the customer portal gates the download.</p>
+        <div class="cli-command">$ export HADES_LICENSE_KEY="..."  &amp;&amp;  curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades -o hades  &amp;&amp;  chmod +x hades   # Path A: direct download</div>
+        <div class="cli-command">$ export HOMEBREW_HADES_LICENSE_KEY="..."  &amp;&amp;  brew tap DarkHorse-InfoSec/tap  &amp;&amp;  brew install DarkHorse-InfoSec/tap/hades-scanner   # Path B: Homebrew tap</div>
+        <div class="cli-command">$ ./hades scan suspicious_file.jpg             # Scan a file</div>
+        <div class="cli-command">$ ./hades scan -r /path/to/evidence/           # Recursive directory scan</div>
+        <div class="cli-command">$ hades-server --port 8666                     # Start API server (Pro+ tier)</div>
         <ul class="requirements-list">
-          <li><strong>Python 3.8+</strong> &mdash; CPython on Linux, macOS, or Windows</li>
-          <li><strong>ExifTool</strong> &mdash; Phil Harvey's ExifTool on PATH for metadata extraction</li>
-          <li><strong>Optional:</strong> PostgreSQL, Redis, YARA, scikit-learn, Docker &mdash; installed via dependency groups</li>
+          <li><strong>64-bit OS:</strong> Linux x86_64 (glibc 2.31+) shipping today; macOS Intel + Apple Silicon and Windows on the 2026-Q3 roadmap.</li>
+          <li><strong>License key</strong> from the <a href="https://portal.darkhorseinfosec.com" target="_blank" rel="noopener noreferrer">customer portal</a>. Free Community tier available; Professional + Enterprise tiers unlocked by paid license.</li>
+          <li><strong>That's it:</strong> Nuitka-compiled binary bundles ExifTool, YARA, scikit-learn, XGBoost, and all other dependencies inline. No Python install. No optional dependency groups. PostgreSQL + Redis are optional external services for Enterprise-tier deployments only.</li>
         </ul>
       </div>
 
@@ -781,7 +780,7 @@ $ helm install hades ./kubernetes/helm/hades/</div>
       <div class="security-warning">
         <p>Ready to detect hidden threats in your file metadata?</p>
         <p style="margin-top: 15px;">
-          <a href="https://cloudsmith.io/~darkhorse-infosec/repos/hades/packages/" target="_blank" rel="noopener noreferrer" class="cta-button">Install from Cloudsmith</a>
+          <a href="https://portal.darkhorseinfosec.com" target="_blank" rel="noopener noreferrer" class="cta-button">Get HADES</a>
           <a href="https://github.com/DarkHorse-InfoSec/hades-docs" target="_blank" rel="noopener noreferrer" class="cta-button secondary">GitHub</a>
           <a href="https://calendly.com/dlaurenzi" target="_blank" rel="noopener noreferrer" class="cta-button secondary">Book a Demo</a>
         </p>

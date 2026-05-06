@@ -3,6 +3,8 @@
 **Version:** 1.0.0 GA
 **Author:** DarkHorse Information Security LLC
 
+> **HISTORICAL NOTICE (added 2026-05-06):** This is a planning checklist from the v1.0.0 release era, kept for historical reference. The release-packaging items (Cloudsmith package publish, Docker image push, Homebrew formula bump, etc.) were applicable under the pre-v1.4 distribution model that has since been retired. Current release-packaging work happens in the private source repo at `tasks/TODO_manual.md`. Strategic / product / customer-success items below may still be relevant; verify against the current TODO before acting.
+
 HADES v1.0.0 is the first General Availability release. All core technical features are implemented and validated (2,452 tests, TPR 97.78%, 0 failures). This document outlines the next steps across engineering, validation, and business execution.
 
 ---

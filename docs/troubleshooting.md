@@ -171,12 +171,9 @@ sudo apt-get install libopenblas-dev liblapack-dev gfortran
 pip install scikit-learn --only-binary=:all:
 ```
 
-If the install environment cannot support scikit-learn (e.g., restricted build hosts), HADES operates without ML detection. The `SKLEARN_AVAILABLE` flag disables all ML paths. Install the base package without ML:
+If the install environment cannot support scikit-learn (e.g., restricted build hosts), HADES operates without ML detection. The `SKLEARN_AVAILABLE` flag disables all ML paths.
 
-```bash
-pip install hades-scanner
-# ML features will report as unavailable; all other detection works
-```
+This scenario does NOT apply to the current v1.4.x Nuitka binary distribution -- scikit-learn and XGBoost are both bundled inline in the binary, with the signed model bundle gated by license tier (Pro+ only). The "install without ML" workaround was specific to the pre-v1.4 pip-based distribution model. Current customers who don't have ML active simply have a Free / Community tier license; the binary has the ML code but the LicenseEnforcer gates it.
 
 ---
 

@@ -6,6 +6,8 @@
 [![Version](https://img.shields.io/badge/Version-0.7.1-blue.svg)]()
 [![Enterprise Grade](https://img.shields.io/badge/Enterprise-Grade-red.svg)]()
 
+> **NOTICE (2026-05-06):** This file describes the v0.7.1 era. Current source product is v1.4.2 with a different distribution model (Nuitka-compiled signed binary via the customer portal -- see [installation.md](installation.md) and the canonical [/README.md](../README.md)). The Cloudsmith pip-based install commands below no longer work. Most architectural and feature content remains accurate (HADES kept the same async pipeline + worker pool + ML ensemble + evidence chain across the v0.7 -> v1.4 transition); only the install + version-numbering sections are stale. Prefer the canonical README at the repo root over this file.
+
 ## 🌟 Overview
 
 HADES (High-Performance Advanced Detection Engine for Security) is a multi-million-dollar enterprise-grade forensic analysis platform designed for comprehensive metadata threat detection, analysis, and intelligence correlation. Built for security professionals, incident responders, and forensic investigators who demand the highest levels of accuracy, performance, and compliance.
