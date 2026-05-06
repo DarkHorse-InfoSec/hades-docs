@@ -12,60 +12,36 @@ HADES extracts and analyzes metadata from files -- images, documents, PDFs, arch
 
 ## Prerequisites
 
-You need three things installed before proceeding:
+You need a 64-bit OS and your `HADES_LICENSE_KEY` from the license email. That's it. The HADES binary is Nuitka-compiled with its Python interpreter, ExifTool, YARA engine, and ML model bundled inline, so the host needs no pre-installed runtime.
 
-| Requirement | Version | How to verify |
-|-------------|---------|---------------|
-| Python | 3.9 or later | `python --version` |
-| pip | Any recent version | `pip --version` |
-| ExifTool | Any recent version | `exiftool -ver` |
-
-**Installing ExifTool:**
-
-- **Windows:** Download from [exiftool.org](https://exiftool.org/), rename `exiftool(-k).exe` to `exiftool.exe`, and place it in a directory on your `PATH`.
-- **macOS:** `brew install exiftool`
-- **Linux (Debian/Ubuntu):** `sudo apt install libimage-exiftool-perl`
+Linux x86_64 (glibc 2.31+) and macOS (via Homebrew tap) are shipping today. Windows binary is on the 2026-Q3 roadmap pending code-signing certificate acquisition.
 
 ---
 
 ## Installation
 
-### Option 1: pip install (recommended)
+### Path A: direct download from the portal (canonical)
 
 ```bash
-# Configure private registry (one-time)
-pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+export HADES_LICENSE_KEY="<paste from portal email>"
 
-pip install hades-scanner
+# Linux x86_64
+curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  -o hades && chmod +x hades
 ```
 
-This installs the core product including YARA detection, ML anomaly detection, the FastAPI server, and the evidence chain.
+The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL, and `curl` follows the redirect. The binary is RSA-PSS-signed and verifies its own integrity at first run.
 
-For enterprise features (PostgreSQL, Redis, RBAC, encryption, Prometheus metrics):
+### Path B: Homebrew tap (macOS and Linux convenience)
 
 ```bash
-pip install "hades-scanner[enterprise]"
+export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
+brew tap DarkHorse-InfoSec/tap
+brew install DarkHorse-InfoSec/tap/hades-scanner
 ```
 
-### Option 2: Docker
-
-If you prefer not to install Python dependencies directly:
-
-```bash
-git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
-cd HADES
-docker compose -f docker/docker-compose.yml up -d
-```
-
-The API server will be available at `http://localhost:8666`. Skip ahead to the "Starting the API Server" section.
-
-### Option 3: From source (development)
-
-```bash
-git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
-cd HADES
-pip install -e ".[dev]"
-```
+For full install details + troubleshooting see `docs/installation.md`.
 
 ---
 
@@ -75,12 +51,6 @@ Scan a single file from the command line:
 
 ```bash
 hades scan suspicious_file.jpg
-```
-
-If you installed from source instead of pip, use:
-
-```bash
-python cli/main.py scan suspicious_file.jpg
 ```
 
 ### Reading the Output
@@ -162,16 +132,10 @@ hades scan -r -v /path/to/evidence/
 
 ## Starting the API Server
 
-For team use, start the REST API server so multiple analysts can submit scans through the web dashboard or API calls:
+For team use, start the REST API server (Pro+ tier) so multiple analysts can submit scans through API calls:
 
 ```bash
-hades serve --port 8666
-```
-
-Or from source:
-
-```bash
-python cli/main.py serve --port 8666
+hades-server --port 8666
 ```
 
 Verify it is running:

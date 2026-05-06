@@ -46,7 +46,15 @@ HADES covers 32 forensic detection categories across images, documents, archives
 ## Quick Start
 
 ```bash
-pip install hades-scanner --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+# Path A: direct download from the customer portal (Linux x86_64 today)
+export HADES_LICENSE_KEY="<paste from portal email>"
+curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  -o hades && chmod +x hades
+
+# Or Path B: Homebrew tap (macOS and Linux)
+export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
+brew tap DarkHorse-InfoSec/tap && brew install DarkHorse-InfoSec/tap/hades-scanner
 
 # Scan a file
 hades scan suspicious_file.jpg
@@ -54,8 +62,8 @@ hades scan suspicious_file.jpg
 # Recursive directory scan
 hades scan -r /path/to/evidence/
 
-# Start the REST API server and web dashboard
-hades serve --port 8666
+# Start the REST API server (Pro+ tier)
+hades-server --port 8666
 ```
 
 For a detailed walkthrough aimed at IR and SOC analysts, see [docs/quick_start.md](docs/quick_start.md).
@@ -80,63 +88,26 @@ For scanning workflows, result interpretation, and case management, see [docs/sc
 
 Run `hades <command> --help` for detailed usage on any subcommand.
 
-When running from source instead of a pip install, use `python cli/main.py` in place of `hades`:
-
-```bash
-python cli/main.py scan suspicious_file.jpg
-python cli/main.py serve --port 8666
-```
-
 ---
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.9+
-- [ExifTool](https://exiftool.org/) installed and on `PATH`
+A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, ExifTool, YARA engine, and all dependencies bundled inline, so the host needs no pre-installed runtime.
 
-### From Cloudsmith (Private Registry)
+| OS | Status |
+|---|---|
+| Linux x86_64 (glibc 2.31+) | Path A + Path B |
+| macOS Intel (10.15+) | Path B today; Path A binary on 2026-Q3 roadmap |
+| macOS Apple Silicon (11.0+) | Path B today; Path A binary on 2026-Q3 roadmap |
+| Windows 10 / 11 / Server 2019+ | Pending code-signing cert acquisition |
 
-```bash
-# Configure the private registry
-pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+See [Installation Guide](docs/installation.md) for full details, troubleshooting, and platform notes.
 
-# Core product -- includes YARA, ML detection, API server
-pip install hades-scanner
+### Older install paths (no longer supported)
 
-# Add enterprise backends and auth
-pip install "hades-scanner[enterprise]"
-
-# Add cloud storage, email gateway, and chat bot integrations
-pip install "hades-scanner[integrations]"
-
-# Everything
-pip install "hades-scanner[full]"
-```
-
-| Group | What it adds |
-|-------|-------------|
-| *(base)* | YARA, ML detection, FastAPI server, deep format analysis, evidence chain |
-| `enterprise` | PostgreSQL, Redis, RBAC, SSO (OIDC/SAML), AES-256-GCM encryption, Prometheus metrics |
-| `integrations` | AWS S3, GCS, Azure Blob scanning, SMTP email gateway, Slack and Teams bots |
-| `full` | All of the above plus dev tools |
-
-### From Source
-
-```bash
-git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
-cd HADES
-pip install -e ".[dev]"
-```
-
-### Docker
-
-```bash
-git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
-cd HADES
-docker compose -f docker/docker-compose.yml up -d
-```
+Pre-v1.4 distribution via PyPI (`pip install hades-scanner`), Docker Hub images at `darkhorse-security/hades-scanner`, the Cloudsmith private registry at `dl.cloudsmith.io/basic/darkhorse/hades`, and public source-clone are no longer supported. Path A and Path B are the only canonical install paths. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 ---
 

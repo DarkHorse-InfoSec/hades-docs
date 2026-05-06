@@ -177,17 +177,7 @@ The engine checks `DEEP_FORMAT_AVAILABLE` before calling the analyzer. Missing o
 | `pikepdf` | Native PDF parsing, object tree traversal | Regex-based pattern matching |
 | `olefile` | OLE compound file parsing (legacy Office) | OLE-specific checks skipped |
 
-Install both for full coverage:
-
-```bash
-pip install "hades-scanner[formats]"
-```
-
-Or individually:
-
-```bash
-pip install pikepdf olefile
-```
+All format-parsing dependencies are bundled inside the Nuitka-compiled HADES binary (Path A direct download or Path B Homebrew tap, see `docs/installation.md`). You do NOT need to install `pikepdf`, `olefile`, or any other library separately; the binary ships with its Python interpreter and dependency tree included. The mentions above are for understanding which library handles each format internally, not as install instructions.
 
 ---
 

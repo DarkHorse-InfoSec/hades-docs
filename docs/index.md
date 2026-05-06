@@ -52,18 +52,22 @@ HADES analyzes hidden and malformed metadata across common file types -- images,
 
 ## Quick Install
 
-```bash
-# Configure private registry (one-time)
-pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
-
-pip install hades-scanner
-```
-
-Install with all features:
+HADES ships as a single Nuitka-compiled binary with everything bundled (Python interpreter, ExifTool, YARA engine, ML model). Two install paths:
 
 ```bash
-pip install "hades-scanner[full]"
+# Path A: direct download from the portal (Linux x86_64 today; macOS + Windows on 2026-Q3 roadmap)
+export HADES_LICENSE_KEY="<paste from portal email>"
+curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  -o hades && chmod +x hades
+
+# Path B: Homebrew tap (macOS and Linux)
+export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
+brew tap DarkHorse-InfoSec/tap
+brew install DarkHorse-InfoSec/tap/hades-scanner
 ```
+
+Full install instructions + troubleshooting: see [Installation Guide](installation.md).
 
 ## Quick Example
 

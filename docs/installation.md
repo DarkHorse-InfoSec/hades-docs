@@ -1,227 +1,119 @@
 # Installation
 
-HADES supports multiple installation methods. Choose the one that fits your environment.
-
-## System Requirements
-
-| Requirement | Minimum | Recommended |
-|---|---|---|
-| Python | 3.8+ | 3.12+ |
-| RAM | 1 GB | 4 GB (with ML detection) |
-| Disk | 100 MB | 500 MB (with models and rules) |
-| OS | Windows, Linux, macOS | Any |
-
-[ExifTool](https://exiftool.org/) must be installed and available on your `PATH` for full metadata extraction. HADES operates in degraded mode without it, using Pillow for basic EXIF parsing.
+HADES ships as a license-gated, signed binary. There are two supported install paths; both fetch the same Nuitka-compiled binary from the portal-issued signed URL after validating your license.
 
 ---
 
-## From Cloudsmith (Private Registry)
+## Path A: direct download from the portal (canonical)
 
-First, configure the registry (one-time):
+Get your `HADES_LICENSE_KEY` from the license email after purchase, then:
 
 ```bash
-pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+export HADES_LICENSE_KEY="<paste from portal email>"
+
+# Linux x86_64
+curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  -o hades && chmod +x hades
+
+# (macOS and Windows binaries on R2 by 2026-Q3; until then, use Path B for macOS.)
 ```
 
-=== "Basic"
+The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL to Cloudflare R2, and `curl` follows the redirect. The binary is RSA-PSS-signed and verifies its own integrity at first run.
 
-    Install core scanning with no optional dependencies:
+To upgrade later, re-run the command with the new version number, or check `https://portal.darkhorseinfosec.com/api/v1/download` for the current version.
 
-    ```bash
-    pip install hades-scanner
-    ```
-
-=== "Full"
-
-    Install all features (API, YARA, ML, Docker, cloud, email, chat, formats, enterprise):
-
-    ```bash
-    pip install "hades-scanner[full]"
-    ```
-
-=== "API Server"
-
-    Install with REST API and WebSocket support:
-
-    ```bash
-    pip install "hades-scanner[api]"
-    ```
-
-=== "Enterprise"
-
-    Install with RBAC, SSO, PostgreSQL, Redis, and encryption:
-
-    ```bash
-    pip install "hades-scanner[enterprise]"
-    ```
-
-=== "Development"
-
-    Install with test and formatting tools:
-
-    ```bash
-    pip install "hades-scanner[dev]"
-    ```
-
-### Dependency Groups
-
-| Group | Packages | Purpose |
-|---|---|---|
-| `api` | FastAPI, Uvicorn, python-multipart, websockets, httpx, Pydantic | REST API server and WebSocket |
-| `yara` | yara-python | YARA pattern matching engine |
-| `ml` | scikit-learn, numpy, joblib | ML anomaly detection |
-| `docker` | docker | Sandboxed file viewer |
-| `cloud` | boto3, google-cloud-storage, azure-storage-blob | Cloud storage scanning |
-| `email` | aiosmtpd | SMTP email gateway |
-| `chat` | slack-bolt, botbuilder-core | Slack and Teams bots |
-| `crypto` | cryptography | Report signing and encryption |
-| `formats` | pikepdf, olefile | Deep PDF and Office analysis |
-| `enterprise` | bcrypt, PyJWT, cryptography, psycopg2-binary, redis | RBAC, SSO, PostgreSQL, Redis, encryption |
-| `dev` | pytest, black, mypy, httpx, psutil | Development tools |
-| `full` | All of the above | Everything |
-
-You can combine groups:
+## Path B: Homebrew tap (macOS and Linux convenience)
 
 ```bash
-pip install "hades-scanner[api,yara,ml]"
-```
-
----
-
-## From Homebrew (macOS)
-
-```bash
+export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
 brew tap DarkHorse-InfoSec/tap
-brew install hades-scanner
+brew install DarkHorse-InfoSec/tap/hades-scanner
 ```
 
-The Homebrew formula installs Python 3.12, ExifTool, and creates a virtualenv with HADES and its dependencies.
+The formula uses `HadesPortalDownloadStrategy` to inject your license key as a Bearer token, hits the same portal endpoint as Path A, and stages the binary under `$(brew --prefix)/bin/hades`. Same gated path, just wrapped in `brew install`.
+
+To upgrade:
+
+```bash
+brew update && brew upgrade hades-scanner
+```
 
 ---
 
-## From Docker
+## Verifying the installation
 
-Pull the production image:
+After either path:
 
 ```bash
-docker pull darkhorse-security/hades-scanner:0.7.1
+hades --version
+# expect: HADES Enhanced Detection Engine v1.4.2
+
+hades doctor
+# runs ~25 dependency probes + a Threat Intel section reporting which
+# API keys are present (length only, never the value)
 ```
 
-Run the API server:
+Quick scan:
 
 ```bash
-docker run -d \
-  --name hades-api \
-  -p 8666:8666 \
-  -e HADES_API_KEY=your-secure-api-key \
-  darkhorse-security/hades-scanner:0.7.1
+hades scan path/to/file.exe
+hades scan path/to/dir/ --recursive
 ```
 
-Or use Docker Compose for the full stack:
+API server (Pro+ tier):
 
 ```bash
-docker compose -f docker/docker-compose.yml up -d
-```
-
-See the [Docker Guide](docker_guide.md) for production configuration, volume mounts, and scaling.
-
----
-
-## From Source
-
-Clone the repository and install in editable mode:
-
-```bash
-git clone https://github.com/DarkHorse-InfoSec/hades-docs.git
-cd HADES
-pip install -e ".[dev]"
-```
-
-This installs HADES with development dependencies (pytest, black, mypy) in editable mode so code changes take effect immediately.
-
----
-
-## Verifying the Installation
-
-After installation, verify that HADES is working:
-
-```bash
-# Check CLI entry points
-hades --help
-hades-enhanced --help
-
-# Check API server
-hades-server --help
-
-# Run a quick scan
-hades suspicious_file.jpg
-
-# Start the API server
 hades-server --port 8666
-
-# Health check
 curl http://localhost:8666/api/v1/health
 ```
 
-### Verify Optional Dependencies
-
-```bash
-# Check which optional features are available
-python -c "
-import importlib
-checks = {
-    'YARA': 'yara',
-    'scikit-learn': 'sklearn',
-    'FastAPI': 'fastapi',
-    'pikepdf': 'pikepdf',
-    'olefile': 'olefile',
-    'Docker SDK': 'docker',
-    'boto3 (S3)': 'boto3',
-    'Redis': 'redis',
-}
-for name, mod in checks.items():
-    try:
-        importlib.import_module(mod)
-        print(f'  {name}: available')
-    except ImportError:
-        print(f'  {name}: not installed')
-"
-```
-
 ---
 
-## Platform Notes
+## Platform notes
 
-### Windows
+The Nuitka-compiled binary ships its Python interpreter + all dependencies inline. You do NOT need Python, pip, ExifTool, YARA, scikit-learn, or any other library installed on the host. Just the OS.
 
-- ExifTool: Download from [exiftool.org](https://exiftool.org/) and add to `PATH`, or install via `choco install exiftool`.
-- yara-python: May require Visual C++ Build Tools. Install via `pip install yara-python` or use a prebuilt wheel.
-- Docker Desktop required for sandbox and container features.
-
-### Linux
-
-- ExifTool: `sudo apt install libimage-exiftool-perl` (Debian/Ubuntu) or `sudo yum install perl-Image-ExifTool` (RHEL/CentOS).
-- yara-python: `pip install yara-python`. If compilation fails, install `libyara-dev` first.
-
-### macOS
-
-- ExifTool: `brew install exiftool`.
-- yara-python: `brew install yara && pip install yara-python`.
+| OS | Status |
+|---|---|
+| Linux x86_64 (glibc 2.31+) | Path A + Path B (via Linuxbrew) |
+| macOS Intel (10.15+) | Path B today; Path A x86_64 macOS binary on R2 by 2026-Q3 |
+| macOS Apple Silicon (11.0+) | Path B today; Path A arm64 macOS binary on R2 by 2026-Q3 |
+| Windows 10 / 11 / Server 2019+ | Windows binary build pending code-signing cert acquisition |
 
 ---
 
 ## Upgrading
 
-```bash
-pip install --upgrade hades-scanner
-```
+- **Path A:** re-run the curl one-liner with the new version number from your release email or `https://portal.darkhorseinfosec.com/api/v1/download`.
+- **Path B:** `brew update && brew upgrade hades-scanner`.
 
-For enterprise deployments, see the [migration section](enterprise_deployment_guide.md#migration-from-v050) in the Enterprise Deployment Guide.
+License re-validation runs at every binary startup; expired or revoked licenses fall back to community tier (heuristics + IOC only). Upgrade your subscription at `https://portal.darkhorseinfosec.com/billing` to restore full features.
+
+---
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `curl: (22) The requested URL returned error: 401 Unauthorized` | License key wrong, expired, or no active subscription | Verify in portal dashboard; check the email matches the active sub |
+| `hades --version` prints "community" tier despite license | Binary started before env var set | Set `HADES_LICENSE_KEY` first, then run; it loads from `~/.hades/.env` if present |
+| `brew install` fails with "Cannot find license key" | `HOMEBREW_HADES_LICENSE_KEY` env var not set | Export it before `brew install`; Homebrew strips most env vars but keeps `HOMEBREW_*` |
+
+For everything else, `hades doctor` covers ~25 environment probes and reports actionable next steps.
+
+---
+
+## Older install paths (no longer supported)
+
+Pre-v1.4 distribution via PyPI (`pip install hades-scanner`), Docker Hub images at `darkhorse-security/hades-scanner`, the Cloudsmith private registry at `dl.cloudsmith.io/basic/darkhorse/hades`, and public source-clone are no longer supported. Path A and Path B above are the only canonical install paths. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
+
+Older release notes (`RELEASE_NOTES_v0.5.0.md` through `RELEASE_NOTES_v0.7.1.md`) reference the legacy distribution model and are kept for historical reference; the install commands they show no longer work.
 
 ---
 
 ## Next Steps
 
-- [Your First Scan](first_scan.md) -- Walkthrough of your first HADES scan
-- [Quick Start Guide](quick_start.md) -- Get scanning in 5 minutes
-- [CLI Reference](cli_reference.md) -- Full command-line reference
+- [Quick Start Guide](quick_start.md), get scanning in 5 minutes
+- [CLI Reference](cli_reference.md), full command-line reference
+- [Threat Intelligence Guide](threat_intel_guide.md), wiring up MalwareBazaar + VirusTotal
