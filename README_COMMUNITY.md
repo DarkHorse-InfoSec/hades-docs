@@ -10,39 +10,42 @@ Built and maintained by DarkHorse Information Security LLC.
 
 ## Quick Start
 
-### Install from Cloudsmith
+HADES ships as a single Nuitka-compiled signed binary with everything bundled (Python interpreter, ExifTool, YARA engine, ML model). Two install paths -- both gated by a license key from the customer portal:
 
 ```bash
-# Configure the private registry
-pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+# Path A: direct download from the portal (Linux x86_64 today)
+export HADES_LICENSE_KEY="<paste from portal email>"
+curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  -o hades && chmod +x hades
 
-# Basic installation
-pip install hades-scanner
-
-# Full installation (all features)
-pip install "hades-scanner[full]"
+# Path B: Homebrew tap (macOS and Linux)
+export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
+brew tap DarkHorse-InfoSec/tap
+brew install DarkHorse-InfoSec/tap/hades-scanner
 ```
+
+Full install instructions + troubleshooting + platform notes: [docs/installation.md](docs/installation.md).
 
 ### Scan a File
 
 ```bash
-# Basic scan
-hades suspicious_file.jpg
+# Single file
+hades scan suspicious_file.jpg
 
-# Recursive directory scan with verbose output
-hades -r /path/to/evidence/ -v
+# Recursive directory
+hades scan -r /path/to/evidence/
 
-# Enhanced scan with ML detection
-hades-enhanced -r --ml-detect /path/to/evidence/
+# JSON output for downstream tools
+hades scan -r --json /path/to/evidence/
 ```
 
-### Start the API Server
+### Start the API Server (Pro+ tier)
 
 ```bash
-hades-enhanced --serve --port 8666
+hades-server --port 8666
+curl http://localhost:8666/api/v1/health
 ```
-
-Then visit `http://localhost:8666/dashboard/` for the web interface.
 
 ---
 
@@ -67,7 +70,7 @@ All analysis is non-execution: HADES reads file structure and metadata without r
 
 ## Features by Tier
 
-HADES is available in three tiers. All tiers include the full installation — your license key determines which features are active.
+HADES is available in three tiers. The same binary ships to all tiers; your license key determines which features are active. Community (Free) tier users get a license key that unlocks the core scanning features below at no charge.
 
 | Feature | Free | Professional | Enterprise |
 |---------|:----:|:------------:|:----------:|
@@ -112,68 +115,53 @@ HADES is available in three tiers. All tiers include the full installation — y
 | Kubernetes Helm chart with HPA | | | x |
 | Docker Compose HA deployments | | | x |
 
-To upgrade, set your license key:
+To activate or change your tier, set your license key:
 
 ```bash
-# Via environment variable
+# Via environment variable (one-shot)
 export HADES_LICENSE_KEY=HADES-PRO-XXXX-XXXX
 
-# Or via CLI flag
-hades-enhanced --license-key HADES-PRO-XXXX-XXXX --serve
+# Persistent across sessions (recommended)
+mkdir -p ~/.hades && chmod 700 ~/.hades
+echo "HADES_LICENSE_KEY=HADES-PRO-XXXX-XXXX" > ~/.hades/.env
+chmod 600 ~/.hades/.env
 
-# Check current license
-hades-enhanced --license-info
+# Verify the loaded tier
+hades --version          # banner shows current tier
 ```
 
 ---
 
-## Installation Options
+## Installation Paths
 
-### Cloudsmith (Recommended)
+Two paths, both gated by the customer portal:
 
-```bash
-# Configure the private registry (one-time)
-pip config set global.extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
+### Path A: direct download from the portal (canonical)
 
-# Core scanner
-pip install hades-scanner
-
-# With specific extras
-pip install "hades-scanner[api]"           # REST API
-pip install "hades-scanner[yara]"          # YARA support
-pip install "hades-scanner[ml]"            # ML detection
-pip install "hades-scanner[enterprise]"    # RBAC, SSO, PostgreSQL, Redis
-pip install "hades-scanner[observability]" # Prometheus metrics
-pip install "hades-scanner[full]"          # Everything
-```
-
-### Docker
+The most direct flow. License key in `Authorization: Bearer`, signed binary out, no source access required.
 
 ```bash
-# Build the image
-docker build -f docker/hades-full.dockerfile -t hades-scanner:latest .
-
-# Run standalone
-docker run -p 8666:8666 hades-scanner:latest
-
-# Full stack with PostgreSQL, Redis, Prometheus, Grafana
-docker compose -f docker/docker-compose.full-stack.yml up -d
+export HADES_LICENSE_KEY="<paste from portal email>"
+curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  -o hades && chmod +x hades
 ```
 
-### Kubernetes (Helm)
+The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL to Cloudflare R2, and `curl` follows the redirect. The binary is RSA-PSS-signed and verifies its own integrity at first run.
+
+### Path B: Homebrew tap (macOS and Linux)
 
 ```bash
-helm install hades kubernetes/helm/hades \
-  --set api.replicas=3 \
-  --set workers.replicas=4 \
-  --set redis.url=redis://redis:6379
+export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
+brew tap DarkHorse-InfoSec/tap
+brew install DarkHorse-InfoSec/tap/hades-scanner
 ```
 
-### Homebrew (macOS)
+The formula uses `HadesPortalDownloadStrategy` to inject your license key as a Bearer token, hits the same portal endpoint as Path A, and stages the binary under `$(brew --prefix)/bin/hades`.
 
-```bash
-brew install hades-scanner
-```
+### Older install paths (no longer supported)
+
+Pre-v1.4 distribution via PyPI (`pip install hades-scanner`), Docker Hub images at `darkhorse-security/hades-scanner`, the Cloudsmith private registry, public source-clone, and standalone `brew install hades-scanner` (no tap) are all no longer supported. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 ---
 
@@ -181,46 +169,51 @@ brew install hades-scanner
 
 ```bash
 # Basic scanning
-hades file.jpg                                    # Scan single file
-hades -r /evidence/                               # Recursive directory scan
-hades -r -v --json /evidence/                     # Verbose JSON output
+hades scan file.jpg                                # Scan single file
+hades scan -r /evidence/                           # Recursive directory scan
+hades scan -r --json /evidence/                    # JSON output for downstream tools
 
-# Enhanced scanner
-hades-enhanced -r --file-types .jpg .png /path/   # Filter by file type
-hades-enhanced -r --ml-detect /evidence/          # ML anomaly detection
-hades-enhanced -r --ml-ensemble /evidence/        # ML ensemble (multi-model)
-hades-enhanced -r --behavioral /evidence/         # Campaign detection
-hades-enhanced -r --mitre-map /evidence/          # MITRE ATT&CK mapping
-hades-enhanced --async --concurrency 8 -r /dir/   # Async pipeline
+# Threat-intel-enriched scan (Pro+ tier; requires API keys in ~/.hades/.env)
+hades scan --threat-intel /path/to/sample.exe
 
-# API server
-hades-enhanced --serve --port 8666                # Start REST API
-hades-enhanced --serve --metrics                  # With Prometheus metrics
-hades-enhanced --serve --distributed              # With worker pool
+# YARA rule and IOC management
+hades rules list
+hades rules build --template <template-name>
 
-# Evidence management
-hades-enhanced --case-create "Investigation Name"
-hades-enhanced --case-id CASE_ID -r /evidence/
-hades-enhanced --audit-verify
-hades-enhanced --export-case CASE_ID
+# Evidence chain and case management (Pro+)
+hades case create "Investigation Name"
+hades case scan --case-id CASE_ID -r /evidence/
+hades case audit-verify
+hades case export --case-id CASE_ID --output /tmp/case.tar.gz
 
-# File monitoring
-hades-enhanced --monitor /path/to/watch --webhook https://hooks.example.com/alert
+# File monitoring (Pro+)
+hades monitor /path/to/watch --webhook https://hooks.example.com/alert
 
-# SIEM export
-hades-enhanced -r /evidence/ --siem-format cef
-hades-enhanced --monitor /watched/ --siem-format syslog --siem-target 10.0.0.50:514
+# SIEM export (Pro+)
+hades scan -r /evidence/ --siem-format cef
+hades monitor /watched/ --siem-format syslog --siem-target 10.0.0.50:514
 
-# Benchmarks
-hades-enhanced --benchmark
-hades-enhanced --benchmark-quick
+# Threat intel feed management (Pro+)
+hades intel update
+hades intel status
+
+# Diagnostics
+hades doctor                                       # ~25 environment probes
+hades --version                                    # version + tier banner
+```
+
+For the full subcommand list:
+
+```bash
+hades --help
+hades <subcommand> --help
 ```
 
 ---
 
 ## API Endpoints
 
-The REST API runs at `http://localhost:8666` by default.
+The REST API runs at `http://localhost:8666` by default. Start with `hades-server --port 8666`.
 
 | Endpoint | Method | Tier | Description |
 |----------|--------|------|-------------|
@@ -262,7 +255,7 @@ The REST API runs at `http://localhost:8666` by default.
 File Input
     |
     v
-[Metadata Extraction] -- ExifTool persistent process pool
+[Metadata Extraction] -- ExifTool (bundled)
     |
     v
 [YARA Pattern Matching] -- 7 rule sets, 50+ rules
@@ -274,16 +267,16 @@ File Input
 [Deep Format Analysis] -- PDF, Office, SVG, polyglot
     |
     v
-[ML Anomaly Detection] -- Isolation Forest + Random Forest + XGBoost
+[ML Anomaly Detection] -- Isolation Forest + Random Forest + XGBoost (Pro+)
     |
     v
-[Behavioral Analysis] -- Campaign correlation, IOC graph
+[Behavioral Analysis] -- Campaign correlation, IOC graph (Pro+)
     |
     v
-[Threat Intel Enrichment] -- VirusTotal, AbuseIPDB, OTX, MalwareBazaar
+[Threat Intel Enrichment] -- VirusTotal, AbuseIPDB, OTX, MalwareBazaar (Pro+)
     |
     v
-[MITRE ATT&CK Mapping] -- Technique and tactic classification
+[MITRE ATT&CK Mapping] -- Technique and tactic classification (Pro+)
     |
     v
 [Unified Threat Score] -- 0-100 composite score with severity level
@@ -291,71 +284,33 @@ File Input
 
 ---
 
-## Plugin Development
+## System Requirements
 
-Create a `.py` file in `plugins/` that subclasses `HADESPlugin`:
+A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, ExifTool, YARA engine, and all dependencies bundled inline, so the host needs no pre-installed runtime.
 
-```python
-from core.plugin_api import HADESPlugin, Finding
+| OS | Status |
+|---|---|
+| Linux x86_64 (glibc 2.31+) | Path A + Path B (via Linuxbrew) |
+| macOS Intel (10.15+) | Path B today; Path A binary on 2026-Q3 roadmap |
+| macOS Apple Silicon (11.0+) | Path B today; Path A binary on 2026-Q3 roadmap |
+| Windows 10 / 11 / Server 2019+ | Pending code-signing cert acquisition |
 
-class MyDetector(HADESPlugin):
-    @property
-    def name(self): return "my-detector"
-
-    @property
-    def version(self): return "1.0.0"
-
-    @property
-    def author(self): return "Your Name"
-
-    def initialize(self): pass
-
-    def supported_file_types(self):
-        return [".jpg", ".png"]
-
-    def analyze(self, file_path, metadata):
-        findings = []
-        # Your detection logic here
-        if suspicious_condition:
-            findings.append(Finding(
-                title="Suspicious Pattern",
-                description="Details...",
-                severity=7.5,
-                category="custom",
-            ))
-        return findings
-
-    def cleanup(self): pass
-```
-
-See `docs/plugin_development_guide.md` for the full walkthrough.
+Pro+ tier features (Redis caching, PostgreSQL backend, Prometheus metrics, distributed workers) optionally use external services that you provision in your own infrastructure; the HADES binary connects to them but does not embed them.
 
 ---
 
 ## Feedback & Support
 
-- **Bug reports**: Submit via the issue tracker
-- **Security vulnerabilities**: Email info@darkhorsesecurity.com (do not file public issues)
-- **Feature requests**: Submit via the issue tracker
-- **Custom plugins**: See `docs/plugin_authoring_guide.md` for the plugin development guide
-
----
-
-## Requirements
-
-- Python 3.8+
-- ExifTool (for metadata extraction)
-- Optional: YARA (`yara-python` for pattern matching)
-- Optional: Docker (for sandbox and deployment)
-- Optional: Redis (for caching and distributed mode)
-- Optional: PostgreSQL (for enterprise data storage)
-- Optional: `prometheus_client` (for metrics)
+- **Bug reports:** Submit via the issue tracker on GitHub
+- **Security vulnerabilities:** Email `security@darkhorseinfosec.com` (do not file public issues)
+- **Feature requests:** Submit via the issue tracker
+- **Custom plugins:** See `docs/plugin_development_guide.md` for the plugin development guide
 
 ---
 
 ## License
 
-Proprietary License. See [LICENSE](LICENSE) for the full license agreement.
+Proprietary License. See [LICENSE](LICENSE) for the full license agreement. Source code, YARA rule sets, scoring algorithms, and ML feature definitions are also designated trade secrets under the Defend Trade Secrets Act of 2016 (18 U.S.C. Sections 1836-1839) and corresponding state Uniform Trade Secrets Act statutes; see `TRADE_SECRETS.md` in the source repository for the formal designation. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 Copyright (c) 2024-2026 DarkHorse Information Security LLC. All rights reserved.
 
@@ -366,7 +321,9 @@ Copyright (c) 2024-2026 DarkHorse Information Security LLC. All rights reserved.
 - Repository: https://github.com/DarkHorse-InfoSec/hades-docs
 - Documentation: https://github.com/DarkHorse-InfoSec/hades-docs/tree/main/docs
 - Issue Tracker: https://github.com/DarkHorse-InfoSec/hades-docs/issues
-- Package Registry: https://cloudsmith.io/~darkhorse/repos/hades/packages/
+- Customer portal: https://portal.darkhorseinfosec.com
+- Live demo: https://demo.darkhorseinfosec.com
+- Marketing site: https://darkhorseinfosec.com/hades
 - Changelog: https://github.com/DarkHorse-InfoSec/hades-docs/blob/main/CHANGELOG.md
 
 ---

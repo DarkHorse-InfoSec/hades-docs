@@ -3,6 +3,8 @@ Version: 1.0.0
 
 DarkHorse Information Security LLC
 
+> **NOTICE (2026-05-06):** This checklist remains structurally accurate, but its install-related items reference the pre-v1.4 distribution model (`pip install "hades-scanner[observability]"` etc.). Those commands no longer apply. HADES now ships as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or Homebrew tap (Path B); all dependencies including the observability stack are bundled inline. The operational items (monitoring, backup, RBAC, SSO, network policy, etc.) below are still the right boxes to check; only the install steps have changed. See [Installation Guide](installation.md) for current install paths.
+
 ---
 
 This checklist covers the critical steps required to deploy HADES in a production environment. Each section contains actionable steps with example commands. Complete every section before exposing the service to production traffic.

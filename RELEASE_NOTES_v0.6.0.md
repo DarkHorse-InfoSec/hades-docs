@@ -2,6 +2,8 @@
 
 **Release Date:** 2026-02-19
 
+> **HISTORICAL NOTICE (added 2026-05-06):** This release note describes HADES under the pre-v1.4 distribution model (Cloudsmith pip registry, optional dependency groups, Docker Hub images, public source-clone). **Those install paths no longer work.** Cloudsmith Free plan stopped allowing RAW packages on 2026-04-29; HADES now ships exclusively as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or the Homebrew tap (Path B). For current installation, see the [Installation Guide](docs/installation.md). The features described below were accurate as of v0.6.0; many have evolved or been replaced in subsequent releases through v1.4.2.
+
 HADES v0.6.0 is the largest release to date, spanning three development phases that add enterprise-grade security infrastructure, dramatically deeper detection capabilities, and a community ecosystem for plugins and documentation. Enterprise deployments gain RBAC, SSO, PostgreSQL, Redis, field-level encryption, and multi-tenant isolation. Detection depth improves with a three-model ML ensemble, behavioral campaign analysis, MITRE ATT&CK mapping, and automated threat feed ingestion. A new documentation site, plugin marketplace, YARA contribution workflow, and GitHub Actions CI/CD round out the release.
 
 All new features are opt-in. Existing v0.5.0 configurations and workflows continue to work without modification.

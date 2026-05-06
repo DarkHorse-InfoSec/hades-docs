@@ -1,5 +1,7 @@
 # Changelog
 
+> **NOTICE (2026-05-06):** Entries below v1.4 reference the pre-v1.4 distribution model (Cloudsmith pip registry, Docker Hub, optional dependency groups). Those install paths no longer work; HADES has shipped exclusively as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or Homebrew tap (Path B) since v1.4.1. Pre-v1.4 entries remain for historical reference. See [docs/installation.md](docs/installation.md) for current install paths.
+
 All notable changes to HADES will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

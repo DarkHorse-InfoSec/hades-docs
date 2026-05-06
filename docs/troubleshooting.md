@@ -3,6 +3,8 @@ Version: 1.0.0
 
 Author: DarkHorse Information Security LLC
 
+> **NOTICE (2026-05-06):** This troubleshooting guide remains accurate for runtime / configuration / scan-result issues, but its install-related sections reference the pre-v1.4 distribution model (`pip install "hades-scanner[integrations]"` etc.). Those commands no longer apply. HADES now ships as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or Homebrew tap (Path B); all dependencies are bundled inline. If a troubleshooting step below tells you to install a missing optional dependency via pip, that step is stale -- the dependency is already in the binary. The actual fix is usually environment-related (license key not loaded, port already in use, RBAC misconfig, etc.). See [Installation Guide](installation.md) for install issues; everything else in this guide remains applicable.
+
 This guide covers common issues encountered when installing, configuring, and operating HADES. Each entry provides the symptom, likely root cause, and resolution steps.
 
 ---

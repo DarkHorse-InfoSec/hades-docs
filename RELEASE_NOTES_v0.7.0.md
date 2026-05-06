@@ -2,6 +2,8 @@
 
 **Release Date:** 2026-02-21
 
+> **HISTORICAL NOTICE (added 2026-05-06):** This release note describes HADES under the pre-v1.4 distribution model (Cloudsmith pip registry, optional dependency groups, Docker Hub images, public source-clone). **Those install paths no longer work.** Cloudsmith Free plan stopped allowing RAW packages on 2026-04-29; HADES now ships exclusively as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or the Homebrew tap (Path B). For current installation, see the [Installation Guide](docs/installation.md). The features described below were accurate as of v0.7.0; many have evolved or been replaced in subsequent releases through v1.4.2.
+
 HADES v0.7.0 is the performance release, delivering an async scan pipeline, distributed worker pool, scan result caching, a pipeline profiler, and Docker scaling infrastructure. Deployments can now scale from a single-process CLI to horizontally distributed clusters with Redis coordination, nginx load balancing, and dedicated worker containers.
 
 All new features are opt-in. Existing v0.6.0 configurations and workflows continue to work without modification.

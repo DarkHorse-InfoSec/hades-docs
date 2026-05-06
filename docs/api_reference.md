@@ -1110,7 +1110,7 @@ curl -H "X-API-Key: your-api-key-here" \
 
 The threat intelligence endpoints provide cloud-based IOC lookups, cache management, enrichment, and feed scheduling powered by `core/cloud_threat_intel.py` and `core/threat_intel_scheduler.py`.
 
-**Requirements:** The `requests` Python package must be installed (`pip install requests`). Provider API keys must be configured in `cli/hades_config.json` under `threat_intel.providers`.
+**Requirements:** Provider API keys must be configured in `~/.hades/.env` under the relevant `*_API_KEY` env vars (or in `cli/hades_config.json` under `threat_intel.providers` for legacy-config installs). The `requests` HTTP client and all other dependencies are bundled inline in the Nuitka binary as of v1.4.x; you do NOT need to `pip install requests` separately.
 
 ---
 
@@ -1694,7 +1694,7 @@ curl -H "X-API-Key: your-api-key-here" \
 
 The monitoring endpoints manage a real-time file watcher powered by `core/file_monitor.py`. When running, the monitor watches directories for new or modified files, automatically scans them through both `ExifScanner` and `EnhancedDetectionEngine`, and generates alerts (JSON Lines log + optional webhook) when threat scores exceed a configurable threshold.
 
-**Requirements:** The `watchdog` Python package must be installed (`pip install watchdog>=3.0.0`). The `requests` package is optional and only needed for webhook delivery.
+**Requirements:** The `watchdog` and `requests` Python packages are both bundled inline in the Nuitka binary as of v1.4.x; you do NOT need to `pip install` anything separately. Webhook delivery is enabled out-of-the-box. (The pre-v1.4 distribution model required these as optional dependency groups; that is no longer the case.)
 
 ---
 

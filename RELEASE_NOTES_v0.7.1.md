@@ -2,6 +2,8 @@
 
 **Release Date:** 2026-02-21
 
+> **HISTORICAL NOTICE (added 2026-05-06):** This release note describes HADES under the pre-v1.4 distribution model (Cloudsmith pip registry, optional dependency groups, Docker Hub images, public source-clone). **Those install paths no longer work.** Cloudsmith Free plan stopped allowing RAW packages on 2026-04-29; HADES now ships exclusively as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or the Homebrew tap (Path B). For current installation, see the [Installation Guide](docs/installation.md). The features described below were accurate as of v0.7.1; many have evolved or been replaced in subsequent releases through v1.4.2.
+
 HADES v0.7.1 adds production-grade observability with Prometheus metrics, pre-configured Grafana dashboards, alerting rules, and Kubernetes deployment support via Helm and Kustomize. Operators can now monitor scan throughput, pipeline stage timing, worker pool health, cache efficiency, and API performance in real time -- and deploy HADES on Kubernetes with horizontal pod autoscaling, ingress, and ServiceMonitor integration out of the box.
 
 All new features are opt-in. Existing v0.7.0 configurations and workflows continue to work without modification.

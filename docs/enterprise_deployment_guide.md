@@ -1,5 +1,7 @@
 # Enterprise Deployment Guide
 
+> **NOTICE (2026-05-06):** This guide describes Enterprise features that remain in HADES, but its install instructions reference the pre-v1.4 distribution model (`pip install "hades-scanner[enterprise]"` etc.). Those commands no longer apply. HADES Enterprise tier is now activated by purchasing/upgrading your license key in the customer portal -- the same Nuitka binary that ships to all tiers (v1.4.2) becomes the Enterprise binary when the license key has Enterprise entitlements. RBAC, SSO, PostgreSQL backend, Redis caching, encryption at rest, multi-tenancy, and Kubernetes deployment manifests are all available; the application code and operator-facing configuration described below remain the right setup pattern. See [Installation Guide](installation.md) for the binary-install paths (Path A portal direct download or Path B Homebrew tap), then return here for the enterprise-specific configuration.
+
 HADES v0.7.1 enterprise features: RBAC, SSO, PostgreSQL, Redis, encryption at rest, multi-tenancy, license management, Prometheus observability, and Kubernetes deployment. All enterprise features are optional and backward compatible with previous deployments.
 
 ## Table of Contents

@@ -2,6 +2,8 @@
 
 **Release Date:** 2026-02-19
 
+> **HISTORICAL NOTICE (added 2026-05-06):** This release note describes HADES under the pre-v1.4 distribution model (Cloudsmith pip registry, optional dependency groups, Docker Hub images, public source-clone). **Those install paths no longer work.** Cloudsmith Free plan stopped allowing RAW packages on 2026-04-29; HADES now ships exclusively as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or the Homebrew tap (Path B). For current installation, see the [Installation Guide](docs/installation.md). The features described below were accurate as of v0.5.0; many have evolved or been replaced in subsequent releases through v1.4.2.
+
 HADES v0.5.0 is a major release that completes the transition from a CLI scanning tool to a production-grade forensics platform. The REST API has been rebuilt on FastAPI with WebSocket support, a full evidence chain with case management enables courtroom-ready forensic workflows, and a self-contained web dashboard provides browser-based access to every feature. Security hardening, deep file format analysis, and an expanded YARA rule repository round out the release.
 
 ## What's New
