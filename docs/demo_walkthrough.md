@@ -23,7 +23,7 @@ mkdir -p demo_workspace/evidence demo_workspace/clean demo_workspace/reports
 
 ## 1. Generate Test Corpus
 
-**What:** Create files with weaponised metadata for scanning. No real malware is involved — these are crafted JPEG/PDF/SVG files with attack payloads injected into metadata fields only.
+**What:** Create files with weaponised metadata for scanning. No real malware is involved; these are crafted JPEG/PDF/SVG files with attack payloads injected into metadata fields only.
 
 **Command:**
 
@@ -59,12 +59,12 @@ print('Corpus generated: 8 malicious + 4 clean files.')
 **Talking points:**
 - HADES includes a built-in corpus generator with 28+ attack variants
 - Attack categories: EXIF injection, document threats, polyglot files
-- Each file is a valid image/document — the attacks hide in metadata
+- Each file is a valid image/document; the attacks hide in metadata
 - Clean baseline files verify zero false positives
 
 ---
 
-## 2. Single File Scan — PHP Backdoor
+## 2. Single File Scan: PHP Backdoor
 
 **What:** Scan a JPEG that has `<?php system($_GET['cmd']); ?>` injected into its EXIF Artist field.
 
@@ -78,13 +78,13 @@ python cli/hades_cli.py demo_workspace/evidence/exif_php_backdoor.jpg -v
 
 **Talking points:**
 - HADES examines metadata without executing the file
-- The PHP payload is embedded in a standard EXIF field — invisible to normal image viewers
+- The PHP payload is embedded in a standard EXIF field, invisible to normal image viewers
 - This technique is used in real attacks: uploaded "images" that execute as PHP on misconfigured servers
 - Detection is pattern-based (regex + heuristics), not signature-only
 
 ---
 
-## 3. Directory Scan — All Evidence Files
+## 3. Directory Scan: All Evidence Files
 
 **What:** Recursively scan the entire evidence directory to detect all 8 threat types at once.
 
@@ -113,7 +113,7 @@ python cli/hades_cli.py -r -v demo_workspace/evidence/
 
 ---
 
-## 4. Clean File Validation — Zero False Positives
+## 4. Clean File Validation: Zero False Positives
 
 **What:** Scan legitimate files to verify HADES does not produce false alarms.
 
@@ -145,14 +145,14 @@ python cli/hades_cli.py -a demo_workspace/evidence/exif_php_backdoor.jpg -v
 **Expected output:** Additional YARA-based detections fire alongside the heuristic findings. Rule names and severity levels are displayed.
 
 **Talking points:**
-- HADES ships with 7 YARA rule files (see `rules/` directory):
-  - `enhanced_detection.yara` — reverse shells, suspicious metadata
-  - `advanced_threats.yar` — encoded payloads, web shells
-  - `enterprise_threats.yar` — ransomware, APT toolkits
-  - `steganography.yar` — hidden data in images
-  - `polyglot_detection.yar` — dual-format files
-  - `suspicious_metadata.yar` — anomalous field patterns
-  - `metadata_threats.yar` — embedded executables
+- HADES ships with 55 YARA rule files carrying 144 detection rules (see the `rules/` directory). The core packs:
+  - `enhanced_detection.yara`, reverse shells, suspicious metadata
+  - `advanced_threats.yar`, encoded payloads, web shells
+  - `enterprise_threats.yar`, ransomware, APT toolkits
+  - `steganography.yar`, hidden data in images
+  - `polyglot_detection.yar`, dual-format files
+  - `suspicious_metadata.yar`, anomalous field patterns
+  - `metadata_threats.yar`, embedded executables
 - Custom rules can be added to `rules/` or passed via `--yara-rules`
 - Validate rules: `python scripts/validate_rules.py`
 
@@ -296,7 +296,7 @@ kill %1
 4. Navigate sections: Scan, Monitor, Cases, Audit Trail, System
 
 **Talking points:**
-- Self-contained vanilla HTML/CSS/JS — no external CDN dependencies
+- Self-contained vanilla HTML/CSS/JS, no external CDN dependencies
 - Dark theme (#1a1a2e) with threat-level color coding
 - Drag-and-drop file upload for scanning
 - Live WebSocket updates for monitoring alerts
@@ -430,7 +430,7 @@ python -m pytest core/ cli/ config/ plugins/ tests/ -v --tb=short
 - Tests cover: metadata parsing, detection engine, YARA rules, REST API, evidence chain, file monitoring, plugins, SIEM, threat intel, ML, security middleware, deep format analysis, all integrations
 - Corpus tests validate detection rates against real-world attack patterns
 - API tests use FastAPI TestClient for full endpoint coverage
-- All test files generate their own fixtures — no external dependencies
+- All test files generate their own fixtures, no external dependencies
 
 ---
 
@@ -447,7 +447,7 @@ rm -rf demo_workspace/
 ## Recording Tips
 
 ### Screen Recording (OBS, Camtasia, etc.)
-1. Use `scripts/demo_recording.sh` — it pauses between steps for you to narrate
+1. Use `scripts/demo_recording.sh`; it pauses between steps for you to narrate
 2. Set terminal font to 16-18pt for readability
 3. Use a dark terminal theme for contrast
 4. Record at 1080p or higher
@@ -461,5 +461,5 @@ rm -rf demo_workspace/
 
 ### Timing Adjustments
 Both scripts have configurable timing variables at the top:
-- `demo_recording.sh`: Interactive — you control the pace with ENTER
-- `demo_asciinema.sh`: Automated — adjust `TYPE_DELAY`, `LINE_PAUSE`, `SECTION_PAUSE`
+- `demo_recording.sh`: Interactive; you control the pace with ENTER
+- `demo_asciinema.sh`: Automated; adjust `TYPE_DELAY`, `LINE_PAUSE`, `SECTION_PAUSE`

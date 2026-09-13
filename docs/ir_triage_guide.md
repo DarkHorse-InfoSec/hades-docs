@@ -6,7 +6,7 @@ A practical guide for SOC analysts and incident responders using HADES to invest
 
 ## 1. Understanding Threat Scores
 
-HADES v1.1.0 uses an **enterprise two-axis scoring model** inspired by CrowdStrike and Palo Alto Networks. Every file is evaluated on two independent axes:
+HADES uses an **enterprise two-axis scoring model** inspired by CrowdStrike and Palo Alto Networks. Every file is evaluated on two independent axes:
 
 ### Confidence Level
 
@@ -18,7 +18,7 @@ How certain HADES is that the file is malicious.
 | **low** | Minor anomalies detected. Could be benign. |
 | **medium** | Multiple suspicious indicators. Warrants investigation. |
 | **high** | Strong evidence of malicious intent from multiple independent signals. |
-| **confirmed** | Definitive match — known malware signature, confirmed threat intel hit, or multiple high-confidence signals converging. |
+| **confirmed** | Definitive match, known malware signature, confirmed threat intel hit, or multiple high-confidence signals converging. |
 
 ### Severity Level
 
@@ -27,10 +27,10 @@ How dangerous the threat is if confirmed.
 | Level | Meaning |
 |-------|---------|
 | **informational** | Metadata oddity or structural note. No security impact. |
-| **low** | Minor risk — unusual metadata, low-confidence heuristic. |
-| **medium** | Moderate risk — suspicious scripts, encoded content, evasion indicators. |
-| **high** | Serious threat — exploits, RATs, stealers, C2 beacons, offensive tools. |
-| **critical** | Destructive/Impact-stage threat — ransomware, wipers, destructive payloads. Requires MITRE ATT&CK Impact tactic indicators. |
+| **low** | Minor risk, unusual metadata, low-confidence heuristic. |
+| **medium** | Moderate risk, suspicious scripts, encoded content, evasion indicators. |
+| **high** | Serious threat, exploits, RATs, stealers, C2 beacons, offensive tools. |
+| **critical** | Destructive/Impact-stage threat, ransomware, wipers, destructive payloads. Requires MITRE ATT&CK Impact tactic indicators. |
 
 **Key rule: CRITICAL severity is reserved for Impact-stage threats.** YARA matches and heuristic findings alone cap at HIGH severity. Only the presence of MITRE ATT&CK Impact tactic indicators (ransomware behavior, data destruction, disk wiping) boosts severity to CRITICAL.
 
@@ -57,21 +57,21 @@ The `overall_threat_score` (0-100) and `threat_level` (SAFE/LOW/MEDIUM/HIGH/CRIT
 
 | Severity | Confidence | Action |
 |----------|------------|--------|
-| **critical** | high/confirmed | **P1 — Immediate containment.** Ransomware/wiper confirmed. Isolate host, preserve evidence, activate IR playbook. |
-| **high** | high/confirmed | **P2 — Escalate immediately.** Confirmed malicious (exploit, RAT, stealer). Scope exposure, block IOCs. |
-| **high** | medium | **P2 — Investigate within 1 hour.** Strong suspicion. Deep analysis needed to confirm. |
-| **high** | low | **P3 — Review within 4 hours.** Suspicious characteristics but low certainty. |
-| **medium** | any | **P3 — Investigate when possible.** Suspicious indicators present but not conclusive. Check source context. |
-| **low** | any | **P4 — Monitor.** Minor anomalies. Only escalate if part of a larger incident pattern. |
+| **critical** | high/confirmed | **P1: Immediate containment.** Ransomware/wiper confirmed. Isolate host, preserve evidence, activate IR playbook. |
+| **high** | high/confirmed | **P2: Escalate immediately.** Confirmed malicious (exploit, RAT, stealer). Scope exposure, block IOCs. |
+| **high** | medium | **P2: Investigate within 1 hour.** Strong suspicion. Deep analysis needed to confirm. |
+| **high** | low | **P3: Review within 4 hours.** Suspicious characteristics but low certainty. |
+| **medium** | any | **P3: Investigate when possible.** Suspicious indicators present but not conclusive. Check source context. |
+| **low** | any | **P4: Monitor.** Minor anomalies. Only escalate if part of a larger incident pattern. |
 | **informational** | any | **No action.** Metadata note for forensic record. |
 
 ### SIEM Alert Fields
 
 HADES scan results now include both legacy and two-axis fields:
-- `hades.confidence_level` — none / low / medium / high / confirmed
-- `hades.severity_level` — informational / low / medium / high / critical
-- `hades.threat_score` — 0-100 (backward compatible)
-- `hades.threat_level` — SAFE/LOW/MEDIUM/HIGH/CRITICAL (backward compatible)
+- `hades.confidence_level`, none / low / medium / high / confirmed
+- `hades.severity_level`, informational / low / medium / high / critical
+- `hades.threat_score`, 0-100 (backward compatible)
+- `hades.threat_level`, SAFE/LOW/MEDIUM/HIGH/CRITICAL (backward compatible)
 
 ---
 
@@ -92,32 +92,32 @@ hades scan /path/to/file --deep-format --include-metadata -v
 
 ### Step 2: Interpret Results
 
-**CRITICAL severity + high/confirmed confidence — Impact-Stage Threat (ransomware, wiper)**
+**CRITICAL severity + high/confirmed confidence, Impact-Stage Threat (ransomware, wiper)**
 1. Do NOT open the file on any production system
-2. Activate your IR playbook immediately — this indicates a destructive threat
+2. Activate your IR playbook immediately; this indicates a destructive threat
 3. Record the SHA256 hash: `sha256sum <file>`
 4. Check if the hash matches known malware: `hades intel lookup --hash <sha256>`
 5. Create a case: `hades case create --name "INC-2026-001" --severity critical`
 6. Add the evidence: `hades case add-evidence --case INC-2026-001 --file <path>`
 7. Proceed to containment (Step 3)
 
-**HIGH severity + high/confirmed confidence — Confirmed Malicious**
-1. Review the specific findings in the scan output — check `confidence_level` and `severity_level` fields
+**HIGH severity + high/confirmed confidence, Confirmed Malicious**
+1. Review the specific findings in the scan output, check `confidence_level` and `severity_level` fields
 2. Look for: embedded executables, suspicious macros, encoded payloads, auto-open actions
 3. Cross-reference with threat intel: `hades intel lookup --hash <sha256>`
 4. If MITRE Impact indicators emerge: treat as CRITICAL
 5. If confirmed non-destructive malware: scope exposure, block IOCs, create case
 6. If uncertain: proceed to deep analysis (Step 4)
 
-**HIGH severity + medium/low confidence — Suspicious, Needs Confirmation**
+**HIGH severity + medium/low confidence, Suspicious, Needs Confirmation**
 1. The file has characteristics of a serious threat but confidence is not yet high
 2. Perform deep analysis (Step 4) to gather more signals
 3. Cross-reference with threat intel
 4. If confidence increases: escalate per above
 5. If confidence does not increase: document and monitor
 
-**MEDIUM severity — Investigate**
-1. Review findings — what triggered the score?
+**MEDIUM severity, Investigate**
+1. Review findings, what triggered the score?
 2. Common benign causes at this level:
    - Password-protected archives (detected as encrypted container)
    - Files with high entropy (could be legitimate compression)
@@ -126,8 +126,8 @@ hades scan /path/to/file --deep-format --include-metadata -v
 4. If from untrusted source: proceed to deep analysis (Step 4)
 5. If from trusted source: document and close
 
-**LOW severity — Minor Anomalies**
-1. Review briefly — usually benign with minor metadata oddities
+**LOW severity: Minor Anomalies**
+1. Review briefly, usually benign with minor metadata oddities
 2. Common causes: unusual EXIF data, GPS coordinates in images, long metadata strings
 3. Only escalate if part of a larger incident pattern
 
@@ -238,7 +238,7 @@ This re-hashes all evidence files and compares against the recorded chain. Any m
 
 1. Scan: `hades scan delivery.iso --deep-format -v`
 2. Look for: embedded executables, LNK shortcuts, batch scripts inside the image
-3. This is a common MOTW bypass technique — the ISO bypasses Windows security warnings
+3. This is a common MOTW bypass technique, the ISO bypasses Windows security warnings
 4. If malicious: search for similar ISO hashes across your environment
 
 ### Scenario D: Ransomware Sample Analysis
@@ -276,24 +276,24 @@ hades scan <file> --siem-export --format sentinel
 ### Alert Fields
 
 HADES SIEM alerts include:
-- `hades.confidence_level` — none/low/medium/high/confirmed (two-axis model)
-- `hades.severity_level` — informational/low/medium/high/critical (two-axis model)
-- `hades.threat_score` — 0-100 score (backward compatible, derived from confidence x severity)
-- `hades.threat_level` — SAFE/LOW/MEDIUM/HIGH/CRITICAL (backward compatible)
-- `hades.yara_matches[]` — list of triggered YARA rules
-- `hades.heuristic_findings[]` — list of heuristic detections
-- `hades.file.sha256` — file hash for correlation
-- `hades.file.type` — detected file type
-- `hades.mitre_techniques[]` — mapped MITRE ATT&CK techniques
+- `hades.confidence_level`, none/low/medium/high/confirmed (two-axis model)
+- `hades.severity_level`, informational/low/medium/high/critical (two-axis model)
+- `hades.threat_score`, 0-100 score (backward compatible, derived from confidence x severity)
+- `hades.threat_level`, SAFE/LOW/MEDIUM/HIGH/CRITICAL (backward compatible)
+- `hades.yara_matches[]`, list of triggered YARA rules
+- `hades.heuristic_findings[]`, list of heuristic detections
+- `hades.file.sha256`, file hash for correlation
+- `hades.file.type`, detected file type
+- `hades.mitre_techniques[]`, mapped MITRE ATT&CK techniques
 
 ### Recommended SIEM Alerts
 
 | Alert Name | Condition | Priority |
 |------------|-----------|----------|
-| HADES Critical Detection | `hades.severity_level = "critical"` | P1 — Immediate (Impact-stage threat) |
-| HADES High Confirmed | `hades.severity_level = "high" AND hades.confidence_level IN ("high","confirmed")` | P2 — 1 hour |
-| HADES Encrypted Container | `hades.heuristic_findings contains "encrypted"` | P3 — Review |
-| HADES Polyglot File | `hades.heuristic_findings contains "polyglot"` | P2 — 1 hour |
+| HADES Critical Detection | `hades.severity_level = "critical"` | P1, Immediate (Impact-stage threat) |
+| HADES High Confirmed | `hades.severity_level = "high" AND hades.confidence_level IN ("high","confirmed")` | P2, 1 hour |
+| HADES Encrypted Container | `hades.heuristic_findings contains "encrypted"` | P3, Review |
+| HADES Polyglot File | `hades.heuristic_findings contains "polyglot"` | P2, 1 hour |
 
 ---
 
@@ -315,7 +315,7 @@ HADES SIEM alerts include:
 
 ### File Types HADES Detects
 
-HADES has been validated against 15,852+ real-world malware samples across 45+ file types with a 98.8% detection rate, including:
+HADES analyzes 45+ file types, including:
 
 **Documents:** PDF, DOC/DOCX/DOCM, XLS/XLSX/XLSM, PPT/PPTX, RTF, OneNote
 **Executables:** EXE, DLL, SYS, OCX, ELF, Mach-O, APK

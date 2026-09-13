@@ -1,8 +1,12 @@
 # YARA Rule Repository
 
-The HADES YARA rule repository contains 41+ detection rules across 7 rule files, all purpose-built for identifying threats hidden in file metadata, embedded payloads, polyglot files, and other attack vectors that traditional file scanners miss.
+The HADES YARA rule repository contains 144 detection rules across 55 rule files, all purpose-built for identifying threats hidden in file metadata, embedded payloads, polyglot files, and other attack vectors that traditional file scanners miss.
 
 ## Repository Structure
+
+The tree below lists the core packs. The full shipped ruleset is 144 detection
+rules across 55 rule files; the 41 per-family packs merged from the DEF CON 34
+rule set in v1.7.0 are not listed individually here.
 
 ```
 rules/

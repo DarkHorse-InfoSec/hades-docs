@@ -1,4 +1,4 @@
-# HADES — Hidden Artifact Detection & EXIF Scanner
+# HADES: Hidden Artifact Detection & EXIF Scanner
 
 **The metadata forensics engine for security professionals.**
 
@@ -39,7 +39,7 @@ HADES scans files for hidden threats buried in metadata, detects malicious patte
 - **REST API + Web Dashboard + CLI** -- FastAPI server with WebSocket support, browser-based dashboard, and full-featured command line interface
 - **Plugin system** -- Extensible detection framework with marketplace, hot-reload, and sandboxed execution
 
-HADES covers 32 forensic detection categories across images, documents, archives, audio, video, firmware, and streaming formats with 15+ YARA rule files.
+HADES covers 32 forensic detection categories across images, documents, archives, audio, video, firmware, and streaming formats with 55 YARA rule files carrying 144 detection rules.
 
 ---
 
@@ -49,7 +49,7 @@ HADES covers 32 forensic detection categories across images, documents, archives
 # Path A: direct download from the customer portal (Linux x86_64 today)
 export HADES_LICENSE_KEY="<paste from portal email>"
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
-  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 
 # Or Path B: Homebrew tap (macOS and Linux)

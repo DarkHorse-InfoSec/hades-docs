@@ -1,6 +1,6 @@
 # HADES Performance Guide
 
-> **NOTICE (2026-05-06):** This guide describes performance characteristics, tuning patterns, and deployment topologies that remain accurate for the current Nuitka-compiled binary distribution (v1.4.2). References below to `pip install "hades-scanner[full]"` or `pip install "hades-scanner[observability]"` no longer apply; the Nuitka binary bundles all dependencies inline. See [Installation Guide](installation.md) for current install paths (Path A direct portal download, Path B Homebrew tap). The performance numbers and tuning recommendations below are still applicable to the current binary; HADES kept the same async pipeline + worker pool architecture across the v0.7 -> v1.4 distribution-model transition.
+> **NOTICE (2026-05-06):** This guide describes performance characteristics, tuning patterns, and deployment topologies that remain accurate for the current Nuitka-compiled binary distribution. References below to `pip install "hades-scanner[full]"` or `pip install "hades-scanner[observability]"` no longer apply; the Nuitka binary bundles all dependencies inline. See [Installation Guide](installation.md) for current install paths (Path A direct portal download, Path B Homebrew tap). The performance numbers and tuning recommendations below are still applicable to the current binary; HADES kept the same async pipeline + worker pool architecture across the v0.7 -> v1.4 distribution-model transition.
 
 This guide covers performance tuning, deployment patterns, benchmarking, and monitoring for HADES metadata forensics engine.
 
@@ -258,7 +258,7 @@ Returns:
     "uptime_seconds": 3600,
     "scans_completed": 12500,
     "engine": "ready",
-    "yara_rules_loaded": 42,
+    "yara_rules_loaded": 144,
     "plugins_loaded": 5
 }
 ```

@@ -359,7 +359,7 @@ Each analyzer contributes `FormatFinding` instances that are merged into the mai
 
 `security_middleware.py` provides reusable security primitives used across the API and detection layers. Recent additions include:
 
-- **Unicode homoglyph detection**: Identifies 39 confusable character substitutions (e.g., Cyrillic `а` for Latin `a`) and 15 bidirectional control characters (RLO, LRO, PDF, etc.) commonly used in filename spoofing and display-layer attacks.
+- **Unicode homoglyph detection**: Identifies 39 confusable character substitutions (e.g., Cyrillic `U+0430` for Latin `a`) and 15 bidirectional control characters (RLO, LRO, PDF, etc.) commonly used in filename spoofing and display-layer attacks.
 - **MIME/extension/magic consistency validation**: Cross-checks the declared MIME type, file extension, and magic byte signature to detect mismatches that indicate file type masquerading.
 - **Script encoding trick detection**: Identifies encoding-based evasion techniques used to bypass content filters.
 
@@ -369,14 +369,14 @@ These checks complement the existing rate limiting, path traversal protection, u
 
 ## YARA Rule Repository
 
-The `rules/` directory contains YARA rules organized by threat category. Recent additions:
+The `rules/` directory holds 144 detection rules across 55 rule files, organized by
+threat category. Selected packs:
 
 | Rule File | Rules | Coverage |
 |-----------|-------|----------|
-| `zip_structure.yar` | 8 | Zombie ZIP entries, ZIP concatenation, ZIP bombs, CRC32 anomalies, local/central header mismatches, excessive file count, suspicious compression ratios, nested archives |
-| `pua_signatures.yar` | 7 | Potentially unwanted application signatures, adware indicators, bundler artifacts, toolbar installers, crypto miners, browser hijackers, tracking beacons |
+| `zip_structure.yar` | 9 | Zombie ZIP entries, ZIP concatenation, ZIP bombs, CRC32 anomalies, local/central header mismatches, excessive file count, suspicious compression ratios, nested archives, Gootloader ZIP bombs |
 
-These join the existing rule files: `enhanced_detection.yara`, `advanced_threats.yar`, `enterprise_threats.yar`, `steganography.yar`, `metadata_threats.yar`, `polyglot_detection.yar`, `suspicious_metadata.yar`, and `firmware_threats.yar`.
+These join `enhanced_detection.yara`, `advanced_threats.yar`, `enterprise_threats.yar`, `steganography.yar`, `metadata_threats.yar`, `polyglot_detection.yar`, `suspicious_metadata.yar`, `script_threats.yar`, `container_threats.yar`, `firmware_threats.yar`, `pdf_cve_threats.yar`, `pe_kernel_threats.yar`, `test_signatures.yar`, and the 41 per-family packs merged from the DEF CON 34 rule set in v1.7.0.
 
 ---
 

@@ -58,7 +58,7 @@ HADES ships as a single Nuitka-compiled binary with everything bundled (Python i
 # Path A: direct download from the portal (Linux x86_64 today; macOS + Windows on 2026-Q3 roadmap)
 export HADES_LICENSE_KEY="<paste from portal email>"
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
-  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 
 # Path B: Homebrew tap (macOS and Linux)
@@ -116,7 +116,7 @@ HADES occupies a distinct niche in the security tooling landscape. It is the onl
 |---|:---:|:---:|:---:|:---:|:---:|
 | Metadata extraction | Yes | Yes | Yes | Limited | Limited |
 | Metadata threat detection | **Yes** | No | No | File-level | Broad strokes |
-| Metadata-specific YARA rules | **41+ rules** | No | No | General rules | General rules |
+| Metadata-specific YARA rules | **144 rules** | No | No | General rules | General rules |
 | ML anomaly on metadata features | **Yes** | No | No | No | No |
 | Polyglot file detection | **Yes** | No | No | Limited | Yes |
 | Deep format analysis (PDF/Office/SVG) | **Yes** | No | Limited | Yes | Yes |
@@ -135,7 +135,7 @@ HADES occupies a distinct niche in the security tooling landscape. It is the onl
 | Metric | Value |
 |---|---|
 | Test suite | 1,781+ tests passing |
-| YARA rules | 41+ across 7 rule files |
+| YARA rules | 144 across 55 rule files |
 | Detection corpus TPR | 100% (28 attack samples) |
 | Detection corpus FPR | 0% (10 clean baselines) |
 | Supported file formats | 15+ (JPEG, PNG, GIF, TIFF, PDF, DOCX, SVG, MP4, MP3, ZIP, RAR, HTML, and more) |

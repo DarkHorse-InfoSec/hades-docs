@@ -45,7 +45,7 @@ HADES v1.0.0 is the first General Availability release. All core technical featu
 | Test failures | 0 |
 | True Positive Rate | 97.78% |
 | False Positive Rate | 0% |
-| YARA rules | 41+ across 7 files |
+| YARA rules | 144 across 55 files |
 | API endpoints | 50+ |
 | Dashboard views | 16 |
 | Detection modules | 16 |
@@ -281,14 +281,14 @@ The technical product is feature-complete. The following business execution item
 
 | Priority | Item | Timeline |
 |----------|------|----------|
-| **P0 — Now** | Release packaging (Cloudsmith, Docker, tag) | Week 1 |
-| **P0 — Now** | Documentation site deployment | Week 1 |
-| **P1 — Soon** | Real-world malware validation (50+ samples) | Weeks 2-4 |
-| **P1 — Soon** | Live SIEM connector testing | Weeks 2-4 |
-| **P1 — Soon** | Security dependency audit | Week 2 |
-| **P2 — Next** | v1.1.0 feature development | Months 2-3 |
-| **P2 — Next** | Cloud deployment (Terraform) | Months 2-3 |
-| **P2 — Next** | Licensing and pricing | Month 2 |
-| **P3 — Later** | HADES-as-a-Service | Months 4-6 |
-| **P3 — Later** | Marketplace listings | Months 4-6 |
-| **P4 — Future** | v1.2.0 features (video, memory, notebooks) | Months 6+ |
+| **P0 : Now** | Release packaging (Cloudsmith, Docker, tag) | Week 1 |
+| **P0 : Now** | Documentation site deployment | Week 1 |
+| **P1 : Soon** | Real-world malware validation (50+ samples) | Weeks 2-4 |
+| **P1 : Soon** | Live SIEM connector testing | Weeks 2-4 |
+| **P1 : Soon** | Security dependency audit | Week 2 |
+| **P2 : Next** | v1.1.0 feature development | Months 2-3 |
+| **P2 : Next** | Cloud deployment (Terraform) | Months 2-3 |
+| **P2 : Next** | Licensing and pricing | Month 2 |
+| **P3 : Later** | HADES-as-a-Service | Months 4-6 |
+| **P3 : Later** | Marketplace listings | Months 4-6 |
+| **P4 : Future** | v1.2.0 features (video, memory, notebooks) | Months 6+ |

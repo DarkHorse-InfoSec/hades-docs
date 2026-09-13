@@ -13,7 +13,7 @@ export HADES_LICENSE_KEY="<paste from portal email>"
 
 # Linux x86_64
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
-  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 
 # (macOS and Windows binaries on R2 by 2026-Q3; until then, use Path B for macOS.)
@@ -47,7 +47,7 @@ After either path:
 
 ```bash
 hades --version
-# expect: HADES Enhanced Detection Engine v1.4.2
+# expect: HADES Enhanced Detection Engine v<current release>
 
 hades doctor
 # runs ~25 dependency probes + a Threat Intel section reporting which

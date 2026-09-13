@@ -16,7 +16,7 @@ HADES ships as a single Nuitka-compiled signed binary with everything bundled (P
 # Path A: direct download from the portal (Linux x86_64 today)
 export HADES_LICENSE_KEY="<paste from portal email>"
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
-  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 
 # Path B: Homebrew tap (macOS and Linux)
@@ -76,7 +76,7 @@ HADES is available in three tiers. The same binary ships to all tiers; your lice
 |---------|:----:|:------------:|:----------:|
 | **Core Scanning** | | | |
 | CLI scanner (single file, directory, recursive) | x | x | x |
-| YARA pattern matching with 7 rule sets | x | x | x |
+| YARA pattern matching, 144 rules across 55 rule files | x | x | x |
 | Deep format analysis (PDF, Office, SVG, polyglot) | x | x | x |
 | REST API server with WebSocket support | x | x | x |
 | Health check endpoint | x | x | x |
@@ -143,7 +143,7 @@ The most direct flow. License key in `Authorization: Bearer`, signed binary out,
 ```bash
 export HADES_LICENSE_KEY="<paste from portal email>"
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
-  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 ```
 
@@ -258,7 +258,7 @@ File Input
 [Metadata Extraction] -- ExifTool (bundled)
     |
     v
-[YARA Pattern Matching] -- 7 rule sets, 50+ rules
+[YARA Pattern Matching] -- 55 rule files, 144 rules
     |
     v
 [Heuristic Analysis] -- Script injection, encoding, anomalies

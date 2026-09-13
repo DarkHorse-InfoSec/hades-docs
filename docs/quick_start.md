@@ -27,7 +27,7 @@ export HADES_LICENSE_KEY="<paste from portal email>"
 
 # Linux x86_64
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
-  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/v1.4.2/hades" \
+  "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 ```
 

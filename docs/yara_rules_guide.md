@@ -1,6 +1,6 @@
 # YARA Rules in HADES
 
-HADES ships with 41+ YARA rules across 7 rule files, all purpose-built for detecting threats hidden in file metadata. This guide covers how HADES loads and uses YARA rules, the shipped rule categories, severity mapping, and how to add custom rules.
+HADES ships with 144 YARA detection rules across 55 rule files, all purpose-built for detecting threats hidden in file metadata. This guide covers how HADES loads and uses YARA rules, the shipped rule categories, severity mapping, and how to add custom rules.
 
 ## Overview
 
@@ -12,6 +12,11 @@ YARA is a pattern matching engine used in malware research. HADES uses YARA to s
 ---
 
 ## Shipped Rule Files
+
+The seven original core packs are listed below. The shipped ruleset is larger:
+144 detection rules across 55 rule files, including the 41 per-family packs
+merged from the DEF CON 34 rule set in v1.7.0. The startup banner reports the
+live count.
 
 | File | Category | Rules | Description |
 |---|---|---|---|
