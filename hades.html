@@ -19,11 +19,11 @@
   <meta name="theme-color" content="#0f0f0f">
   <link rel="icon" type="image/webp" href="images/logo/DH Circle Dark Background.webp">
   <link rel="apple-touch-icon" href="images/logo/DH Circle Dark Background.webp">
-  <meta name="description" content="HADES v1.7.1, Hidden Artifact Detection & EXIF Scanner. Enterprise metadata forensics engine measured 2026-04-20 on 15,468 real-world files (98.7% detection on MalwareBazaar 3,271, 99.9% on Contagio 11,877, 0% actionable false-positive rate on 311 clean files). ML ensemble detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. 19 dedicated forensic analyzers covering images, documents, archives, audio, video, email, and web files. Install via Cloudsmith private registry">
+  <meta name="description" content="HADES v1.7.1, Hidden Artifact Detection & EXIF Scanner. Enterprise metadata forensics engine measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across 15,156 malware samples (99.93% overall detection, 99.70% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). ML ensemble detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. 19 dedicated forensic analyzers covering images, documents, archives, audio, video, email, and web files. Install via Cloudsmith private registry">
   <meta name="keywords" content="HADES, hidden artifact detection, EXIF scanner, metadata extraction, steganography detection, digital forensics, enterprise security, file analysis, forensic investigation, MITRE ATT&CK, YARA rules, metadata forensics">
   <meta name="author" content="DarkHorse InfoSec">
   <meta property="og:title" content="HADES Scanner - Enterprise Metadata Forensics Engine | DarkHorse InfoSec">
-  <meta property="og:description" content="Court-ready metadata forensics for security professionals. 19 forensic analyzers, ML ensemble detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. Measured 2026-04-20 on 15,468 real-world files: 98.7% MalwareBazaar / 99.9% Contagio / 0% actionable false-positive rate.">
+  <meta property="og:description" content="Court-ready metadata forensics for security professionals. 19 forensic analyzers, ML ensemble detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. Measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across 15,156 malware samples: 99.93% overall detection, 99.70% MalwareBazaar / 99.98% Contagio / 100% targeted Gootloader.">
   <meta property="og:image" content="https://darkhorseinfosec.com/images/logo/dh circle dark background.webp">
   <meta property="og:url" content="https://darkhorseinfosec.com/hades.html">
   <meta property="og:type" content="website">
@@ -387,7 +387,7 @@
     "applicationCategory": "SecurityApplication",
     "operatingSystem": "Linux, macOS, Windows",
     "softwareVersion": "1.7.1",
-    "description": "Enterprise metadata forensics engine measured 2026-04-20 on 15,468 real-world files (98.7% detection on MalwareBazaar 3,271, 99.9% on Contagio 11,877, 0% actionable false-positive rate on 311 clean files). ML ensemble detection, MITRE ATT&CK mapping (51+ techniques), playbook automation, native SIEM connectors, and court-ready evidence chain. 2,757+ tests passing.",
+    "description": "Enterprise metadata forensics engine measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across 15,156 malware samples (99.93% overall detection, 99.70% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). ML ensemble detection, MITRE ATT&CK mapping (51+ techniques), playbook automation, native SIEM connectors, and court-ready evidence chain. 2,757+ tests passing.",
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -464,12 +464,12 @@
 
       <div class="stats-bar">
         <div class="stat-item">
-          <span class="stat-value">15,468</span>
-          <span class="stat-label">Samples Validated</span>
+          <span class="stat-value">19,882</span>
+          <span class="stat-label">Files Scanned in Validation</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">99.9%</span>
-          <span class="stat-label">Peak Detection (Contagio)</span>
+          <span class="stat-value">99.93%</span>
+          <span class="stat-label">Overall Malware Detection (15,156)</span>
         </div>
         <div class="stat-item">
           <span class="stat-value">51+</span>
@@ -490,7 +490,7 @@
       </div>
 
       <div class="hades-intro">
-        <p>HADES is an enterprise metadata forensics engine built for security teams and incident responders. Measured 2026-04-20 on 15,468 real-world files at the v1.1.0 engine baseline (commit 73e4a00): <strong>98.7% detection on MalwareBazaar (3,271)</strong>, <strong>99.9% on Contagio (11,877)</strong>, and a <strong>0% actionable false-positive rate</strong> on 311 clean files (zero HIGH or CRITICAL false positives). Overall malware detection 99.6% across 15,157 malware samples. Zero crashes, zero timeouts. The targeted Gootloader set (9 samples) was re-verified at 100% on v1.7.1 on 2026-09-12 through the shipped binary. Multi-layer detection combines 144 YARA detection rules across 55 rule files, ML ensemble models, behavioral analysis, 26 dedicated forensic analyzers, and deep format parsing across 45+ file types, without executing target files. Enterprise-grade two-axis scoring (confidence &times; severity) matches CrowdStrike/Palo Alto patterns, with court-ready evidence handling and automated response playbooks.</p>
+        <p>HADES is an enterprise metadata forensics engine built for security teams and incident responders. Measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across <strong>15,156 malware samples</strong>: <strong>99.70% detection on MalwareBazaar (3,269)</strong>, <strong>99.98% on Contagio (11,877)</strong>, <strong>100% on the targeted Gootloader set (10 files)</strong>, and <strong>99.93% overall</strong>, with 10 samples undetected and 1 timeout. A separate 4,726-file clean corpus scanned the same day returned 1 CRITICAL and 396 HIGH; that corpus is built for machine-learning training and deliberately includes known-false-positive categories, so its 8.40% HIGH-or-CRITICAL share is not a false-positive rate over a typical customer file mix. Figures measured on engine source, not on a release binary. Multi-layer detection combines 144 YARA detection rules across 55 rule files, ML ensemble models, behavioral analysis, 26 dedicated forensic analyzers, and deep format parsing across 45+ file types, without executing target files. Enterprise-grade two-axis scoring (confidence &times; severity) matches CrowdStrike/Palo Alto patterns, with court-ready evidence handling and automated response playbooks.</p>
         <div style="margin-top: 20px;">
           <a href="https://portal.darkhorseinfosec.com" class="cta-button" target="_blank" rel="noopener noreferrer">Get HADES</a>
           <a href="https://github.com/DarkHorse-InfoSec/hades-docs" class="cta-button secondary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
