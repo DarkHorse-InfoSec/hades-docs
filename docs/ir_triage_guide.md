@@ -315,7 +315,7 @@ HADES SIEM alerts include:
 
 ### File Types HADES Detects
 
-HADES analyzes 45+ file types, including:
+HADES analyzes file types including:
 
 **Documents:** PDF, DOC/DOCX/DOCM, XLS/XLSX/XLSM, PPT/PPTX, RTF, OneNote
 **Executables:** EXE, DLL, SYS, OCX, ELF, Mach-O, APK

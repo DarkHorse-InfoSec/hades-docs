@@ -416,7 +416,7 @@ python core/hades_enhanced_cli.py --benchmark
 
 ## 15. Full Test Suite
 
-**What:** Run the complete test suite (1,781+ tests) to verify all components.
+**What:** Run the complete test suite to verify all components.
 
 **Command:**
 
@@ -424,7 +424,7 @@ python core/hades_enhanced_cli.py --benchmark
 python -m pytest core/ cli/ config/ plugins/ tests/ -v --tb=short
 ```
 
-**Expected output:** All tests pass (1,781+ passed, 0 errors, 0 failures).
+**Expected output:** A pytest summary line. Investigate any failure before continuing the demo.
 
 **Talking points:**
 - Tests cover: metadata parsing, detection engine, YARA rules, REST API, evidence chain, file monitoring, plugins, SIEM, threat intel, ML, security middleware, deep format analysis, all integrations

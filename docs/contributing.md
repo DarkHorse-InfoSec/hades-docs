@@ -88,7 +88,7 @@ python -m pytest tests/test_corpus_full_validation.py -v -s
 ```
 
 !!! warning "All tests must pass"
-    Changes will not be accepted if any tests fail. The test suite has 1,781+ tests -- run the full suite before finalizing changes.
+    Changes will not be accepted if any tests fail. Run the full suite before finalizing changes.
 
 ### Commit Messages
 

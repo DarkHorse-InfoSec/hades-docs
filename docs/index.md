@@ -134,12 +134,9 @@ HADES occupies a distinct niche in the security tooling landscape. It is the onl
 
 | Metric | Value |
 |---|---|
-| Test suite | 1,781+ tests passing |
 | YARA rules | 144 across 55 rule files |
-| Detection corpus TPR | 100% (28 attack samples) |
-| Detection corpus FPR | 0% (10 clean baselines) |
-| Supported file formats | 15+ (JPEG, PNG, GIF, TIFF, PDF, DOCX, SVG, MP4, MP3, ZIP, RAR, HTML, and more) |
-| ML features | 25 metadata-derived features |
+| Supported file formats | JPEG, PNG, GIF, TIFF, PDF, DOCX, SVG, MP4, MP3, ZIP, RAR, HTML, and more |
+| ML features | 25 in the ensemble extractor; 33 in the production classifier schema |
 | SIEM formats | 5 (Syslog, CEF, STIX, LEEF, ECS) |
 | Threat intel providers | 4 (VirusTotal, AbuseIPDB, OTX, MalwareBazaar) |
 

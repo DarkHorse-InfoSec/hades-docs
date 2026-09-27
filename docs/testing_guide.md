@@ -57,7 +57,7 @@ python core/hades_enhanced_cli.py --help
 
 ## 2. Test Suite Architecture
 
-The HADES test suite contains **2,452+ tests** organized across 7 directories. Every module has a corresponding test file that validates its public API.
+The HADES test suite is organized across 7 directories. Every module has a corresponding test file that validates its public API.
 
 ### Directory Layout
 
@@ -116,7 +116,7 @@ python -m pytest core/ cli/ config/ plugins/test_registry.py \
     --ignore=plugins/deepfake-detector -v --tb=short
 ```
 
-Expected result: **2,452+ passed**, 0 failures. Some tests will be **skipped** when optional dependencies (PostgreSQL, Redis, etc.) are not installed.
+Some tests will be **skipped** when optional dependencies (PostgreSQL, Redis, etc.) are not installed.
 
 ### Quick Smoke Test
 
@@ -304,8 +304,6 @@ The full validation test outputs a detection matrix:
 - **TN (True Negative):** Clean file correctly passed (score < 75)
 - **FN (False Negative):** Malicious file missed (score < 25)
 
-Current results: **TPR 97.78%, FPR 0%** across 28 synthetic files.
-
 ### MalwareBazaar Validation
 
 For testing against real-world malware samples (requires network access):
@@ -460,19 +458,6 @@ Before any release, ALL of the following must pass:
 | Enterprise tests | `python -m pytest core/test_auth_*.py core/test_storage_*.py -v` | 0 failures |
 | Type check | `mypy --ignore-missing-imports core/*.py cli/*.py` | No errors |
 | YARA rules | `python scripts/validate_rules_ci.py` | Exit 0 |
-
-### Test Count Expectations
-
-| Category | Expected Tests |
-|----------|---------------|
-| CLI | ~30 |
-| Core engine | ~2,100 |
-| Config | ~15 |
-| Plugins | ~40 |
-| Integration/corpus | ~120 |
-| Demo | ~20 |
-| Grafana/Kubernetes | ~60 |
-| **Total** | **~2,452+** |
 
 ### Coverage Goals
 
