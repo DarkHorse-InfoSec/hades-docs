@@ -150,7 +150,7 @@ The formula uses `HadesPortalDownloadStrategy` to inject your license key as a B
 
 ### Older install paths (no longer supported)
 
-Pre-v1.4 distribution via pip from the Cloudsmith private registry (`pip install hades-scanner`; HADES is not on public PyPI), Docker Hub images at `darkhorse-security/hades-scanner`, public source-clone, and standalone `brew install hades-scanner` (no tap) are all no longer supported. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
+Pre-v1.4 distribution via pip from the Cloudsmith private registry (`pip install hades-scanner` against that private index only), Docker Hub images at `darkhorse-security/hades-scanner`, public source-clone, and standalone `brew install hades-scanner` (no tap) are all no longer supported. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 ---
 

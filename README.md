@@ -105,7 +105,7 @@ See [Installation Guide](docs/installation.md) for full details, troubleshooting
 
 ### Older install paths (no longer supported)
 
-Pre-v1.4 distribution via pip from the Cloudsmith private registry at `dl.cloudsmith.io/basic/darkhorse/hades` (`pip install hades-scanner`; HADES is not on public PyPI), Docker Hub images at `darkhorse-security/hades-scanner`, and public source-clone are no longer supported. Path A and Path B are the only canonical install paths. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
+Pre-v1.4 distribution via pip from the Cloudsmith private registry at `dl.cloudsmith.io/basic/darkhorse/hades` (`pip install hades-scanner` against that private index only), Docker Hub images at `darkhorse-security/hades-scanner`, and public source-clone are no longer supported. Path A and Path B are the only canonical install paths. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 ---
 

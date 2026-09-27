@@ -54,10 +54,8 @@ HADES (High-Performance Advanced Detection Engine for Security) is a multi-milli
 ### Enterprise Installation
 
 ```bash
-# 1. Install from Cloudsmith private registry
-pip install hades-scanner --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
-# Or download from GitHub releases:
-# https://github.com/DarkHorse-InfoSec/hades-docs/releases
+# 1. Obtain the signed binary from the customer portal: see installation.md
+#    (the pip-based install this step used to show is retired; see the notice above)
 
 # 2. Run automated installation
 sudo python3 enterprise_installer.py \
