@@ -489,11 +489,7 @@ curl -H "X-API-Key: your-key" http://localhost:8666/api/v1/metrics/alerts
 
 ### 5.1 Deployment Profiles
 
-| Profile      | API Replicas | Workers | CPU (total)   | RAM (total)    | Use Case                                  |
-|-------------|-------------|---------|---------------|----------------|---------------------------------------------|
-| **Small**   | 1           | 0       | 2 cores       | 2 GB           | Single analyst, < 1000 scans/day            |
-| **Medium**  | 2           | 2       | 8 cores       | 8 GB           | Team of 5-10 analysts, < 10,000 scans/day   |
-| **Large**   | 4+          | 4-16    | 16+ cores     | 32+ GB         | Enterprise SOC, 10,000+ scans/day            |
+HADES publishes no measured capacity per profile. Multi-replica and worker deployments are on the Enterprise roadmap; a current deployment is one `hades-server` binary. Size CPU and RAM by benchmarking on your own file mix.
 
 ### 5.2 Per-Component Resource Limits
 
@@ -521,7 +517,7 @@ These match the limits defined in `docker-compose.full-stack.yml` and the Helm c
 | Prometheus TSDB (30d)       | ~500 MB for a medium deployment           |
 | Grafana data                | < 100 MB                                  |
 | Scan artifacts / uploads    | Highly variable; plan for peak daily volume |
-| Application logs            | ~100 MB/day at info level; rotate weekly   |
+| Application logs            | Depends on scan volume; rotate weekly       |
 
 ### 5.4 Scaling Notes
 

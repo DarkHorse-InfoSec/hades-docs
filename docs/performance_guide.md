@@ -1,6 +1,8 @@
 # HADES Performance Guide
 
-> **NOTICE (2026-05-06):** This guide describes performance characteristics, tuning patterns, and deployment topologies that remain accurate for the current Nuitka-compiled binary distribution. References below to `pip install "hades-scanner[full]"` or `pip install "hades-scanner[observability]"` no longer apply; the Nuitka binary bundles all dependencies inline. See [Installation Guide](installation.md) for current install paths (Path A direct portal download, Path B Homebrew tap). The performance numbers and tuning recommendations below are still applicable to the current binary; HADES kept the same async pipeline + worker pool architecture across the v0.7 -> v1.4 distribution-model transition.
+> **ROADMAP, not a shipped deployment option (updated 2026-09-27).** HADES currently ships as a single self-contained binary (the `hades` CLI and `hades-server`). Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap. This guide describes that planned architecture. **No throughput, scans-per-day or hardware-sizing figure in it is a measured HADES result**, and none is given; size a deployment by benchmarking on your own hardware and file mix.
+>
+> References below to `pip install "hades-scanner[full]"` or `pip install "hades-scanner[observability]"` do not apply to the shipped binary, which bundles its dependencies inline. See [Installation Guide](installation.md) for current install paths.
 
 This guide covers performance tuning, deployment patterns, benchmarking, and monitoring for HADES metadata forensics engine.
 
@@ -109,7 +111,7 @@ For high-availability, use Redis Sentinel (included in `docker-compose.ha.yml`).
 
 ## Deployment Patterns
 
-### Single Server (50,000-100,000 scans/day)
+### Single Server
 
 ```bash
 pip install "hades-scanner[full]"
@@ -122,17 +124,15 @@ hades-enhanced --serve \
     --scan-cache
 ```
 
-Hardware: 4 CPU cores, 8 GB RAM, SSD storage.
-
-### Small Team (100,000-500,000 scans/day)
+### Small Team
 
 ```bash
 docker compose -f docker/docker-compose.scale.yml up -d
 ```
 
-Uses PostgreSQL, Redis, and 2 worker replicas. Hardware: 8 CPU cores, 16 GB RAM.
+Uses PostgreSQL, Redis, and 2 worker replicas.
 
-### Enterprise (500,000-2,000,000 scans/day)
+### Enterprise
 
 ```bash
 # Scale workers based on load
@@ -145,9 +145,9 @@ export HADES_ASYNC_PIPELINE=true
 export HADES_CACHE_ENABLED=true
 ```
 
-Hardware: 16+ CPU cores, 32 GB RAM, dedicated PostgreSQL host.
+Uses a dedicated PostgreSQL host.
 
-### Large Enterprise (2,000,000+ scans/day)
+### Large Enterprise
 
 ```bash
 docker compose -f docker/docker-compose.ha.yml up -d \
@@ -155,11 +155,11 @@ docker compose -f docker/docker-compose.ha.yml up -d \
     --scale hades-worker=12
 ```
 
-Full HA deployment with nginx load balancer, PgBouncer, Redis Sentinel. Hardware: multiple hosts behind a load balancer, dedicated database and Redis clusters.
+Full HA deployment with nginx load balancer, PgBouncer, Redis Sentinel, on multiple hosts behind a load balancer with dedicated database and Redis clusters.
 
 ### Kubernetes (Horizontal Pod Autoscaling)
 
-For Kubernetes-native deployments, HADES provides a Helm chart and Kustomize overlays with HPA, ServiceMonitor, and ingress support:
+Planned for Kubernetes-native deployments (roadmap): a Helm chart and Kustomize overlays with HPA, ServiceMonitor, and ingress support:
 
 ```bash
 # Helm install with autoscaling
@@ -195,16 +195,16 @@ python core/benchmarks.py --quick
 
 The benchmark suite measures:
 
-| Metric | Target | Description |
-|--------|--------|-------------|
-| Single-file latency | < 200ms | Time to scan one file end-to-end |
-| Batch throughput | > 50 files/sec | Sustained scanning rate |
-| Memory per scan | < 50 MB | Peak RSS during single scan |
-| ML feature extraction | < 10ms | Feature vector generation time |
-| Cache hit latency | < 5ms | Cached result retrieval time |
-| API response (health) | < 50ms | Health endpoint round-trip |
+| Metric | Description |
+|--------|-------------|
+| Single-file latency | Time to scan one file end-to-end |
+| Batch throughput | Sustained scanning rate |
+| Memory per scan | Peak RSS during single scan |
+| ML feature extraction | Feature vector generation time |
+| Cache hit latency | Cached result retrieval time |
+| API response (health) | Health endpoint round-trip |
 
-Results are printed as a summary table with pass/fail against targets.
+HADES publishes no target or reference values for these metrics; results depend on hardware and file mix, so compare runs on your own systems.
 
 ### Saving Benchmark Results
 
@@ -280,7 +280,7 @@ curl -H "X-API-Key: YOUR_KEY" http://localhost:8666/api/v1/workers/status
 
 ### Prometheus Metrics and Grafana
 
-HADES v0.7.1 includes a Prometheus metrics exporter with 20+ metrics covering scans, findings, cache, workers, API requests, and pipeline stage timing. When `prometheus_client` is installed, the `/metrics` endpoint is automatically available.
+HADES includes a Prometheus metrics exporter with metrics covering scans, findings, cache, workers, API requests, and pipeline stage timing. When `prometheus_client` is installed, the `/metrics` endpoint is automatically available.
 
 ```bash
 # Install observability support
