@@ -49,7 +49,7 @@ HADES (High-Performance Advanced Detection Engine for Security) is a multi-milli
 - **Memory**: 4GB+ RAM (16GB+ for production)
 - **Storage**: 10GB+ free space (200GB+ for production)
 - **Database**: PostgreSQL 12+ or MySQL 8.0+
-- **OS**: Linux (Ubuntu 20.04+, CentOS 8+), macOS 11+, Windows 10+
+- **OS**: Linux x86_64 (glibc 2.34+) and Windows x86_64. macOS is not available (updated 2026-09-27; see [installation.md](installation.md) for the current platform table).
 
 ### Enterprise Installation
 
