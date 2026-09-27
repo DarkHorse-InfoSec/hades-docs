@@ -89,7 +89,11 @@ The glibc floor of 2.34 was measured with `readelf` on the shipped v1.7.1 Linux 
 - **Path A:** re-run the curl one-liner with the new version number from your release email or `https://portal.darkhorseinfosec.com/api/v1/download`.
 - **Path B:** `brew update && brew upgrade hades-scanner`.
 
-License re-validation runs at every binary startup; expired or revoked licenses fall back to community tier (heuristics + IOC only). Upgrade your subscription at `https://portal.darkhorseinfosec.com/billing` to restore full features.
+License behaviour, as implemented in v1.7.1 (`core/auth/license.py`, `core/auth/license_enforcer.py`):
+
+- **Expired license: HADES stops; it does not fall back to Community.** The key's signature and expiry date are checked locally each time HADES starts. If `HADES_LICENSE_KEY` is set and the key has expired (or its signature fails), the CLI exits with `License validation failed: License is no longer valid (expired at ...)` and the API server rejects requests. This is deliberate: a silent downgrade would scan with fewer detection stages without telling you. Renew at `https://portal.darkhorseinfosec.com/billing`, or unset the key to run as Community (Free).
+- **Revoked license (API server only):** `hades-server` checks the license with the portal at startup. If the portal reports the license revoked, the server runs at Community tier. The CLI does not contact the portal.
+- **Offline:** if `hades-server` cannot reach the portal at startup, it uses its cached validation result, and once that cache is more than 24 hours old it logs a warning and keeps the licensed tier. Only an explicit revocation from the portal lowers the tier, so an air-gapped host keeps working until the license's expiry date.
 
 ---
 
