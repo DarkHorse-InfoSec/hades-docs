@@ -7,7 +7,7 @@
 
 ## TL;DR
 
-HADES has promoted ML bundle v1.10.0 to the production alias. The new model lowers the aggregate per-category false-positive rate from 0.83% to 0.78%, eliminates a long-standing OEM-driver false-positive cluster (Epson `E_WPUI10.DLL` and `EBPNET6.DLL` from `e_wf1kde`), and clears every per-category false-positive gate under the project ceiling of 1.5%. True-positive recall is unchanged at 99.34%. Customers do not need to take any action; the bundle will load on the next phone-home or process restart, and signed-bundle verification fail-closes if the artifact is tampered.
+HADES has promoted ML bundle v1.10.0 to the production alias. The new model lowers the aggregate per-category false-positive rate from 0.83% to 0.78%, eliminates a long-standing OEM-driver false-positive cluster (Epson `E_WPUI10.DLL` and `EBPNET6.DLL` from `e_wf1kde`), and clears every per-category false-positive gate under the project ceiling of 1.5%. True-positive recall rises to 99.34% (v1.9.0: 98.88%), measured on the held-out test set of 3,034 malicious and 774 clean files recorded in the v1.10.0 model metadata (`models/baseline_classifier_v1_10_0.metadata.json`, source repo, 2026-05-03). Customers do not need to take any action; the bundle will load on the next phone-home or process restart, and signed-bundle verification fail-closes if the artifact is tampered.
 
 ## What changed
 
@@ -20,7 +20,7 @@ v1.10.0 ships two new layers of false-positive defense in front of and inside th
 - f27 `is_epson_driver_naming`: regex match on Epson basename patterns (E_*, EBP*, EBPNET*, EN*).
 - f28 `is_generic_oem_driver_naming`: generalized vendor-prefix regex covering broader OEM naming conventions.
 - f29 `is_in_oem_driver_path`: path-token detection for `DriverStore`, `inf_amd64`, and `FileRepository`.
-- f30 `parent_dir_vendor_token_present`: 28 known vendor name tokens in the parent directory basename.
+- f30 `parent_dir_vendor_token_present`: 30 known vendor name tokens in the parent directory basename.
 
 f29 ranked 4th and f27 ranked 7th in XGBoost feature importance after retraining. Both features pulled measurable weight as designed. f28 and f30 ship as scaffolding (zero importance in the current corpus); they activate as new corpus diversity is ingested in v1.11.
 
@@ -38,27 +38,29 @@ v1.10.0 applies the layered defense pattern that production-grade EDR vendors ap
 
 | Metric                          | v1.9.0 (prior)     | v1.10.0 (current) | Delta       |
 |---------------------------------|--------------------|-------------------|-------------|
-| Precision                       | 0.9990             | 0.9980            | -0.001      |
-| Recall                          | 0.9931             | 0.9934            | +0.0003     |
-| ROC-AUC                         | 0.9994             | 0.9995            | +0.0001     |
-| F1                              | 0.9961             | 0.9957            | -0.0004     |
+| Precision                       | 0.9980             | 0.9980            | 0.0000      |
+| Recall                          | 0.9888             | 0.9934            | +0.0046     |
+| ROC-AUC                         | 0.9991             | 0.9995            | +0.0004     |
+| F1                              | 0.9934             | 0.9957            | +0.0023     |
 | Aggregate FP rate (per-cat)     | 0.83% (6/720)      | 0.78% (6/774)     | -0.05pp     |
 | Test set size (clean)           | 720                | 774               | +54         |
+
+Source for both columns: the signed model metadata in the source repo, `models/baseline_classifier_v1_9_0.metadata.json` (2026-04-30) and `models/baseline_classifier_v1_10_0.metadata.json` (2026-05-03), per-category-threshold metrics. The v1.9.0 column was corrected on 2026-09-27; it previously carried figures that did not match that metadata.
 
 ### Per-category false-positive rates (project gate: under 1.5%)
 
 | Category    | v1.9.0 FP rate    | v1.10.0 FP rate    | Threshold | Gate   |
 |-------------|-------------------|--------------------|-----------|--------|
 | windows_pe  | 1.53% (2/131)     | 0.66% (1/152)      | 0.50      | PASS   |
-| pdf         | 0.00%             | 0.00% (0/110)      | 0.50      | PASS   |
-| powershell  | ~1.00%            | 1.23% (2/163)      | 0.75      | PASS   |
-| linux_elf   | ~1.00%            | 1.34% (2/149)      | 0.50      | PASS   |
-| python      | 0.00%             | 0.00% (0/57)       | 0.50      | PASS   |
+| pdf         | 0.74% (1/136)     | 0.00% (0/110)      | 0.50      | PASS   |
+| powershell  | 0.59% (1/169)     | 1.23% (2/163)      | 0.75      | PASS   |
+| linux_elf   | 0.00% (0/133)     | 1.34% (2/149)      | 0.50      | PASS   |
+| python      | 0.00% (0/40)      | 0.00% (0/57)       | 0.50      | PASS   |
 | image       | 25.0% (2/8)       | 0.00% (0/47)       | 0.50      | PASS   |
-| font        | n/a               | 0.00% (0/2)        | 0.50      | PASS   |
-| other       | ~1.00%            | 1.06% (1/94)       | 0.50      | PASS   |
+| font        | 0.00% (0/4)       | 0.00% (0/2)        | 0.50      | PASS   |
+| other       | 0.00% (0/99)      | 1.06% (1/94)       | 0.50      | PASS   |
 
-Every per-category rate sits under the 1.5% project gate. The two categories that produced slim-margin or sample-noise violations in v1.9.0 (windows_pe at 1.53%, image at 25% on n=8) are both cured: windows_pe drops to 0.66%, and image goes to 0% on a 6x larger clean image corpus (47 samples vs 8). No category regressed.
+Every per-category rate sits under the 1.5% project gate. The two categories that produced slim-margin or sample-noise violations in v1.9.0 (windows_pe at 1.53%, image at 25% on n=8) are both cured: windows_pe drops to 0.66%, and image goes to 0% on a 6x larger clean image corpus (47 samples vs 8). Three categories rose while staying under the gate: powershell 0.59% to 1.23%, linux_elf 0.00% to 1.34%, and other 0.00% to 1.06%.
 
 ### Cluster validation
 
@@ -78,7 +80,7 @@ No action required. The signed v1.10.0 bundle ships in HADES v1.4.2 source and b
 Practical effects:
 - Slightly lower aggregate false-positive rate (0.83% to 0.78%).
 - The Epson `E_WPUI10.DLL` / `EBPNET6.DLL` cluster, if present in your environment, will no longer flag.
-- Same true-positive rate on production threats (recall 99.34%, family-holdout 9 of 12 families at 100% recall).
+- Recall 99.34% on the held-out test set (3,034 malicious files; model metadata, 2026-05-03). Per-family recall is 100% for 8 of 12 held-out families; the other four are 83.3% (n=6), 84.6% (n=13), 97.9% (n=663) and 99.9% (n=2,178).
 - No CLI, API, or configuration changes.
 
 Customers running their own retraining pipeline against the documented schema should regenerate features against the v6 extractor; v5 features continue to load through the backward-compatibility path.

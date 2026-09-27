@@ -5,7 +5,7 @@
 
 > **HISTORICAL NOTICE (added 2026-05-06):** This is a planning checklist from the v1.0.0 release era, kept for historical reference. The release-packaging items (Cloudsmith package publish, Docker image push, Homebrew formula bump, etc.) were applicable under the pre-v1.4 distribution model that has since been retired. Current release-packaging work happens in the private source repo at `tasks/TODO_manual.md`. Strategic / product / customer-success items below may still be relevant; verify against the current TODO before acting.
 
-HADES v1.0.0 is the first General Availability release. All core technical features are implemented and validated (2,452 tests, TPR 97.78%, 0 failures). This document outlines the next steps across engineering, validation, and business execution.
+HADES v1.0.0 is the first General Availability release. All core technical features were implemented at that milestone. The synthetic-corpus validation committed with the 2026-03-01 initial import (`tests/corpus/validation_results.json` in the source repo) detected 88 of 90 malicious synthetic files (TPR 97.78%) and flagged 0 of 18 clean ones. That is a synthetic corpus, not real-world malware; for the current real-world measurement see the HADES product page. This document outlines the next steps across engineering, validation, and business execution.
 
 ---
 
@@ -30,7 +30,7 @@ HADES v1.0.0 is the first General Availability release. All core technical featu
 | **SIEM Connectors** | Splunk HEC, Elasticsearch, Microsoft Sentinel with platform APIs |
 | **SDK 1.1.0** | Retry logic, webhook subscriptions, SSE streaming |
 | **Community Edition** | 13-feature free tier for individual practitioners |
-| **MITRE ATT&CK** | 51+ techniques across 11 tactics (100% coverage) |
+| **MITRE ATT&CK** | 51 techniques across 14 tactics |
 | **GPS Forensics** | DMS/decimal parsing, Haversine clustering, impossible travel detection |
 | **Quarantine Manager** | SQLite-backed lifecycle management with API and dashboard |
 | **Sanitize Dashboard** | Drag-and-drop metadata removal with before/after comparison |
@@ -41,14 +41,9 @@ HADES v1.0.0 is the first General Availability release. All core technical featu
 
 | Metric | Value |
 |--------|-------|
-| Test count | 2,452+ |
-| Test failures | 0 |
-| True Positive Rate | 97.78% |
-| False Positive Rate | 0% |
-| YARA rules | 144 across 55 files |
-| API endpoints | 50+ |
-| Dashboard views | 16 |
-| Detection modules | 16 |
+| Synthetic-corpus TPR (2026-03-01) | 97.78% (88 of 90 malicious synthetic files) |
+| Synthetic-corpus FPR (2026-03-01) | 0% (0 of 18 clean synthetic files) |
+| YARA rules | 57 across 8 rule files at the 2026-03-01 import (144 across 55 at v1.7.1) |
 
 ---
 
@@ -226,9 +221,10 @@ The technical product is feature-complete. The following business execution item
 
 | Tier | Target Audience | Key Features |
 |------|----------------|--------------|
-| **Community** (free) | Individual practitioners | CLI scan, basic API, YARA rules, sanitize |
-| **Professional** | Small security teams | + SIEM, threat intel, ML, evidence chain, monitoring, plugins |
-| **Enterprise** | SOC teams, MSSPs | + RBAC, SSO, cloud scanning, multi-tenant, encrypted storage |
+| **Community** (free) | Individual practitioners | CLI scan, basic API, evidence chain, scan analytics; IOC and heuristic stages only |
+| **Professional** | Small security teams | + YARA, ML, full engine, SIEM export, threat intel, MITRE mapping, monitoring, playbooks, plugins |
+| **Team** | Security teams, MSPs | + RBAC, SSO, cloud scanning, CI/CD, chat integrations, encrypted storage |
+| **Enterprise** | Large organizations | + multi-tenant administration |
 
 **Action items:**
 - [ ] Finalize pricing strategy

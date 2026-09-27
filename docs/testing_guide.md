@@ -51,57 +51,57 @@ python core/hades_enhanced_cli.py --help
 ```
 
 !!! note "Optional Dependencies"
-    Many HADES modules use optional imports (YARA, scikit-learn, PostgreSQL drivers, Redis, etc.). Tests for optional modules will **skip** automatically if the dependency is not installed. This is expected behavior — not a failure.
+    Many HADES modules use optional imports (YARA, scikit-learn, PostgreSQL drivers, Redis, etc.). Tests for optional modules will **skip** automatically if the dependency is not installed. This is expected behavior, not a failure.
 
 ---
 
 ## 2. Test Suite Architecture
 
-The HADES test suite contains **2,452+ tests** organized across 7 directories. Every module has a corresponding test file that validates its public API.
+The HADES test suite is organized across 7 directories. Every module has a corresponding test file that validates its public API.
 
 ### Directory Layout
 
 ```
 darkhorse-hades/
-├── cli/                          # CLI layer tests
-│   ├── test_cli.py               # Basic CLI smoke test
-│   ├── test_reverse_shell.py     # Reverse shell detection
-│   ├── test_integration.py       # CLI end-to-end integration
-│   └── test_enhanced_scan.py     # Enhanced CLI pipeline
-├── core/                         # Core engine tests (~50 test files)
-│   ├── test_metadata_parser.py   # Foundation parser
-│   ├── test_detection_engine.py  # Threat detection
-│   ├── test_api.py               # REST API endpoints
-│   ├── test_dashboard.py         # Web dashboard
-│   ├── test_gps_forensics.py     # GPS forensic analysis
-│   ├── test_quarantine.py        # Quarantine lifecycle
-│   ├── test_playbook_engine.py   # Playbook automation
-│   └── ...                       # ~40 more test files
-├── config/
-│   └── test_config.py            # Configuration validation
-├── plugins/
-│   ├── test_registry.py          # Plugin marketplace
-│   └── test_example_plugins.py   # Built-in plugins
-├── tests/                        # Integration & corpus tests
-│   ├── test_full_pipeline.py     # End-to-end pipeline
-│   ├── test_corpus_*.py          # Detection corpus validation
-│   ├── test_malwarebazaar_validation.py
-│   └── ...
-├── demo/
-│   ├── test_demo_server.py       # Demo server endpoints
-│   └── test_demo_samples.py      # Sample file generation
-├── grafana/
-│   └── test_dashboards.py        # Grafana dashboard JSON
-└── kubernetes/
-    └── test_helm.py              # Helm chart validation
+|-- cli/                          # CLI layer tests
+|   |-- test_cli.py               # Basic CLI smoke test
+|   |-- test_reverse_shell.py     # Reverse shell detection
+|   |-- test_integration.py       # CLI end-to-end integration
+|   `-- test_enhanced_scan.py     # Enhanced CLI pipeline
+|-- core/                         # Core engine tests (~50 test files)
+|   |-- test_metadata_parser.py   # Foundation parser
+|   |-- test_detection_engine.py  # Threat detection
+|   |-- test_api.py               # REST API endpoints
+|   |-- test_dashboard.py         # Web dashboard
+|   |-- test_gps_forensics.py     # GPS forensic analysis
+|   |-- test_quarantine.py        # Quarantine lifecycle
+|   |-- test_playbook_engine.py   # Playbook automation
+|   `-- ...                       # ~40 more test files
+|-- config/
+|   `-- test_config.py            # Configuration validation
+|-- plugins/
+|   |-- test_registry.py          # Plugin marketplace
+|   `-- test_example_plugins.py   # Built-in plugins
+|-- tests/                        # Integration & corpus tests
+|   |-- test_full_pipeline.py     # End-to-end pipeline
+|   |-- test_corpus_*.py          # Detection corpus validation
+|   |-- test_malwarebazaar_validation.py
+|   `-- ...
+|-- demo/
+|   |-- test_demo_server.py       # Demo server endpoints
+|   `-- test_demo_samples.py      # Sample file generation
+|-- grafana/
+|   `-- test_dashboards.py        # Grafana dashboard JSON
+`-- kubernetes/
+    `-- test_helm.py              # Helm chart validation
 ```
 
 ### Test Naming Convention
 
 All test files follow the pattern `test_<module_name>.py` and reside alongside (or near) the code they test. Test classes use descriptive names:
 
-- `TestClassName` — groups related tests
-- `test_<behavior>` — individual test methods describing expected behavior
+- `TestClassName`: groups related tests
+- `test_<behavior>`: individual test methods describing expected behavior
 
 ---
 
@@ -116,7 +116,7 @@ python -m pytest core/ cli/ config/ plugins/test_registry.py \
     --ignore=plugins/deepfake-detector -v --tb=short
 ```
 
-Expected result: **2,452+ passed**, 0 failures. Some tests will be **skipped** when optional dependencies (PostgreSQL, Redis, etc.) are not installed.
+Some tests will be **skipped** when optional dependencies (PostgreSQL, Redis, etc.) are not installed.
 
 ### Quick Smoke Test
 
@@ -213,9 +213,9 @@ python -m pytest core/ -k "gps" -v
 Test individual classes and functions in isolation. Mock external dependencies (HTTP, databases, file I/O).
 
 **Examples:**
-- `core/test_metadata_parser.py` — Tests `HADESMetadataParser` with synthetic file content
-- `core/test_gps_forensics.py` — Tests `GPSForensicsAnalyzer` coordinate parsing, Haversine distance, clustering
-- `core/test_ml_ensemble.py` — Tests feature extraction and model training with synthetic data
+- `core/test_metadata_parser.py`: Tests `HADESMetadataParser` with synthetic file content
+- `core/test_gps_forensics.py`: Tests `GPSForensicsAnalyzer` coordinate parsing, Haversine distance, clustering
+- `core/test_ml_ensemble.py`: Tests feature extraction and model training with synthetic data
 
 **Pattern:** Direct class instantiation, assertions on return values. No subprocess calls, no network access.
 
@@ -224,9 +224,9 @@ Test individual classes and functions in isolation. Mock external dependencies (
 Test module interactions and the REST API surface.
 
 **Examples:**
-- `core/test_api.py` — Tests FastAPI endpoints via `TestClient` (scan, sanitize, health, WebSocket)
-- `core/test_quarantine.py::TestQuarantineRoutes` — Tests quarantine API routes via `TestClient`
-- `tests/test_full_pipeline.py` — End-to-end: API server start, upload, detect, monitor, sanitize, shutdown
+- `core/test_api.py`: Tests FastAPI endpoints via `TestClient` (scan, sanitize, health, WebSocket)
+- `core/test_quarantine.py::TestQuarantineRoutes`: Tests quarantine API routes via `TestClient`
+- `tests/test_full_pipeline.py`: End-to-end: API server start, upload, detect, monitor, sanitize, shutdown
 
 **Pattern:** Uses `starlette.testclient.TestClient` for API tests. Real database creation (temp SQLite). No external network calls.
 
@@ -235,11 +235,11 @@ Test module interactions and the REST API surface.
 Validate detection accuracy against a 28-file synthetic malware corpus.
 
 **Examples:**
-- `tests/test_corpus_exif_injection.py` — 8 EXIF injection attack types
-- `tests/test_corpus_documents.py` — PDF/DOCX/SVG attack types
-- `tests/test_corpus_polyglots.py` — Multi-format polyglot files
-- `tests/test_corpus_clean.py` — 10 clean files (false positive validation)
-- `tests/test_corpus_full_validation.py` — Master TPR/FPR/FNR validation
+- `tests/test_corpus_exif_injection.py`: 8 EXIF injection attack types
+- `tests/test_corpus_documents.py`: PDF/DOCX/SVG attack types
+- `tests/test_corpus_polyglots.py`: Multi-format polyglot files
+- `tests/test_corpus_clean.py`: 10 clean files (false positive validation)
+- `tests/test_corpus_full_validation.py`: Master TPR/FPR/FNR validation
 
 **Acceptance Criteria:**
 
@@ -252,34 +252,34 @@ Validate detection accuracy against a 28-file synthetic malware corpus.
 
 Validate configuration files parse correctly and contain expected structure.
 
-- `config/test_config.py` — JSON parsing, YARA compilation, threat intel config, HTML templates
+- `config/test_config.py`: JSON parsing, YARA compilation, threat intel config, HTML templates
 
 ### Infrastructure Tests
 
 Validate deployment manifests, Docker configs, and dashboards.
 
-- `tests/test_docker_compose.py` — Docker Compose YAML structure
-- `grafana/test_dashboards.py` — Grafana dashboard JSON validity
-- `kubernetes/test_helm.py` — Helm chart templates, values, Kustomize overlays
-- `tests/test_docs.py` — MkDocs config, file existence, cross-references
+- `tests/test_docker_compose.py`: Docker Compose YAML structure
+- `grafana/test_dashboards.py`: Grafana dashboard JSON validity
+- `kubernetes/test_helm.py`: Helm chart templates, values, Kustomize overlays
+- `tests/test_docs.py`: MkDocs config, file existence, cross-references
 
 ---
 
 ## 5. Detection Corpus Validation
 
-The detection corpus is a set of programmatically generated files that simulate real-world attack techniques. No actual malware is included — all files are inert.
+The detection corpus is a set of programmatically generated files that simulate real-world attack techniques. No actual malware is included: all files are inert.
 
 ### Corpus Structure
 
 ```
 tests/corpus/
-├── generators/
-│   ├── exif_injection.py      # 8 EXIF injection attacks
-│   ├── document_attacks.py    # 6 document attacks
-│   ├── polyglot_files.py      # 4 polyglot files
-│   └── clean_baseline.py      # 10 clean files
-├── validation_results.json    # Generated results
-└── README.md                  # Corpus documentation
+|-- generators/
+|   |-- exif_injection.py      # 8 EXIF injection attacks
+|   |-- document_attacks.py    # 6 document attacks
+|   |-- polyglot_files.py      # 4 polyglot files
+|   `-- clean_baseline.py      # 10 clean files
+|-- validation_results.json    # Generated results
+`-- README.md                  # Corpus documentation
 ```
 
 ### Running Validation
@@ -303,8 +303,6 @@ The full validation test outputs a detection matrix:
 - **FP (False Positive):** Clean file incorrectly flagged (score >= 75)
 - **TN (True Negative):** Clean file correctly passed (score < 75)
 - **FN (False Negative):** Malicious file missed (score < 25)
-
-Current results: **TPR 97.78%, FPR 0%** across 28 synthetic files.
 
 ### MalwareBazaar Validation
 
@@ -460,19 +458,6 @@ Before any release, ALL of the following must pass:
 | Enterprise tests | `python -m pytest core/test_auth_*.py core/test_storage_*.py -v` | 0 failures |
 | Type check | `mypy --ignore-missing-imports core/*.py cli/*.py` | No errors |
 | YARA rules | `python scripts/validate_rules_ci.py` | Exit 0 |
-
-### Test Count Expectations
-
-| Category | Expected Tests |
-|----------|---------------|
-| CLI | ~30 |
-| Core engine | ~2,100 |
-| Config | ~15 |
-| Plugins | ~40 |
-| Integration/corpus | ~120 |
-| Demo | ~20 |
-| Grafana/Kubernetes | ~60 |
-| **Total** | **~2,452+** |
 
 ### Coverage Goals
 

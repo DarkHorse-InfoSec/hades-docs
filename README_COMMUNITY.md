@@ -10,16 +10,16 @@ Built and maintained by DarkHorse Information Security LLC.
 
 ## Quick Start
 
-HADES ships as a single Nuitka-compiled signed binary with everything bundled (Python interpreter, ExifTool, YARA engine, ML model). Two install paths -- both gated by a license key from the customer portal:
+HADES ships as a single Nuitka-compiled signed binary with its Python interpreter, YARA engine and ML model bundled; ExifTool is optional (a native fallback ships in the binary). Two install paths, both gated by a license key from the customer portal:
 
 ```bash
-# Path A: direct download from the portal (Linux x86_64 today)
+# Path A: direct download from the portal (Linux x86_64 shown; Windows x86_64 also available)
 export HADES_LICENSE_KEY="<paste from portal email>"
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
   "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 
-# Path B: Homebrew tap (macOS and Linux)
+# Path B: Homebrew tap (Linux, via Linuxbrew)
 export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
 brew tap DarkHorse-InfoSec/tap
 brew install DarkHorse-InfoSec/tap/hades-scanner
@@ -70,50 +70,39 @@ All analysis is non-execution: HADES reads file structure and metadata without r
 
 ## Features by Tier
 
-HADES is available in three tiers. The same binary ships to all tiers; your license key determines which features are active. Community (Free) tier users get a license key that unlocks the core scanning features below at no charge.
+HADES has four tiers. The same binary ships to all of them; the license key determines which features are active. Without a license key HADES runs as Community (Free). If a license key is set but fails validation (expired, bad signature, tampered), HADES stops with an error rather than silently dropping to Community.
 
-| Feature | Free | Professional | Enterprise |
-|---------|:----:|:------------:|:----------:|
-| **Core Scanning** | | | |
-| CLI scanner (single file, directory, recursive) | x | x | x |
-| YARA pattern matching, 144 rules across 55 rule files | x | x | x |
-| Deep format analysis (PDF, Office, SVG, polyglot) | x | x | x |
-| REST API server with WebSocket support | x | x | x |
-| Health check endpoint | x | x | x |
-| Metadata sanitization | x | x | x |
-| Async scan pipeline | x | x | x |
-| YARA rule builder with templates | x | x | x |
-| **Detection & Intelligence** | | | |
-| ML anomaly detection (Isolation Forest) | | x | x |
-| ML ensemble (Isolation Forest + Random Forest + XGBoost) | | x | x |
-| Cloud threat intelligence (VirusTotal, AbuseIPDB, OTX, MalwareBazaar) | | x | x |
-| Behavioral analysis and campaign detection | | x | x |
-| MITRE ATT&CK technique mapping | | x | x |
-| Threat intelligence feed scheduler | | x | x |
-| **Operations & Integration** | | | |
-| Evidence chain and case management | | x | x |
-| Forensic audit trail with hash-chain verification | | x | x |
-| SIEM integration (Syslog, CEF, STIX, LEEF, ECS, Kafka) | | x | x |
-| File monitoring (watchdog) | | x | x |
-| Plugin system with marketplace | | x | x |
-| Web dashboard (scan, monitor, cases, audit, MITRE, rules, playbooks) | | x | x |
-| Playbook engine (10 pre-built response automations) | | x | x |
-| Distributed worker pool | | x | x |
-| Scan result caching (LRU + Redis) | | x | x |
-| Prometheus metrics exporter | | x | x |
-| Grafana dashboards (4 pre-built) | | x | x |
-| Scan analytics with trend/anomaly detection | | x | x |
-| **Enterprise Security & Scale** | | | |
-| RBAC (admin/analyst/viewer roles) | | | x |
-| SSO (OIDC + SAML) | | | x |
-| Cloud storage scanning (S3, GCS, Azure Blob) | | | x |
-| CI/CD pipeline scanner (SARIF, GitHub, GitLab) | | | x |
-| Chat bot integration (Slack, Teams) | | | x |
-| Multi-tenant isolation | | | x |
-| AES-256-GCM encryption at rest | | | x |
-| PostgreSQL backend with connection pooling | | | x |
-| Kubernetes Helm chart with HPA | | | x |
-| Docker Compose HA deployments | | | x |
+The tables below are taken from the license module of HADES v1.7.1 (`core/auth/license.py`: `TIER_FEATURES`, `ANALYZER_TIERS`, `TIER_QUOTA_DEFAULTS`).
+
+| | Community (Free) | Professional | Team | Enterprise |
+|---|:---:|:---:|:---:|:---:|
+| **Price** | Free | $99/mo or $799/yr | $299/mo or $2,499/yr | Custom |
+| **Detection stages** | IOC and heuristic analysis only | Full engine | Full engine | Full engine |
+| YARA rule matching | | x | x | x |
+| ML detection | | x | x | x |
+| Deep format analyzers (PDF, Office, archives and the rest of the engine) | | x | x | x |
+| **Licensed features** | | | | |
+| CLI scanning | x | x | x | x |
+| Basic REST API and health endpoint | x | x | x | x |
+| Evidence chain | x | x | x | x |
+| Scan analytics | x | x | x | x |
+| Threat intelligence lookups and MITRE ATT&CK mapping | | x | x | x |
+| SIEM export | | x | x | x |
+| Monitoring and playbooks | | x | x | x |
+| Plugins | | x | x | x |
+| RBAC and SSO | | | x | x |
+| Cloud storage scanning | | | x | x |
+| CI/CD integration | | | x | x |
+| Chat integrations (Slack, Teams) | | | x | x |
+| Encrypted storage | | | x | x |
+| Multi-tenant administration | | | | x |
+| **Default quotas** | | | | |
+| Scans per month (CLI) | 10 | 5,000 | 50,000 | Unlimited |
+| Scans per month (API) | 5 | 2,500 | 25,000 | Unlimited |
+| Batch scanning | No | Yes | Yes | Yes |
+| Maximum file size | 10 MB | 100 MB | 500 MB | Unlimited |
+
+Community (Free) runs the IOC and heuristic stages only; YARA, ML and the deep format analyzers need Professional or higher. A license can carry its own quota values, which override the defaults above.
 
 To activate or change your tier, set your license key:
 
@@ -147,9 +136,9 @@ curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
   -o hades && chmod +x hades
 ```
 
-The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL to Cloudflare R2, and `curl` follows the redirect. The binary is RSA-PSS-signed and verifies its own integrity at first run.
+The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL to Cloudflare R2, and `curl` follows the redirect. Windows binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped; the bundled ML model is RSA-PSS-signed and is not loaded if its signature fails to verify.
 
-### Path B: Homebrew tap (macOS and Linux)
+### Path B: Homebrew tap (Linux, via Linuxbrew)
 
 ```bash
 export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
@@ -161,7 +150,7 @@ The formula uses `HadesPortalDownloadStrategy` to inject your license key as a B
 
 ### Older install paths (no longer supported)
 
-Pre-v1.4 distribution via PyPI (`pip install hades-scanner`), Docker Hub images at `darkhorse-security/hades-scanner`, the Cloudsmith private registry, public source-clone, and standalone `brew install hades-scanner` (no tap) are all no longer supported. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
+Pre-v1.4 distribution via pip from the Cloudsmith private registry (`pip install hades-scanner` against that private index only), Docker Hub images at `darkhorse-security/hades-scanner`, public source-clone, and standalone `brew install hades-scanner` (no tap) are all no longer supported. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 ---
 
@@ -215,11 +204,13 @@ hades <subcommand> --help
 
 The REST API runs at `http://localhost:8666` by default. Start with `hades-server --port 8666`.
 
+Tier is the lowest tier whose license unlocks the route (v1.7.1 `core/hades_api.py` route gates). Pro, Team and Enterprise each include every lower tier.
+
 | Endpoint | Method | Tier | Description |
 |----------|--------|------|-------------|
 | `/api/v1/health` | GET | Free | Health check |
 | `/api/v1/scan` | POST | Free | Scan file (multipart upload) |
-| `/api/v1/scan/batch` | POST | Free | Batch scan multiple files |
+| `/api/v1/scan/batch` | POST | Pro | Batch scan multiple files |
 | `/api/v1/scan/{id}` | GET | Free | Retrieve scan results |
 | `/api/v1/sanitize` | POST | Free | Sanitize file metadata |
 | `/api/v1/rules/templates` | GET | Free | YARA rule templates |
@@ -227,7 +218,7 @@ The REST API runs at `http://localhost:8666` by default. Start with `hades-serve
 | `/dashboard/` | GET | Free | Web dashboard |
 | `/docs` | GET | Free | Swagger/OpenAPI docs |
 | `/ws` | WS | Free | WebSocket for live updates |
-| `/api/v1/evidence/*` | GET/POST | Pro | Evidence chain and case management |
+| `/api/v1/evidence/*` | GET/POST | Free | Evidence chain and case management |
 | `/api/v1/mitre/*` | GET | Pro | MITRE ATT&CK mappings |
 | `/api/v1/ml/ensemble/*` | GET | Pro | ML ensemble status |
 | `/api/v1/behavioral/*` | GET | Pro | Campaign detection |
@@ -237,15 +228,15 @@ The REST API runs at `http://localhost:8666` by default. Start with `hades-serve
 | `/api/v1/export` | POST | Pro | SIEM export |
 | `/api/v1/threat-intel/*` | GET/POST | Pro | Threat intel scheduler |
 | `/api/v1/playbooks/*` | GET/POST | Pro | Playbook engine |
-| `/metrics` | GET | Pro | Prometheus metrics |
-| `/api/v1/metrics/*` | GET | Pro | JSON metrics and health |
-| `/api/v1/auth/*` | GET/POST | Enterprise | RBAC user management |
-| `/api/v1/integrations/cloud/*` | GET/POST | Enterprise | Cloud storage scanning |
-| `/api/v1/integrations/cicd/*` | POST | Enterprise | CI/CD scanning |
-| `/api/v1/integrations/slack/*` | POST | Enterprise | Slack bot |
-| `/api/v1/integrations/teams/*` | POST | Enterprise | Teams bot |
+| `/metrics` | GET | Free | Prometheus metrics |
+| `/api/v1/metrics/*` | GET | Free | JSON metrics and health |
+| `/api/v1/auth/*` | GET/POST | Team | RBAC user management |
+| `/api/v1/integrations/cloud/*` | GET/POST | Team | Cloud storage scanning |
+| `/api/v1/integrations/cicd/*` | POST | Team | CI/CD scanning |
+| `/api/v1/integrations/slack/*` | POST | Team | Slack bot |
+| `/api/v1/integrations/teams/*` | POST | Team | Teams bot |
 | `/api/v1/admin/tenants/*` | GET/POST | Enterprise | Multi-tenant management |
-| `/api/v1/admin/encryption/*` | GET | Enterprise | Encryption status |
+| `/api/v1/admin/encryption/*` | GET | Team | Encryption status |
 
 ---
 
@@ -286,14 +277,13 @@ File Input
 
 ## System Requirements
 
-A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, ExifTool, YARA engine, and all dependencies bundled inline, so the host needs no pre-installed runtime.
+A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, YARA engine, and all Python dependencies bundled inline, so the host needs no pre-installed runtime. ExifTool is optional for scanning (a native fallback ships in the binary) and recommended for the metadata sanitizer.
 
 | OS | Status |
 |---|---|
-| Linux x86_64 (glibc 2.31+) | Path A + Path B (via Linuxbrew) |
-| macOS Intel (10.15+) | Path B today; Path A binary on 2026-Q3 roadmap |
-| macOS Apple Silicon (11.0+) | Path B today; Path A binary on 2026-Q3 roadmap |
-| Windows 10 / 11 / Server 2019+ | Pending code-signing cert acquisition |
+| Linux x86_64 (glibc 2.34+) | Path A + Path B (via Linuxbrew) |
+| Windows x86_64 | Path A; binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped |
+| macOS | Not yet available; no release date |
 
 Pro+ tier features (Redis caching, PostgreSQL backend, Prometheus metrics, distributed workers) optionally use external services that you provision in your own infrastructure; the HADES binary connects to them but does not embed them.
 

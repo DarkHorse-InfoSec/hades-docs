@@ -49,15 +49,13 @@ HADES (High-Performance Advanced Detection Engine for Security) is a multi-milli
 - **Memory**: 4GB+ RAM (16GB+ for production)
 - **Storage**: 10GB+ free space (200GB+ for production)
 - **Database**: PostgreSQL 12+ or MySQL 8.0+
-- **OS**: Linux (Ubuntu 20.04+, CentOS 8+), macOS 11+, Windows 10+
+- **OS**: Linux x86_64 (glibc 2.34+) and Windows x86_64. macOS is not available (updated 2026-09-27; see [installation.md](installation.md) for the current platform table).
 
 ### Enterprise Installation
 
 ```bash
-# 1. Install from Cloudsmith private registry
-pip install hades-scanner --extra-index-url https://dl.cloudsmith.io/basic/darkhorse/hades/python/simple/
-# Or download from GitHub releases:
-# https://github.com/DarkHorse-InfoSec/hades-docs/releases
+# 1. Obtain the signed binary from the customer portal: see installation.md
+#    (the pip-based install this step used to show is retired; see the notice above)
 
 # 2. Run automated installation
 sudo python3 enterprise_installer.py \

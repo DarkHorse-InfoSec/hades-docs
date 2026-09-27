@@ -14,25 +14,57 @@ The module uses an Isolation Forest algorithm to model "normal" metadata and fla
 
 ## Feature Descriptions
 
-The extractor computes 15 features from each file:
+As of HADES v1.7.1, `MetadataFeatureExtractor` (`core/ml_detection.py`) computes **33 features** per file (`FEATURE_COUNT`, feature schema version 9). The separate ensemble path (`--ml-ensemble`, `core/ml_ensemble.py`) uses its own `ExtendedFeatureExtractor` with **25 features**, listed further down. The active production classifier is `SignedXGBClassifier`, a supervised XGBoost model loaded only if its signature verifies; the Isolation Forest `AnomalyDetector` described in this guide is the anomaly-scoring path used by `--ml-train` and `--ml-baseline`.
 
-| # | Feature | Description | Why it matters |
-|---|---------|-------------|----------------|
-| 1 | `file_size` | Raw file size in bytes | Outlier sizes may indicate padding, appended payloads, or truncation |
-| 2 | `file_size_log` | Log-scaled file size | Normalises the wide range of file sizes for the model |
-| 3 | `entropy` | Shannon entropy of the full file content (0--8) | High entropy suggests encryption or compression; low entropy may indicate padding |
-| 4 | `metadata_field_count` | Number of metadata fields extracted | Unusually many or few fields can signal manipulation |
-| 5 | `metadata_total_length` | Sum of all metadata value string lengths | Excessively long values may embed payloads |
-| 6 | `has_gps` | Binary flag: GPS coordinates present (1) or absent (0) | GPS in unexpected file types may indicate data leakage |
-| 7 | `has_thumbnail` | Binary flag: embedded thumbnail present | Thumbnails can carry hidden data or outdated images |
-| 8 | `suspicious_field_count` | Count of fields matching suspicious patterns (e.g., script tags, base64) | Direct indicator of potential payload embedding |
-| 9 | `creation_modify_delta` | Seconds between creation and modification timestamps | Large or negative deltas suggest timestamp manipulation |
-| 10 | `extension_mimetype_mismatch` | Binary flag: file extension does not match detected MIME type | Classic polyglot/masquerading indicator |
-| 11 | `header_magic_valid` | Binary flag: file header magic bytes match expected type | Invalid magic bytes indicate file type spoofing |
-| 12 | `embedded_file_count` | Number of embedded files or objects detected | Hidden embedded content is a common attack vector |
-| 13 | `null_byte_ratio` | Ratio of null bytes to total file size | Abnormal null byte ratios indicate padding or binary injection |
-| 14 | `printable_ratio` | Ratio of printable ASCII characters to total file size | Helps distinguish text-heavy payloads from binary content |
-| 15 | `longest_run_length` | Length of the longest repeated byte sequence | Long runs may indicate NOP sleds, padding, or steganography |
+**Metadata and content features (f0-f14)**
+
+| # | Feature |
+|---|---------|
+| 0 | `metadata_field_count` |
+| 1 | `total_metadata_size_bytes` |
+| 2 | `field_name_entropy` |
+| 3 | `field_value_entropy` |
+| 4 | `printable_ratio` |
+| 5 | `base64_string_count` |
+| 6 | `url_string_count` |
+| 7 | `executable_string_count` |
+| 8 | `sql_string_count` |
+| 9 | `file_size_metadata_ratio` |
+| 10 | `timestamp_consistency_score` |
+| 11 | `gps_present` |
+| 12 | `embedded_file_indicators` |
+| 13 | `exif_completeness_score` |
+| 14 | `file_header_entropy` |
+
+**Analyzer-derived features (f15-f24)**, taken from the PE and PDF analyzers' findings and the detected format:
+
+| # | Feature |
+|---|---------|
+| 15 | `pe_finding_count` |
+| 16 | `pe_kernel_driver_flag` |
+| 17 | `pe_suspicious_imports_flag` |
+| 18 | `pe_packed_or_overlay_flag` |
+| 19 | `pe_max_risk_score_norm` |
+| 20 | `pdf_js_flag` |
+| 21 | `pdf_structural_anomaly_count` |
+| 22 | `pdf_max_risk_score_norm` |
+| 23 | `detected_format_pe` |
+| 24 | `detected_format_pdf` |
+
+**Trust and false-positive-control features (f25-f32)**
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 25 | `publisher_trust_valid_chain` | Valid publisher signature: Authenticode for PE files, the signature block for PowerShell scripts; 0 for other files |
+| 26 | `is_known_clean_format` | First bytes match a recognized image or font format (PNG, JPEG, GIF, SVG, TTF, OTF, WOFF, WOFF2, WebP, ICO, TIFF, BMP, HEIC) |
+| 27 | `is_epson_driver_naming` | File name matches Epson printer-driver naming |
+| 28 | `is_generic_oem_driver_naming` | File name matches a generic vendor-driver naming pattern |
+| 29 | `is_in_oem_driver_path` | Path contains Windows DriverStore markers |
+| 30 | `parent_dir_vendor_token_present` | Parent directory name contains a known vendor token |
+| 31 | `is_powershell_test_harness` | Pester / Microsoft test-harness shape |
+| 32 | `image_icon_size_heuristic` | Tiny known-clean-format file (icon shape) |
+
+**Ensemble features (`ExtendedFeatureExtractor`, 25):** `metadata_field_count`, `field_value_avg_length`, `field_value_max_length`, `field_value_stddev_length`, `field_count_ratio`, `numeric_field_ratio`, `ascii_ratio`, `entropy_avg`, `entropy_max`, `entropy_stddev`, `has_gps_data`, `has_thumbnail`, `timestamp_count`, `timestamp_consistency`, `url_count`, `email_count`, `executable_pattern_count`, `base64_likelihood`, `special_char_ratio`, `field_name_anomaly_score`, `nested_depth_max`, `binary_content_ratio`, `file_size_to_metadata_ratio`, `duplicate_value_count`, `language_consistency`.
 
 ## Getting Started
 
@@ -101,8 +133,8 @@ Each anomaly result contains:
 - **contributing_features**: List of feature names that contributed most to the anomaly score. These tell you *why* the file was flagged.
 
 Example interpretation:
-- Score 0.85, contributing features `["entropy", "null_byte_ratio"]` -- the file has unusually high entropy and an abnormal proportion of null bytes, possibly indicating encrypted content appended to an otherwise normal file.
-- Score 0.62, contributing features `["extension_mimetype_mismatch", "metadata_field_count"]` -- the file extension does not match its actual content type and has an unusual number of metadata fields.
+- Score 0.85, contributing features `["file_header_entropy", "embedded_file_indicators"]` -- the file header has unusually high entropy and the file shows signs of embedded content, possibly indicating an encrypted payload inside an otherwise normal file.
+- Score 0.62, contributing features `["base64_string_count", "metadata_field_count"]` -- the metadata carries more base64-encoded strings than usual and an unusual number of metadata fields.
 
 ## Baseline Model Limitations
 

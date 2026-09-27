@@ -6,7 +6,7 @@ A practical guide for SOC analysts and incident responders using HADES to invest
 
 ## 1. Understanding Threat Scores
 
-HADES uses an **enterprise two-axis scoring model** inspired by CrowdStrike and Palo Alto Networks. Every file is evaluated on two independent axes:
+HADES uses a **two-axis scoring model**. Every file is evaluated on two independent axes:
 
 ### Confidence Level
 
@@ -315,7 +315,7 @@ HADES SIEM alerts include:
 
 ### File Types HADES Detects
 
-HADES analyzes 45+ file types, including:
+HADES analyzes file types including:
 
 **Documents:** PDF, DOC/DOCX/DOCM, XLS/XLSX/XLSM, PPT/PPTX, RTF, OneNote
 **Executables:** EXE, DLL, SYS, OCX, ELF, Mach-O, APK

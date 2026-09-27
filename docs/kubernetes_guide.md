@@ -1,6 +1,8 @@
 # Kubernetes Deployment Guide
 
-HADES provides a production-grade Helm chart and Kustomize overlays for Kubernetes deployments.
+> **ROADMAP, not a shipped deployment option (updated 2026-09-27).** HADES currently ships as a single self-contained binary (the `hades` CLI and `hades-server`). Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap. This guide describes that planned architecture. **No throughput, scans-per-day or hardware-sizing figure in it is a measured HADES result**, and none is given; size a deployment by benchmarking on your own hardware and file mix.
+
+This guide describes the planned Helm chart and Kustomize overlays for Kubernetes deployments.
 
 **Related guides:**
 - [Observability Guide](observability_guide.md) -- Prometheus metrics, Grafana dashboards, alerting
@@ -288,14 +290,9 @@ spec:
 
 ## Resource Tuning
 
-### Sizing by Deployment Tier
+### Sizing
 
-| Tier | API Pods | API CPU/Memory | Worker Pods | Worker CPU/Memory | Estimated Throughput |
-|------|---------|----------------|-------------|-------------------|---------------------|
-| Dev / Testing | 1 | 250m / 256Mi | 1 | 250m / 256Mi | < 10,000 scans/day |
-| Small Team | 2 | 500m / 512Mi | 2-4 | 500m / 512Mi | 50,000-200,000 scans/day |
-| Enterprise | 3-5 | 1000m / 1Gi | 4-8 | 1000m / 1Gi | 200,000-1,000,000 scans/day |
-| Large Scale | 5-10 | 2000m / 2Gi | 8-20 | 2000m / 2Gi | 1,000,000+ scans/day |
+HADES publishes no measured per-pod throughput, so there is no sizing table here. Start from the chart defaults above, benchmark with your own file mix, and scale from the measured result.
 
 ### Tuning Tips
 

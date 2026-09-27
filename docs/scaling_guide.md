@@ -1,5 +1,7 @@
 # HADES Scaling Guide
 
+> **ROADMAP, not a shipped deployment option (updated 2026-09-27).** HADES currently ships as a single self-contained binary (the `hades` CLI and `hades-server`). Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap. This guide describes that planned architecture. **No throughput, scans-per-day or hardware-sizing figure in it is a measured HADES result**, and none is given; size a deployment by benchmarking on your own hardware and file mix.
+
 This guide covers horizontal scaling, database scaling, load balancing, and Kubernetes deployment concepts for HADES.
 
 ## Docker Compose Scaling
@@ -64,12 +66,7 @@ export HADES_REDIS_URL=redis://:password@redis-host:6379/0
 
 ### Redis Memory Sizing
 
-| Deployment | maxmemory | Estimated Capacity |
-|-----------|-----------|-------------------|
-| Small (< 100K scans/day) | 256 MB | ~50K cached results |
-| Medium (100K-500K/day) | 512 MB | ~100K cached results |
-| Large (500K-2M/day) | 1 GB | ~200K cached results |
-| Enterprise (2M+/day) | 2-4 GB | ~500K+ cached results |
+Set `maxmemory` from the measured size of your cached results and your cache TTL; HADES publishes no measured capacity figures for Redis. Monitor `used_memory` and the eviction count and adjust.
 
 ### Redis Sentinel (High Availability)
 
