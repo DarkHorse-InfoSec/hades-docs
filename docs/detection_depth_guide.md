@@ -20,21 +20,35 @@ XGBoost requires the `xgboost` package. When unavailable, the ensemble degrades 
 
 ### Extended Features (25 total)
 
-The `ExtendedFeatureExtractor` inherits the base 15 features from `MetadataFeatureExtractor` and adds 10 new security-focused features:
+The `ExtendedFeatureExtractor` (`core/ml_ensemble.py`, v1.7.1) computes its own 25 statistical features; it does not inherit from `MetadataFeatureExtractor`, which has a separate 33-feature schema (see the ML Detection Guide). Names and descriptions below are from the extractor's source:
 
 | # | Feature | Description |
 |---|---------|-------------|
-| 0-14 | Base features | Field count, entropy, printable ratio, Base64/URL/exec/SQL counts, timestamps, GPS, etc. |
-| 15 | script_tag_count | Number of `<script>` tags in metadata values |
-| 16 | php_pattern_count | PHP code patterns (`<?php`, `shell_exec`, `passthru`) |
-| 17 | shell_command_count | Shell commands (`wget`, `curl`, `nc`, `chmod`, `bash -i`) |
-| 18 | iframe_count | Number of `<iframe>` tags |
-| 19 | encoding_layer_depth | Estimated nesting depth of encoding (Base64, hex, URL, double-encoding) |
-| 20 | unicode_escape_count | Unicode/hex escape sequences (`\uXXXX`, `\xXX`, `%uXXXX`) |
-| 21 | null_byte_count | Null bytes in metadata values (common in injection attacks) |
-| 22 | field_name_length_variance | Statistical variance of field name lengths |
-| 23 | value_length_variance | Statistical variance of field value lengths |
-| 24 | suspicious_field_ratio | Ratio of fields containing suspicious keywords |
+| 0 | metadata_field_count | Total number of metadata fields |
+| 1 | field_value_avg_length | Average length of all field values |
+| 2 | field_value_max_length | Maximum field value length |
+| 3 | field_value_stddev_length | Standard deviation of field value lengths |
+| 4 | field_count_ratio | Populated / expected fields for the file type |
+| 5 | numeric_field_ratio | Proportion of numeric-valued fields |
+| 6 | ascii_ratio | Proportion of pure-ASCII field values |
+| 7 | entropy_avg | Average Shannon entropy across values |
+| 8 | entropy_max | Maximum Shannon entropy of any value |
+| 9 | entropy_stddev | Standard deviation of per-field entropy |
+| 10 | has_gps_data | GPS coordinates present |
+| 11 | has_thumbnail | Embedded thumbnail present |
+| 12 | timestamp_count | Number of timestamp-related fields |
+| 13 | timestamp_consistency | Score (0-1) for date consistency |
+| 14 | url_count | Number of URLs across all fields |
+| 15 | email_count | Number of email addresses found |
+| 16 | executable_pattern_count | Count of executable-like patterns |
+| 17 | base64_likelihood | Score (0-1) for Base64 content |
+| 18 | special_char_ratio | Ratio of special characters to total characters |
+| 19 | field_name_anomaly_score | Score for unusual field names |
+| 20 | nested_depth_max | Maximum nesting depth of metadata |
+| 21 | binary_content_ratio | Proportion of non-printable bytes |
+| 22 | file_size_to_metadata_ratio | Ratio of metadata size to file size |
+| 23 | duplicate_value_count | Number of fields with identical values |
+| 24 | language_consistency | Score for consistent encoding / language |
 
 ### Weighted Voting
 

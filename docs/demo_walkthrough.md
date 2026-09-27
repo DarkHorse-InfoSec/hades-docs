@@ -321,10 +321,10 @@ python core/hades_enhanced_cli.py --ml-train demo_workspace/clean/
 python core/hades_enhanced_cli.py -r --ml-detect demo_workspace/evidence/
 ```
 
-**Expected output:** ML status shows model availability. Training builds an Isolation Forest from 15 metadata features. ML-enabled scans report anomaly scores alongside traditional detections.
+**Expected output:** ML status shows model availability. Training builds an Isolation Forest from the 33 features of `MetadataFeatureExtractor` (v1.7.1). ML-enabled scans report anomaly scores alongside traditional detections.
 
 **Talking points:**
-- 15 features extracted per file: field count, value lengths, entropy, special char ratios, etc.
+- 33 features extracted per file (v1.7.1): metadata field count and size, field-name and field-value entropy, base64 / URL / executable string counts, PE and PDF analyzer signals, publisher-signature trust and known-clean-format flags. The `--ml-ensemble` path uses a separate 25-feature extractor.
 - Isolation Forest identifies files that are statistically unusual vs. the baseline
 - Works alongside (not replacing) YARA and heuristic detection
 - Requires scikit-learn: `pip install scikit-learn`
