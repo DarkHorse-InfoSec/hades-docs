@@ -385,9 +385,9 @@
     "name": "HADES",
     "alternateName": "Hidden Artifact Detection & EXIF Scanner",
     "applicationCategory": "SecurityApplication",
-    "operatingSystem": "Linux, macOS, Windows",
+    "operatingSystem": "Linux, Windows",
     "softwareVersion": "1.7.1",
-    "description": "Enterprise metadata forensics engine measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across 15,156 malware samples (99.93% overall detection, 99.70% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). ML ensemble detection, MITRE ATT&CK mapping (51+ techniques), playbook automation, native SIEM connectors, and court-ready evidence chain.",
+    "description": "Enterprise metadata forensics engine measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across 15,156 malware samples (99.93% overall detection, 99.70% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). ML ensemble detection, MITRE ATT&CK mapping (51 techniques), playbook automation, native SIEM connectors, and court-ready evidence chain.",
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -401,14 +401,14 @@
     "downloadUrl": "https://portal.darkhorseinfosec.com/api/v1/download",
     "codeRepository": "https://github.com/DarkHorse-InfoSec/hades-docs",
     "featureList": [
-      "Metadata extraction from 200+ file formats",
+      "Metadata extraction across images, documents, archives, audio, video, email, and web files",
       "144 YARA detection rules across 55 rule files for metadata threat detection",
       "ML ensemble detection (Isolation Forest + Random Forest + XGBoost)",
-      "MITRE ATT&CK mapping with 51+ techniques across 11 tactics",
-      "Event-driven playbook automation with 10+ built-in workflows",
+      "MITRE ATT&CK mapping with 51 techniques across 14 tactics",
+      "Event-driven playbook automation with 10 built-in workflows",
       "Court-ready forensic evidence chain with HMAC-SHA256 signatures",
       "Native SIEM connectors (Splunk HEC, Elasticsearch, Microsoft Sentinel)",
-      "FastAPI REST API with 16-view web dashboard and Python SDK",
+      "FastAPI REST API with 12-view web dashboard and Python SDK",
       "RBAC, SSO (OIDC/SAML), AES-256-GCM encryption, multi-tenant isolation",
       "Cloud storage scanning (AWS S3, GCS, Azure Blob)",
       "Kubernetes Helm chart with horizontal autoscaling",
@@ -472,7 +472,7 @@
           <span class="stat-label">Overall Malware Detection (15,156)</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">51+</span>
+          <span class="stat-value">51</span>
           <span class="stat-label">MITRE Techniques</span>
         </div>
         <div class="stat-item">
@@ -483,14 +483,10 @@
           <span class="stat-value">20</span>
           <span class="stat-label">Forensic Analyzer Modules</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-value">45+</span>
-          <span class="stat-label">File Types Covered</span>
-        </div>
       </div>
 
       <div class="hades-intro">
-        <p>HADES is an enterprise metadata forensics engine built for security teams and incident responders. Measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across <strong>15,156 malware samples</strong>: <strong>99.70% detection on MalwareBazaar (3,269)</strong>, <strong>99.98% on Contagio (11,877)</strong>, <strong>100% on the targeted Gootloader set (10 files)</strong>, and <strong>99.93% overall</strong>, with 10 samples undetected and 1 timeout. A separate 4,726-file clean corpus scanned the same day returned 1 CRITICAL and 396 HIGH; that corpus is built for machine-learning training and deliberately includes known-false-positive categories, so its 8.40% HIGH-or-CRITICAL share is not a false-positive rate over a typical customer file mix. Figures measured on engine source, not on a release binary. Multi-layer detection combines 144 YARA detection rules across 55 rule files, ML ensemble models, behavioral analysis, 20 dedicated forensic analyzer modules, and deep format parsing across 45+ file types, without executing target files. Enterprise-grade two-axis scoring (confidence &times; severity) matches CrowdStrike/Palo Alto patterns, with court-ready evidence handling and automated response playbooks.</p>
+        <p>HADES is an enterprise metadata forensics engine built for security teams and incident responders. Measured 2026-09-13 on the current engine (v1.7.1 source, commit de6bf83f) across <strong>15,156 malware samples</strong>: <strong>99.70% detection on MalwareBazaar (3,269)</strong>, <strong>99.98% on Contagio (11,877)</strong>, <strong>100% on the targeted Gootloader set (10 files)</strong>, and <strong>99.93% overall</strong>, with 10 samples undetected and 1 timeout. A separate 4,726-file clean corpus scanned the same day returned 1 CRITICAL and 396 HIGH; that corpus is built for machine-learning training and deliberately includes known-false-positive categories, so its 8.40% HIGH-or-CRITICAL share is not a false-positive rate over a typical customer file mix. Figures measured on engine source, not on a release binary. Multi-layer detection combines 144 YARA detection rules across 55 rule files, ML ensemble models, behavioral analysis, 20 dedicated forensic analyzer modules, and deep format parsing, without executing target files. Enterprise-grade two-axis scoring (confidence &times; severity) matches CrowdStrike/Palo Alto patterns, with court-ready evidence handling and automated response playbooks.</p>
         <div style="margin-top: 20px;">
           <a href="https://portal.darkhorseinfosec.com" class="cta-button" target="_blank" rel="noopener noreferrer">Get HADES</a>
           <a href="https://github.com/DarkHorse-InfoSec/hades-docs" class="cta-button secondary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
@@ -500,16 +496,16 @@
       <!-- Quick Start -->
       <div class="quick-start">
         <h3>Get Started in 5 Minutes</h3>
-        <p>HADES ships as a single Nuitka-compiled signed binary. Python interpreter, ExifTool, YARA engine, and ML model are all bundled inline; the host needs no pre-installed runtime. License key from the customer portal gates the download.</p>
+        <p>HADES ships as a single Nuitka-compiled signed binary. Python interpreter, YARA engine, and ML model are all bundled inline; the host needs no pre-installed runtime. ExifTool is optional for scanning (a native fallback ships in the binary) and recommended for the metadata sanitizer. License key from the customer portal gates the download.</p>
         <div class="cli-command">$ export HADES_LICENSE_KEY="..."  &amp;&amp;  curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades -o hades  &amp;&amp;  chmod +x hades   # Path A: direct download</div>
         <div class="cli-command">$ export HOMEBREW_HADES_LICENSE_KEY="..."  &amp;&amp;  brew tap DarkHorse-InfoSec/tap  &amp;&amp;  brew install DarkHorse-InfoSec/tap/hades-scanner   # Path B: Homebrew tap</div>
         <div class="cli-command">$ ./hades scan suspicious_file.jpg             # Scan a file</div>
         <div class="cli-command">$ ./hades scan -r /path/to/evidence/           # Recursive directory scan</div>
         <div class="cli-command">$ hades-server --port 8666                     # Start API server (Pro+ tier)</div>
         <ul class="requirements-list">
-          <li><strong>64-bit OS:</strong> Linux x86_64 (glibc 2.31+) shipping today; macOS Intel + Apple Silicon and Windows on the 2026-Q3 roadmap.</li>
+          <li><strong>64-bit OS:</strong> Linux x86_64 (glibc 2.34+) and Windows x86_64 available today; Windows binaries are Authenticode-signed and RFC3161-timestamped. macOS is not yet available and has no release date.</li>
           <li><strong>License key</strong> from the <a href="https://portal.darkhorseinfosec.com" target="_blank" rel="noopener noreferrer">customer portal</a>. Free Community tier available; Professional + Enterprise tiers unlocked by paid license.</li>
-          <li><strong>That's it:</strong> Nuitka-compiled binary bundles ExifTool, YARA, scikit-learn, XGBoost, and all other dependencies inline. No Python install. No optional dependency groups. PostgreSQL + Redis are optional external services for Enterprise-tier deployments only.</li>
+          <li><strong>That's it:</strong> Nuitka-compiled binary bundles YARA, scikit-learn, XGBoost, and all other Python dependencies inline; ExifTool is optional. No Python install. No optional dependency groups. PostgreSQL + Redis are optional external services for Enterprise-tier deployments only.</li>
         </ul>
       </div>
 
@@ -554,13 +550,13 @@
 
         <div class="hades-feature">
           <h3>MITRE ATT&CK Mapping</h3>
-          <p>Automatic mapping of detection findings to 51+ MITRE ATT&CK techniques across 11 tactics. Every finding is classified with technique IDs, tactic categories, and severity scores, ready for compliance reporting and threat intelligence correlation.</p>
+          <p>Automatic mapping of detection findings to 51 MITRE ATT&CK techniques across 14 tactics. Every finding is classified with technique IDs, tactic categories, and severity scores, ready for compliance reporting and threat intelligence correlation.</p>
           <div class="tech-specs">
             <h4>Coverage:</h4>
             <ul>
-              <li>51+ techniques: script injection, backdoors, steganography, polyglot, macros, encoding</li>
-              <li>11 tactics: Initial Access through Impact</li>
-              <li>52+ finding-to-technique mappings</li>
+              <li>51 techniques: script injection, backdoors, steganography, polyglot, macros, encoding</li>
+              <li>14 tactics, from Reconnaissance through Impact</li>
+              <li>83 finding types mapped to techniques</li>
               <li>API endpoint for technique lookup and tactic queries</li>
             </ul>
           </div>
@@ -584,7 +580,7 @@ $ hades case export CASE_ID</div>
 
         <div class="hades-feature">
           <h3>Automated Response Playbooks</h3>
-          <p>Event-driven response automation with 10+ built-in playbooks covering phishing triage, malware analysis, BEC detection, ransomware response, and insider threat workflows. Actions include case creation, SIEM forwarding, Slack/Teams notification, evidence export, and file quarantine.</p>
+          <p>Event-driven response automation with 10 built-in playbooks covering phishing triage, malware analysis, BEC detection, ransomware response, and insider threat workflows. Actions include case creation, SIEM forwarding, Slack/Teams notification, evidence export, and file quarantine.</p>
           <div class="tech-specs">
             <h4>Playbook Engine:</h4>
             <ul>
@@ -599,12 +595,12 @@ $ hades case export CASE_ID</div>
 
         <div class="hades-feature">
           <h3>REST API, Dashboard & SDK</h3>
-          <p>FastAPI server with authenticated endpoints, WebSocket live updates, and a 16-view browser-based dashboard. Python SDK with retry logic, webhook subscriptions, and SSE streaming for programmatic integration.</p>
+          <p>FastAPI server with authenticated endpoints, WebSocket live updates, and a 12-view browser-based dashboard. Python SDK with retry logic, webhook subscriptions, and SSE streaming for programmatic integration.</p>
           <div class="tech-specs">
             <h4>Interface Options:</h4>
             <ul>
               <li>FastAPI with async endpoints, Pydantic models, Swagger UI at /docs</li>
-              <li>16-view dashboard: Scan, Monitor, Cases, Audit, MITRE, Rules, Playbooks, Alerts, Analytics, SIEM Connectors, Quarantine, and more</li>
+              <li>12-view dashboard: Scan, Monitor, Cases, Audit, System, MITRE, Rules, Analytics, Playbooks, Alerts, Quarantine, Sanitize</li>
               <li>X-API-Key auth, rate limiting, CORS, WebSocket</li>
             </ul>
           </div>
@@ -621,7 +617,7 @@ $ hades case export CASE_ID</div>
               <li>SSO: OIDC JWT validation, SAML AuthnRequest, JIT user provisioning</li>
               <li>AES-256-GCM encrypted storage with key management</li>
               <li>Multi-tenant isolation with API key to tenant mapping</li>
-              <li>Prometheus metrics (20+), Grafana dashboards (4), Alertmanager</li>
+              <li>Prometheus metrics (21), Grafana dashboards (4), Alertmanager</li>
             </ul>
           </div>
         </div>
@@ -743,7 +739,7 @@ $ hades case export CASE_ID</div>
 
       <div class="faq-item">
         <div class="faq-question">What are the system requirements?</div>
-        <div class="faq-answer">Python 3.8+ and Phil Harvey's ExifTool installed on PATH. Optional dependencies (PostgreSQL, Redis, YARA, scikit-learn) are installed via pip dependency groups. HADES runs on Linux, macOS, and Windows.</div>
+        <div class="faq-answer">A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, YARA engine, and all Python dependencies bundled inline, so the host needs no pre-installed runtime. ExifTool is optional for scanning (a native fallback ships in the binary) and recommended for the metadata sanitizer. Linux x86_64 (glibc 2.34+) and Windows x86_64 are available today via direct portal download; Linux is also on the Homebrew tap. macOS is not yet available and has no release date.</div>
       </div>
 
       <div class="faq-item">
@@ -763,7 +759,7 @@ $ hades case export CASE_ID</div>
 
       <div class="faq-item">
         <div class="faq-question">What specific threats can HADES detect in file metadata?</div>
-        <div class="faq-answer">HADES detects 44+ threat categories including: Zombie ZIP attacks (compression method mismatch), PDF shadow attacks (incremental update abuse), VBA stomping (source/p-code mismatch), RTF Equation Editor exploits (CVE-2017-11882), weaponized LNK shortcuts (PowerShell payloads, icon harvesting), OneNote embedded executables, CSV formula injection (=CMD, DDE), HTML credential harvesting and phishing, steganography (JPEG DCT analysis, palette manipulation), image decompression bombs, timestamp stomping (anti-forensic detection), archive bombs (ZIP, RAR, 7z), and many more. Every finding is mapped to MITRE ATT&CK techniques.</div>
+        <div class="faq-answer">HADES detects threat categories including: Zombie ZIP attacks (compression method mismatch), PDF shadow attacks (incremental update abuse), VBA stomping (source/p-code mismatch), RTF Equation Editor exploits (CVE-2017-11882), weaponized LNK shortcuts (PowerShell payloads, icon harvesting), OneNote embedded executables, CSV formula injection (=CMD, DDE), HTML credential harvesting and phishing, steganography (JPEG DCT analysis, palette manipulation), image decompression bombs, timestamp stomping (anti-forensic detection), archive bombs (ZIP, RAR, 7z), and many more. Every finding is mapped to MITRE ATT&CK techniques.</div>
       </div>
 
       <div class="faq-item">
