@@ -6,7 +6,7 @@ A practical guide for SOC analysts and incident responders using HADES to invest
 
 ## 1. Understanding Threat Scores
 
-HADES uses an **enterprise two-axis scoring model** inspired by CrowdStrike and Palo Alto Networks. Every file is evaluated on two independent axes:
+HADES uses a **two-axis scoring model**. Every file is evaluated on two independent axes:
 
 ### Confidence Level
 
