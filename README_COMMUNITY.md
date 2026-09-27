@@ -10,7 +10,7 @@ Built and maintained by DarkHorse Information Security LLC.
 
 ## Quick Start
 
-HADES ships as a single Nuitka-compiled signed binary with its Python interpreter, YARA engine and ML model bundled; ExifTool is optional (a native fallback ships in the binary). Two install paths -- both gated by a license key from the customer portal:
+HADES ships as a single Nuitka-compiled signed binary with its Python interpreter, YARA engine and ML model bundled; ExifTool is optional (a native fallback ships in the binary). Two install paths, both gated by a license key from the customer portal:
 
 ```bash
 # Path A: direct download from the portal (Linux x86_64 shown; Windows x86_64 also available)
