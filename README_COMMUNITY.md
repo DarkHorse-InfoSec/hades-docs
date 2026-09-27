@@ -70,50 +70,39 @@ All analysis is non-execution: HADES reads file structure and metadata without r
 
 ## Features by Tier
 
-HADES is available in three tiers. The same binary ships to all tiers; your license key determines which features are active. Community (Free) tier users get a license key that unlocks the core scanning features below at no charge.
+HADES has four tiers. The same binary ships to all of them; the license key determines which features are active. Without a license key HADES runs as Community (Free). If a license key is set but fails validation (expired, bad signature, tampered), HADES stops with an error rather than silently dropping to Community.
 
-| Feature | Free | Professional | Enterprise |
-|---------|:----:|:------------:|:----------:|
-| **Core Scanning** | | | |
-| CLI scanner (single file, directory, recursive) | x | x | x |
-| YARA pattern matching, 144 rules across 55 rule files | x | x | x |
-| Deep format analysis (PDF, Office, SVG, polyglot) | x | x | x |
-| REST API server with WebSocket support | x | x | x |
-| Health check endpoint | x | x | x |
-| Metadata sanitization | x | x | x |
-| Async scan pipeline | x | x | x |
-| YARA rule builder with templates | x | x | x |
-| **Detection & Intelligence** | | | |
-| ML anomaly detection (Isolation Forest) | | x | x |
-| ML ensemble (Isolation Forest + Random Forest + XGBoost) | | x | x |
-| Cloud threat intelligence (VirusTotal, AbuseIPDB, OTX, MalwareBazaar) | | x | x |
-| Behavioral analysis and campaign detection | | x | x |
-| MITRE ATT&CK technique mapping | | x | x |
-| Threat intelligence feed scheduler | | x | x |
-| **Operations & Integration** | | | |
-| Evidence chain and case management | | x | x |
-| Forensic audit trail with hash-chain verification | | x | x |
-| SIEM integration (Syslog, CEF, STIX, LEEF, ECS, Kafka) | | x | x |
-| File monitoring (watchdog) | | x | x |
-| Plugin system with marketplace | | x | x |
-| Web dashboard (scan, monitor, cases, audit, MITRE, rules, playbooks) | | x | x |
-| Playbook engine (10 pre-built response automations) | | x | x |
-| Distributed worker pool | | x | x |
-| Scan result caching (LRU + Redis) | | x | x |
-| Prometheus metrics exporter | | x | x |
-| Grafana dashboards (4 pre-built) | | x | x |
-| Scan analytics with trend/anomaly detection | | x | x |
-| **Enterprise Security & Scale** | | | |
-| RBAC (admin/analyst/viewer roles) | | | x |
-| SSO (OIDC + SAML) | | | x |
-| Cloud storage scanning (S3, GCS, Azure Blob) | | | x |
-| CI/CD pipeline scanner (SARIF, GitHub, GitLab) | | | x |
-| Chat bot integration (Slack, Teams) | | | x |
-| Multi-tenant isolation | | | x |
-| AES-256-GCM encryption at rest | | | x |
-| PostgreSQL backend with connection pooling | | | x |
-| Kubernetes Helm chart with HPA | | | x |
-| Docker Compose HA deployments | | | x |
+The tables below are taken from the license module of HADES v1.7.1 (`core/auth/license.py`: `TIER_FEATURES`, `ANALYZER_TIERS`, `TIER_QUOTA_DEFAULTS`).
+
+| | Community (Free) | Professional | Team | Enterprise |
+|---|:---:|:---:|:---:|:---:|
+| **Price** | Free | $99/mo or $799/yr | $299/mo or $2,499/yr | Custom |
+| **Detection stages** | IOC and heuristic analysis only | Full engine | Full engine | Full engine |
+| YARA rule matching | | x | x | x |
+| ML detection | | x | x | x |
+| Deep format analyzers (PDF, Office, archives and the rest of the engine) | | x | x | x |
+| **Licensed features** | | | | |
+| CLI scanning | x | x | x | x |
+| Basic REST API and health endpoint | x | x | x | x |
+| Evidence chain | x | x | x | x |
+| Scan analytics | x | x | x | x |
+| Threat intelligence lookups and MITRE ATT&CK mapping | | x | x | x |
+| SIEM export | | x | x | x |
+| Monitoring and playbooks | | x | x | x |
+| Plugins | | x | x | x |
+| RBAC and SSO | | | x | x |
+| Cloud storage scanning | | | x | x |
+| CI/CD integration | | | x | x |
+| Chat integrations (Slack, Teams) | | | x | x |
+| Encrypted storage | | | x | x |
+| Multi-tenant administration | | | | x |
+| **Default quotas** | | | | |
+| Scans per month (CLI) | 10 | 5,000 | 50,000 | Unlimited |
+| Scans per month (API) | 5 | 2,500 | 25,000 | Unlimited |
+| Batch scanning | No | Yes | Yes | Yes |
+| Maximum file size | 10 MB | 100 MB | 500 MB | Unlimited |
+
+Community (Free) runs the IOC and heuristic stages only; YARA, ML and the deep format analyzers need Professional or higher. A license can carry its own quota values, which override the defaults above.
 
 To activate or change your tier, set your license key:
 
@@ -215,11 +204,13 @@ hades <subcommand> --help
 
 The REST API runs at `http://localhost:8666` by default. Start with `hades-server --port 8666`.
 
+Tier is the lowest tier whose license unlocks the route (v1.7.1 `core/hades_api.py` route gates). Pro, Team and Enterprise each include every lower tier.
+
 | Endpoint | Method | Tier | Description |
 |----------|--------|------|-------------|
 | `/api/v1/health` | GET | Free | Health check |
 | `/api/v1/scan` | POST | Free | Scan file (multipart upload) |
-| `/api/v1/scan/batch` | POST | Free | Batch scan multiple files |
+| `/api/v1/scan/batch` | POST | Pro | Batch scan multiple files |
 | `/api/v1/scan/{id}` | GET | Free | Retrieve scan results |
 | `/api/v1/sanitize` | POST | Free | Sanitize file metadata |
 | `/api/v1/rules/templates` | GET | Free | YARA rule templates |
@@ -227,7 +218,7 @@ The REST API runs at `http://localhost:8666` by default. Start with `hades-serve
 | `/dashboard/` | GET | Free | Web dashboard |
 | `/docs` | GET | Free | Swagger/OpenAPI docs |
 | `/ws` | WS | Free | WebSocket for live updates |
-| `/api/v1/evidence/*` | GET/POST | Pro | Evidence chain and case management |
+| `/api/v1/evidence/*` | GET/POST | Free | Evidence chain and case management |
 | `/api/v1/mitre/*` | GET | Pro | MITRE ATT&CK mappings |
 | `/api/v1/ml/ensemble/*` | GET | Pro | ML ensemble status |
 | `/api/v1/behavioral/*` | GET | Pro | Campaign detection |
@@ -237,15 +228,15 @@ The REST API runs at `http://localhost:8666` by default. Start with `hades-serve
 | `/api/v1/export` | POST | Pro | SIEM export |
 | `/api/v1/threat-intel/*` | GET/POST | Pro | Threat intel scheduler |
 | `/api/v1/playbooks/*` | GET/POST | Pro | Playbook engine |
-| `/metrics` | GET | Pro | Prometheus metrics |
-| `/api/v1/metrics/*` | GET | Pro | JSON metrics and health |
-| `/api/v1/auth/*` | GET/POST | Enterprise | RBAC user management |
-| `/api/v1/integrations/cloud/*` | GET/POST | Enterprise | Cloud storage scanning |
-| `/api/v1/integrations/cicd/*` | POST | Enterprise | CI/CD scanning |
-| `/api/v1/integrations/slack/*` | POST | Enterprise | Slack bot |
-| `/api/v1/integrations/teams/*` | POST | Enterprise | Teams bot |
+| `/metrics` | GET | Free | Prometheus metrics |
+| `/api/v1/metrics/*` | GET | Free | JSON metrics and health |
+| `/api/v1/auth/*` | GET/POST | Team | RBAC user management |
+| `/api/v1/integrations/cloud/*` | GET/POST | Team | Cloud storage scanning |
+| `/api/v1/integrations/cicd/*` | POST | Team | CI/CD scanning |
+| `/api/v1/integrations/slack/*` | POST | Team | Slack bot |
+| `/api/v1/integrations/teams/*` | POST | Team | Teams bot |
 | `/api/v1/admin/tenants/*` | GET/POST | Enterprise | Multi-tenant management |
-| `/api/v1/admin/encryption/*` | GET | Enterprise | Encryption status |
+| `/api/v1/admin/encryption/*` | GET | Team | Encryption status |
 
 ---
 

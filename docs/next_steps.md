@@ -221,9 +221,10 @@ The technical product is feature-complete. The following business execution item
 
 | Tier | Target Audience | Key Features |
 |------|----------------|--------------|
-| **Community** (free) | Individual practitioners | CLI scan, basic API, YARA rules, sanitize |
-| **Professional** | Small security teams | + SIEM, threat intel, ML, evidence chain, monitoring, plugins |
-| **Enterprise** | SOC teams, MSSPs | + RBAC, SSO, cloud scanning, multi-tenant, encrypted storage |
+| **Community** (free) | Individual practitioners | CLI scan, basic API, evidence chain, scan analytics; IOC and heuristic stages only |
+| **Professional** | Small security teams | + YARA, ML, full engine, SIEM export, threat intel, MITRE mapping, monitoring, playbooks, plugins |
+| **Team** | Security teams, MSPs | + RBAC, SSO, cloud scanning, CI/CD, chat integrations, encrypted storage |
+| **Enterprise** | Large organizations | + multi-tenant administration |
 
 **Action items:**
 - [ ] Finalize pricing strategy
