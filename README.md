@@ -2,10 +2,9 @@
 
 **The metadata forensics engine for security professionals.**
 
-![Version](https://img.shields.io/badge/Version-1.1.0-red)
-![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Version](https://img.shields.io/badge/Version-1.7.1-red)
 ![License](https://img.shields.io/badge/License-Proprietary-red)
-![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey)
 
 Built by [DarkHorse Information Security LLC](https://github.com/DarkHorse-InfoSec).
 
@@ -39,20 +38,20 @@ HADES scans files for hidden threats buried in metadata, detects malicious patte
 - **REST API + Web Dashboard + CLI** -- FastAPI server with WebSocket support, browser-based dashboard, and full-featured command line interface
 - **Plugin system** -- Extensible detection framework with marketplace, hot-reload, and sandboxed execution
 
-HADES covers 32 forensic detection categories across images, documents, archives, audio, video, firmware, and streaming formats with 55 YARA rule files carrying 144 detection rules.
+HADES covers forensic detection across images, documents, archives, audio, video, firmware, and streaming formats with 55 YARA rule files carrying 144 detection rules.
 
 ---
 
 ## Quick Start
 
 ```bash
-# Path A: direct download from the customer portal (Linux x86_64 today)
+# Path A: direct download from the customer portal (Linux x86_64 shown; Windows x86_64 also available)
 export HADES_LICENSE_KEY="<paste from portal email>"
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
   "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 
-# Or Path B: Homebrew tap (macOS and Linux)
+# Or Path B: Homebrew tap (Linux, via Linuxbrew)
 export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
 brew tap DarkHorse-InfoSec/tap && brew install DarkHorse-InfoSec/tap/hades-scanner
 
@@ -94,20 +93,19 @@ Run `hades <command> --help` for detailed usage on any subcommand.
 
 ### Prerequisites
 
-A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, ExifTool, YARA engine, and all dependencies bundled inline, so the host needs no pre-installed runtime.
+A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, YARA engine, and all Python dependencies bundled inline, so the host needs no pre-installed runtime. ExifTool is optional for scanning (a native fallback ships in the binary) and recommended for the metadata sanitizer.
 
 | OS | Status |
 |---|---|
-| Linux x86_64 (glibc 2.31+) | Path A + Path B |
-| macOS Intel (10.15+) | Path B today; Path A binary on 2026-Q3 roadmap |
-| macOS Apple Silicon (11.0+) | Path B today; Path A binary on 2026-Q3 roadmap |
-| Windows 10 / 11 / Server 2019+ | Pending code-signing cert acquisition |
+| Linux x86_64 (glibc 2.34+) | Path A + Path B (via Linuxbrew) |
+| Windows x86_64 | Path A; binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped |
+| macOS | Not yet available; no release date |
 
 See [Installation Guide](docs/installation.md) for full details, troubleshooting, and platform notes.
 
 ### Older install paths (no longer supported)
 
-Pre-v1.4 distribution via PyPI (`pip install hades-scanner`), Docker Hub images at `darkhorse-security/hades-scanner`, the Cloudsmith private registry at `dl.cloudsmith.io/basic/darkhorse/hades`, and public source-clone are no longer supported. Path A and Path B are the only canonical install paths. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
+Pre-v1.4 distribution via pip from the Cloudsmith private registry at `dl.cloudsmith.io/basic/darkhorse/hades` (`pip install hades-scanner`; HADES is not on public PyPI), Docker Hub images at `darkhorse-security/hades-scanner`, and public source-clone are no longer supported. Path A and Path B are the only canonical install paths. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 ---
 

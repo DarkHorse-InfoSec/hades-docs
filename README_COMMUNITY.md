@@ -10,16 +10,16 @@ Built and maintained by DarkHorse Information Security LLC.
 
 ## Quick Start
 
-HADES ships as a single Nuitka-compiled signed binary with everything bundled (Python interpreter, ExifTool, YARA engine, ML model). Two install paths -- both gated by a license key from the customer portal:
+HADES ships as a single Nuitka-compiled signed binary with its Python interpreter, YARA engine and ML model bundled; ExifTool is optional (a native fallback ships in the binary). Two install paths -- both gated by a license key from the customer portal:
 
 ```bash
-# Path A: direct download from the portal (Linux x86_64 today)
+# Path A: direct download from the portal (Linux x86_64 shown; Windows x86_64 also available)
 export HADES_LICENSE_KEY="<paste from portal email>"
 curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
   "https://portal.darkhorseinfosec.com/api/v1/download/linux-x86_64/latest/hades" \
   -o hades && chmod +x hades
 
-# Path B: Homebrew tap (macOS and Linux)
+# Path B: Homebrew tap (Linux, via Linuxbrew)
 export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
 brew tap DarkHorse-InfoSec/tap
 brew install DarkHorse-InfoSec/tap/hades-scanner
@@ -147,9 +147,9 @@ curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
   -o hades && chmod +x hades
 ```
 
-The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL to Cloudflare R2, and `curl` follows the redirect. The binary is RSA-PSS-signed and verifies its own integrity at first run.
+The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL to Cloudflare R2, and `curl` follows the redirect. Windows binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped; the bundled ML model is RSA-PSS-signed and is not loaded if its signature fails to verify.
 
-### Path B: Homebrew tap (macOS and Linux)
+### Path B: Homebrew tap (Linux, via Linuxbrew)
 
 ```bash
 export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
@@ -161,7 +161,7 @@ The formula uses `HadesPortalDownloadStrategy` to inject your license key as a B
 
 ### Older install paths (no longer supported)
 
-Pre-v1.4 distribution via PyPI (`pip install hades-scanner`), Docker Hub images at `darkhorse-security/hades-scanner`, the Cloudsmith private registry, public source-clone, and standalone `brew install hades-scanner` (no tap) are all no longer supported. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
+Pre-v1.4 distribution via pip from the Cloudsmith private registry (`pip install hades-scanner`; HADES is not on public PyPI), Docker Hub images at `darkhorse-security/hades-scanner`, public source-clone, and standalone `brew install hades-scanner` (no tap) are all no longer supported. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 ---
 
@@ -286,14 +286,13 @@ File Input
 
 ## System Requirements
 
-A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, ExifTool, YARA engine, and all dependencies bundled inline, so the host needs no pre-installed runtime.
+A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, YARA engine, and all Python dependencies bundled inline, so the host needs no pre-installed runtime. ExifTool is optional for scanning (a native fallback ships in the binary) and recommended for the metadata sanitizer.
 
 | OS | Status |
 |---|---|
-| Linux x86_64 (glibc 2.31+) | Path A + Path B (via Linuxbrew) |
-| macOS Intel (10.15+) | Path B today; Path A binary on 2026-Q3 roadmap |
-| macOS Apple Silicon (11.0+) | Path B today; Path A binary on 2026-Q3 roadmap |
-| Windows 10 / 11 / Server 2019+ | Pending code-signing cert acquisition |
+| Linux x86_64 (glibc 2.34+) | Path A + Path B (via Linuxbrew) |
+| Windows x86_64 | Path A; binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped |
+| macOS | Not yet available; no release date |
 
 Pro+ tier features (Redis caching, PostgreSQL backend, Prometheus metrics, distributed workers) optionally use external services that you provision in your own infrastructure; the HADES binary connects to them but does not embed them.
 

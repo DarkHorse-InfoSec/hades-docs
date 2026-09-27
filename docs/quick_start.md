@@ -12,9 +12,9 @@ HADES extracts and analyzes metadata from files -- images, documents, PDFs, arch
 
 ## Prerequisites
 
-You need a 64-bit OS and your `HADES_LICENSE_KEY` from the license email. That's it. The HADES binary is Nuitka-compiled with its Python interpreter, ExifTool, YARA engine, and ML model bundled inline, so the host needs no pre-installed runtime.
+You need a 64-bit OS and your `HADES_LICENSE_KEY` from the license email. That's it. The HADES binary is Nuitka-compiled with its Python interpreter, YARA engine, and ML model bundled inline, so the host needs no pre-installed runtime. ExifTool is optional for scanning (a native fallback ships in the binary).
 
-Linux x86_64 (glibc 2.31+) and macOS (via Homebrew tap) are shipping today. Windows binary is on the 2026-Q3 roadmap pending code-signing certificate acquisition.
+Linux x86_64 (glibc 2.34+) and Windows x86_64 are available today. macOS is not yet available and has no release date.
 
 ---
 
@@ -31,9 +31,9 @@ curl -fL -H "Authorization: Bearer $HADES_LICENSE_KEY" \
   -o hades && chmod +x hades
 ```
 
-The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL, and `curl` follows the redirect. The binary is RSA-PSS-signed and verifies its own integrity at first run.
+The portal validates your license, generates a 15-minute HMAC-SHA256-signed URL, and `curl` follows the redirect. Windows binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped; the bundled ML model is RSA-PSS-signed and is not loaded if its signature fails to verify.
 
-### Path B: Homebrew tap (macOS and Linux convenience)
+### Path B: Homebrew tap (Linux convenience, via Linuxbrew)
 
 ```bash
 export HOMEBREW_HADES_LICENSE_KEY="<paste from portal email>"
