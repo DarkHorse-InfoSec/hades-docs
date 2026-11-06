@@ -19,18 +19,18 @@
   <meta name="theme-color" content="#0f0f0f">
   <link rel="icon" type="image/webp" href="images/logo/DH Circle Dark Background.webp">
   <link rel="apple-touch-icon" href="images/logo/DH Circle Dark Background.webp">
-  <meta name="description" content="HADES v1.7.4, Hidden Artifact Detection & EXIF Scanner. Enterprise metadata forensics engine measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across 15,156 malware samples (99.93% overall detection, 99.72% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). ML ensemble detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. 20 dedicated forensic analyzer modules. Ships as Nuitka-compiled, Authenticode-signed binaries distributed through a license-gated Cloudflare R2 endpoint behind HMAC-signed download URLs issued by the customer portal.">
+  <meta name="description" content="HADES v1.7.4, Hidden Artifact Detection & EXIF Scanner. Enterprise metadata forensics engine measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across 15,156 malware samples (99.93% overall detection, 99.72% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). signed ML detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. 20 dedicated forensic analyzer modules. Ships as Nuitka-compiled, Authenticode-signed binaries distributed through a license-gated Cloudflare R2 endpoint behind HMAC-signed download URLs issued by the customer portal.">
   <meta name="keywords" content="HADES, hidden artifact detection, EXIF scanner, metadata extraction, steganography detection, digital forensics, enterprise security, file analysis, forensic investigation, MITRE ATT&CK, YARA rules, metadata forensics">
   <meta name="author" content="DarkHorse InfoSec">
   <meta property="og:title" content="HADES Scanner - Enterprise Metadata Forensics Engine | DarkHorse InfoSec">
-  <meta property="og:description" content="Court-ready metadata forensics for security professionals. 20 forensic analyzer modules, ML ensemble detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. Measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across 15,156 malware samples: 99.93% overall detection, 99.72% MalwareBazaar / 99.98% Contagio / 100% targeted Gootloader.">
+  <meta property="og:description" content="Court-ready metadata forensics for security professionals. 20 forensic analyzer modules, signed ML detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors. Measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across 15,156 malware samples: 99.93% overall detection, 99.72% MalwareBazaar / 99.98% Contagio / 100% targeted Gootloader.">
   <meta property="og:image" content="https://darkhorseinfosec.com/images/logo/dh circle dark background.webp">
   <meta property="og:url" content="https://darkhorseinfosec.com/hades.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@darkhorse_sec">
   <meta name="twitter:title" content="HADES Scanner | Enterprise Metadata Forensics Engine">
-  <meta name="twitter:description" content="HADES v1.7.4, Court-ready metadata forensics with ML ensemble detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors.">
+  <meta name="twitter:description" content="HADES v1.7.4, Court-ready metadata forensics with signed ML detection, MITRE ATT&CK mapping, playbook automation, and native SIEM connectors.">
   <meta name="twitter:image" content="https://darkhorseinfosec.com/images/logo/dh circle dark background.webp">
   <link rel="canonical" href="https://darkhorseinfosec.com/hades.html">
 
@@ -387,7 +387,7 @@
     "applicationCategory": "SecurityApplication",
     "operatingSystem": "Linux, Windows",
     "softwareVersion": "1.7.4",
-    "description": "Enterprise metadata forensics engine measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across 15,156 malware samples (99.93% overall detection, 99.72% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). ML ensemble detection, MITRE ATT&CK mapping (51 techniques), playbook automation, native SIEM connectors, and court-ready evidence chain.",
+    "description": "Enterprise metadata forensics engine measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across 15,156 malware samples (99.93% overall detection, 99.72% on MalwareBazaar 3,269, 99.98% on Contagio 11,877, 100% on the targeted Gootloader set of 10 files). signed ML detection, MITRE ATT&CK mapping (51 techniques), playbook automation, native SIEM connectors, and court-ready evidence chain.",
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -403,13 +403,13 @@
     "featureList": [
       "Metadata extraction across images, documents, archives, audio, video, email, and web files",
       "144 YARA detection rules across 55 rule files for metadata threat detection",
-      "ML ensemble detection (Isolation Forest + Random Forest + XGBoost)",
+      "ML detection (signed XGBoost classifier, 33 features)",
       "MITRE ATT&CK mapping with 51 techniques across 14 tactics",
       "Event-driven playbook automation with 10 built-in workflows",
       "Court-ready forensic evidence chain with HMAC-SHA256 signatures",
       "Native SIEM connectors (Splunk HEC, Elasticsearch, Microsoft Sentinel)",
       "FastAPI REST API with 12-view web dashboard and Python SDK",
-      "RBAC, SSO (OIDC/SAML), AES-256-GCM encryption, multi-tenant isolation",
+      "RBAC, AES-256-GCM encryption, multi-tenant isolation",
       "Cloud storage scanning (AWS S3, GCS, Azure Blob)",
       "Prometheus metrics with Grafana dashboards",
       "Firmware and boot-level threat detection",
@@ -485,7 +485,7 @@
       </div>
 
       <div class="hades-intro">
-        <p>HADES is an enterprise metadata forensics engine built for security teams and incident responders. Measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across <strong>15,156 malware samples</strong>: <strong>99.72% detection on MalwareBazaar (3,269)</strong>, <strong>99.98% on Contagio (11,877)</strong>, <strong>100% on the targeted Gootloader set (10 files)</strong>, and <strong>99.93% overall</strong>, with 10 samples undetected and 1 timeout. A separate 4,726-file clean corpus scanned the same day returned 1 CRITICAL and 396 HIGH; that corpus is built for machine-learning training and deliberately includes known-false-positive categories, so its 8.40% HIGH-or-CRITICAL share is not a false-positive rate over a typical customer file mix. Figures measured on engine source, not on a release binary. Multi-layer detection combines 144 YARA detection rules across 55 rule files, ML ensemble models, behavioral analysis, 20 dedicated forensic analyzer modules, and deep format parsing, without executing target files. Two-axis scoring (confidence &times; severity), with court-ready evidence handling and automated response playbooks.</p>
+        <p>HADES is an enterprise metadata forensics engine built for security teams and incident responders. Measured 2026-09-13 on the current engine (engine source at commit de6bf83f: v1.7.1 plus unreleased detection changes) across <strong>15,156 malware samples</strong>: <strong>99.72% detection on MalwareBazaar (3,269)</strong>, <strong>99.98% on Contagio (11,877)</strong>, <strong>100% on the targeted Gootloader set (10 files)</strong>, and <strong>99.93% overall</strong>, with 10 samples undetected and 1 timeout. A separate 4,726-file clean corpus scanned the same day returned 1 CRITICAL and 396 HIGH; that corpus is built for machine-learning training and deliberately includes known-false-positive categories, so its 8.40% HIGH-or-CRITICAL share is not a false-positive rate over a typical customer file mix. Figures measured on engine source, not on a release binary. Multi-layer detection combines 144 YARA detection rules across 55 rule files, a signed ML classifier, behavioral analysis, 20 dedicated forensic analyzer modules, and deep format parsing, without executing target files. Two-axis scoring (confidence &times; severity), with court-ready evidence handling and automated response playbooks.</p>
         <div style="margin-top: 20px;">
           <a href="https://portal.darkhorseinfosec.com" class="cta-button" target="_blank" rel="noopener noreferrer">Get HADES</a>
           <a href="https://github.com/DarkHorse-InfoSec/hades-docs" class="cta-button secondary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
@@ -504,7 +504,7 @@
         <ul class="requirements-list">
           <li><strong>64-bit OS:</strong> Linux x86_64 (glibc 2.34+) and Windows x86_64 available today; Windows binaries are Authenticode-signed and RFC3161-timestamped. macOS is not yet available and has no release date.</li>
           <li><strong>License key</strong> from the <a href="https://portal.darkhorseinfosec.com" target="_blank" rel="noopener noreferrer">customer portal</a>. Free Community tier available; Professional + Enterprise tiers unlocked by paid license.</li>
-          <li><strong>That's it:</strong> Nuitka-compiled binary bundles YARA, scikit-learn, XGBoost, and all other Python dependencies inline; ExifTool is optional. No Python install. No optional dependency groups. PostgreSQL + Redis are optional external services for Enterprise-tier deployments only.</li>
+          <li><strong>That's it:</strong> Nuitka-compiled binary bundles YARA, scikit-learn, XGBoost, and all other Python dependencies inline; ExifTool is optional. No Python install. No optional dependency groups. Redis is an optional external service for Enterprise-tier deployments only; SQLite is built in.</li>
         </ul>
       </div>
 
@@ -533,8 +533,8 @@
         </div>
 
         <div class="hades-feature">
-          <h3>ML Ensemble & Behavioral Analysis</h3>
-          <p>Multi-model machine learning ensemble (Isolation Forest + Random Forest + optional XGBoost) with 25 statistical features including Shannon entropy and byte frequency analysis. Behavioral engine detects coordinated attack campaigns through IOC correlation and metadata pattern similarity.</p>
+          <h3>ML Detection & Behavioral Analysis</h3>
+          <p>A signed, supervised XGBoost classifier over 33 metadata and structure features, including entropy, encoded-string counts and PE and PDF analyzer signals; the model is verified at load and refused if its signature does not match. Behavioral engine detects coordinated attack campaigns through IOC correlation and metadata pattern similarity.</p>
           <div class="tech-specs">
             <h4>Analysis Capabilities:</h4>
             <ul>
@@ -608,12 +608,11 @@ $ hades case export CASE_ID</div>
 
         <div class="hades-feature">
           <h3>Enterprise Security & Observability</h3>
-          <p>Role-based access control with admin/analyst/viewer roles, SSO via OIDC and SAML, AES-256-GCM field-level encryption at rest, multi-tenant isolation, and full observability with Prometheus metrics and four pre-built Grafana dashboards.</p>
+          <p>Role-based access control with admin/analyst/viewer roles, AES-256-GCM field-level encryption at rest, multi-tenant isolation, and full observability with Prometheus metrics and four pre-built Grafana dashboards.</p>
           <div class="tech-specs">
             <h4>Enterprise Features:</h4>
             <ul>
               <li>RBAC with permission matrix and API key rotation</li>
-              <li>SSO: OIDC JWT validation, SAML AuthnRequest, JIT user provisioning</li>
               <li>AES-256-GCM encrypted storage with key management</li>
               <li>Multi-tenant isolation with API key to tenant mapping</li>
               <li>Prometheus metrics (21), Grafana dashboards (4), Alertmanager</li>
@@ -678,7 +677,7 @@ $ hades case export CASE_ID</div>
           <p style="text-align: center; color: #888; font-size: 13px; margin: -8px 0 12px;">$799/yr (save 33%)</p>
           <ul>
             <li>5,000 scans/month</li>
-            <li>144 YARA detection rules &amp; ML ensemble detection</li>
+            <li>144 YARA detection rules &amp; signed ML detection</li>
             <li>All 20 forensic analyzer modules</li>
             <li>Full findings, MITRE ATT&CK mapping</li>
             <li>Batch scanning &amp; SIEM export</li>
@@ -700,7 +699,6 @@ $ hades case export CASE_ID</div>
             <li>50,000 scans/month</li>
             <li>Everything in Professional, plus:</li>
             <li>RBAC (admin/analyst/viewer roles)</li>
-            <li>SSO (OIDC + SAML)</li>
             <li>Cloud scanning (S3, GCS, Azure)</li>
             <li>CI/CD pipeline integration</li>
             <li>Slack &amp; Teams bots</li>
@@ -739,7 +737,7 @@ $ hades case export CASE_ID</div>
 
       <div class="faq-item">
         <div class="faq-question">Is HADES free to use?</div>
-        <div class="faq-answer">Yes. The Community tier is completely free and includes heuristic &amp; IOC detection, evidence chain, and threat scoring. Professional ($99/mo), Team ($299/mo), and Enterprise (custom annual) tiers add ML ensemble detection, YARA rules, RBAC, SSO, cloud scanning, and multi-tenant isolation. Annual plans save up to 33%.</div>
+        <div class="faq-answer">Yes. The Community tier is completely free and includes heuristic &amp; IOC detection, evidence chain, and threat scoring. Professional ($99/mo), Team ($299/mo), and Enterprise (custom annual) tiers add signed ML detection, YARA rules, RBAC, cloud scanning, and multi-tenant isolation. Annual plans save up to 33%.</div>
       </div>
 
       <div class="faq-item">
@@ -764,7 +762,7 @@ $ hades case export CASE_ID</div>
 
       <div class="faq-item">
         <div class="faq-question">How does HADES differ from ExifTool alone?</div>
-        <div class="faq-answer">ExifTool extracts metadata; HADES analyzes it for threats. HADES adds YARA-based threat detection, ML ensemble anomaly scoring, deep format analysis (PDF JavaScript, Office macros, polyglot files, Zombie ZIP attacks, VBA stomping, RTF exploits, LNK payloads, audio/video metadata threats, email phishing, CSV formula injection, HTML credential harvesting), behavioral campaign detection, MITRE ATT&CK mapping, court-ready evidence handling, and automated response playbooks on top of ExifTool's extraction capabilities.</div>
+        <div class="faq-answer">ExifTool extracts metadata; HADES analyzes it for threats. HADES adds YARA-based threat detection, signed ML anomaly scoring, deep format analysis (PDF JavaScript, Office macros, polyglot files, Zombie ZIP attacks, VBA stomping, RTF exploits, LNK payloads, audio/video metadata threats, email phishing, CSV formula injection, HTML credential harvesting), behavioral campaign detection, MITRE ATT&CK mapping, court-ready evidence handling, and automated response playbooks on top of ExifTool's extraction capabilities.</div>
       </div>
 
       <div class="faq-item">
