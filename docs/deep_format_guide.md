@@ -186,7 +186,7 @@ All format-parsing dependencies are bundled inside the Nuitka-compiled HADES bin
 ### Malicious PDF with JavaScript
 
 ```bash
-$ hades-enhanced malicious.pdf -v
+$ hades scan malicious.pdf -v
 
 File: malicious.pdf
   [DEEP]  PDF contains JavaScript in /OpenAction (severity: 8)
@@ -199,7 +199,7 @@ File: malicious.pdf
 ### Office Document with Template Injection
 
 ```bash
-$ hades-enhanced phishing.docx -v
+$ hades scan phishing.docx -v
 
 File: phishing.docx
   [DEEP]  External template reference detected (severity: 8)
@@ -212,7 +212,7 @@ File: phishing.docx
 ### JPEG+ZIP Polyglot
 
 ```bash
-$ hades-enhanced image.jpg -v
+$ hades scan image.jpg -v
 
 File: image.jpg
   [DEEP]  Polyglot: valid as JPEG and ZIP (severity: 7)

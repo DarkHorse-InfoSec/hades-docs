@@ -8,7 +8,7 @@ Submit bug reports via the issue tracker at [https://github.com/DarkHorse-InfoSe
 
 When reporting a bug, include:
 
-1. HADES version (`hades-enhanced --version` or check `pyproject.toml`)
+1. HADES version (`hades --version`)
 2. Python version (`python --version`)
 3. Operating system
 4. Steps to reproduce
@@ -41,7 +41,9 @@ When submitting a rule, include:
 3. Description of the attack technique detected
 4. MITRE ATT&CK reference (if applicable)
 5. Test evidence showing the rule triggers on malicious samples and does not trigger on clean files
-6. Validation output from `python scripts/validate_rules.py`
+6. Validation output from `hades rules validate`
+
+> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 ---
 
@@ -55,7 +57,7 @@ Plugins extend HADES with custom detection logic. See the [Plugin Authoring Guid
 2. Implement required methods: `name`, `version`, `author`, `initialize`, `analyze`, `supported_file_types`, `cleanup`
 3. Return `Finding` instances with severity 0.0-10.0
 4. Add unit tests
-5. Verify loading: `hades-enhanced --list-plugins`
+5. Verify loading: `hades plugin list`
 
 ---
 

@@ -13,13 +13,19 @@ This guide covers performance tuning, deployment patterns, benchmarking, and mon
 HADES supports two scanning modes:
 
 - **Synchronous (default):** Each scan request processes sequentially through metadata extraction, YARA matching, heuristic analysis, and ML detection. Suitable for single-server deployments handling moderate volumes.
-- **Asynchronous pipeline (`--async`):** Scan tasks are submitted to a queue and processed by background workers. The API returns immediately with a task ID. Workers pull tasks from Redis and write results to the database. Suitable for high-throughput environments.
+- **Asynchronous pipeline:** Scan tasks are submitted to a queue and processed by background workers. The API returns immediately with a task ID. Workers pull tasks from Redis and write results to the database. Suitable for high-throughput environments.
 
 Enable the async pipeline:
 
 ```bash
-hades-enhanced --serve --async
+# Command-line scans
+hades scan -r --async --concurrency 8 /evidence/
+
+# Docker deployment (API server and workers)
+HADES_ASYNC_PIPELINE=true
 ```
+
+The `hades serve` command has no async option; in the Docker deployment the container entrypoint turns the pipeline on from `HADES_ASYNC_PIPELINE`.
 
 ### ExifTool Persistent Process
 
@@ -27,19 +33,25 @@ HADES uses PyExifTool to maintain a persistent ExifTool subprocess, avoiding the
 
 ### Worker Pool
 
-The `--workers` flag controls how many concurrent scan workers process files:
+`hades serve --api-workers` sets the number of API (Uvicorn) worker processes:
 
 ```bash
-# 4 scan workers + 2 uvicorn workers
-hades-enhanced --serve --workers 4 --api-workers 2
+hades serve --api-workers 2
 ```
+
+`hades scan --workers` is accepted but reserved in v1.7.4: command-line scanning is single-threaded, and the value does not yet parallelise anything. For concurrent command-line scans use `--async --concurrency N`.
 
 For distributed deployments, run dedicated worker containers:
 
 ```bash
-# Worker mode (no API server, processes queue tasks only)
-hades-enhanced --worker --distributed
+# API server side: enable the distributed worker pool (requires Redis)
+hades serve --distributed --redis-url redis://redis:6379/0
+
+# Worker containers (Docker deployment): the entrypoint starts worker mode
+HADES_MODE=worker
 ```
+
+There is no worker-only command in the `hades` binary; worker processes run in the Docker deployment.
 
 ## Tuning Parameters
 
@@ -49,7 +61,7 @@ The `--api-workers` flag sets the number of uvicorn worker processes:
 
 ```bash
 # Production: 2-4 workers per CPU core
-hades-enhanced --serve --api-workers 4
+hades serve --api-workers 4
 ```
 
 | Deployment Size | API Workers | Scan Workers |
@@ -64,14 +76,14 @@ hades-enhanced --serve --api-workers 4
 Enable scan caching to skip re-scanning unchanged files:
 
 ```bash
-hades-enhanced --serve --scan-cache --cache-ttl 3600 --cache-max-size 10000
+# Command-line scans
+hades scan -r --cache /evidence/
+
+# Docker deployment (API server and workers)
+HADES_CACHE_ENABLED=true
 ```
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--scan-cache` | disabled | Enable SHA-256 based result caching |
-| `--cache-ttl` | 3600 | Cache entry lifetime in seconds |
-| `--cache-max-size` | 10000 | Maximum cached entries (LRU eviction) |
+Caching is keyed on the file's SHA-256. The cache lifetime and size are not configurable from the command line in v1.7.4.
 
 With Redis enabled, cache is shared across all API instances.
 
@@ -94,12 +106,10 @@ For high-availability, use Redis Sentinel (included in `docker-compose.ha.yml`).
 ```bash
 pip install "hades-scanner[full]"
 
-hades-enhanced --serve \
+hades serve \
     --host 0.0.0.0 \
     --port 8666 \
-    --api-workers 2 \
-    --workers 4 \
-    --scan-cache
+    --api-workers 2
 ```
 
 ### Small Team
@@ -159,14 +169,10 @@ See the **[Kubernetes Guide](kubernetes_guide.md)** for values reference, secret
 
 ```bash
 # Full benchmark suite
-hades-benchmark
+hades benchmark --full
 
 # Quick benchmark (faster, fewer iterations)
-hades-benchmark --quick
-
-# Standalone
-python core/benchmarks.py
-python core/benchmarks.py --quick
+hades benchmark --quick
 ```
 
 ### Interpreting Results
@@ -188,10 +194,10 @@ HADES publishes no target or reference values for these metrics; results depend 
 
 ```bash
 # Save results to JSON
-python core/benchmarks.py --output results.json
+hades benchmark --quick --output results.json
 
 # Compare across runs
-python core/benchmarks.py --output results_after.json
+hades benchmark --quick --output results_after.json
 ```
 
 ## Profiling
@@ -200,10 +206,8 @@ python core/benchmarks.py --output results_after.json
 
 ```bash
 # Profile a scan directory
-hades-enhanced -r --profile /path/to/files/
+hades scan -r --profile /path/to/files/
 
-# Profile the API server (writes profile on shutdown)
-hades-enhanced --serve --profile
 ```
 
 ### Reading Profiler Output
@@ -246,7 +250,7 @@ Returns:
 For Kubernetes liveness/readiness probes or external monitoring scripts:
 
 ```bash
-hades-enhanced --health-check
+hades serve --health-check
 # Exits with code 0 (healthy) or 1 (unhealthy)
 ```
 
@@ -265,7 +269,7 @@ HADES includes a Prometheus metrics exporter with metrics covering scans, findin
 pip install "hades-scanner[observability]"
 
 # Enable metrics on the API server
-hades-enhanced --serve --metrics
+hades serve --metrics
 
 # Prometheus scrape endpoint
 curl http://localhost:8666/metrics

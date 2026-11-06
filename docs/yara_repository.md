@@ -150,9 +150,11 @@ When submitting a rule, include:
 
 1. The rule source following the `HADES_<CATEGORY>_<SPECIFIC>` naming convention
 2. Required metadata: `author`, `description`, `severity`, `date`
-3. Validation output from `python scripts/validate_rules.py`
+3. Validation output from `hades rules validate`
 4. Test evidence against both clean and malicious files
 5. Description of the attack technique and MITRE ATT&CK reference (if applicable)
+
+> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 ---
 

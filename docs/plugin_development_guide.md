@@ -56,7 +56,7 @@ class HelloPlugin(HADESPlugin):
 Verify it loads:
 
 ```bash
-python core/hades_enhanced_cli.py --list-plugins
+hades plugin list
 ```
 
 ## API Reference
@@ -181,25 +181,25 @@ The entire `plugins` section is passed to each plugin's `initialize(config)` met
 
 ## CLI Flags
 
-The enhanced CLI (`core/hades_enhanced_cli.py`) provides these plugin-related flags:
+The `hades` CLI provides these plugin-related commands and options:
 
-| Flag | Description |
+| Command / option | Description |
 |------|-------------|
-| `--plugins-dir DIR` | Override the plugins directory (default: `plugins`) |
-| `--disable-plugins` | Skip loading all detection plugins |
-| `--list-plugins` | List loaded plugins with version/author info and exit |
+| `hades scan --plugins-dir DIR` | Override the plugins directory for a scan |
+| `hades scan --disable-plugins` | Skip loading all detection plugins |
+| `hades plugin list` | List loaded plugins with version/author info |
 
 Examples:
 
 ```bash
 # List all discovered plugins
-python core/hades_enhanced_cli.py --list-plugins
+hades plugin list
 
 # Scan with plugins from a custom directory
-python core/hades_enhanced_cli.py --plugins-dir /path/to/my/plugins -r /evidence/
+hades scan --plugins-dir /path/to/my/plugins -r /evidence/
 
 # Scan without plugins
-python core/hades_enhanced_cli.py --disable-plugins -r /evidence/
+hades scan --disable-plugins -r /evidence/
 ```
 
 ## Walkthrough: Building a Hash Checker Plugin
@@ -295,10 +295,10 @@ In `cli/hades_config.json`, add your plugin config under `plugins.plugin_config`
 
 ```bash
 # Verify the plugin loads
-python core/hades_enhanced_cli.py --list-plugins
+hades plugin list
 
 # Run a scan
-python core/hades_enhanced_cli.py suspicious_file.exe -v
+hades scan suspicious_file.exe -v
 ```
 
 ## Plugin Discovery

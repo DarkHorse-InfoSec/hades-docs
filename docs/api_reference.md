@@ -2094,16 +2094,16 @@ The API reads configuration from `cli/hades_config.json`. Key settings:
 
 ## Starting the Server
 
-**Via the enhanced CLI (recommended):**
+**Via the CLI (recommended):**
 
 ```bash
-python core/hades_enhanced_cli.py --serve --port 8666
+hades serve --port 8666
 ```
 
-**Via the API module directly:**
+**Via the standalone server program:**
 
 ```bash
-python core/hades_api.py --host 127.0.0.1 --port 5000 --debug
+hades-server --host 127.0.0.1 --port 5000
 ```
 
 **Programmatically:**

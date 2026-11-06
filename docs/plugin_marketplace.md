@@ -69,14 +69,14 @@ Plugins in the `plugins/` directory are automatically discovered and loaded at s
 
 1. Place the `.py` file in the `plugins/` directory
 2. Restart the scanner or API server
-3. Verify: `hades-enhanced --list-plugins`
+3. Verify: `hades plugin list`
 
 ### From a Custom Directory
 
 Point HADES to a custom plugins directory:
 
 ```bash
-hades-enhanced --plugins-dir /path/to/my/plugins -r /evidence/
+hades scan --plugins-dir /path/to/my/plugins -r /evidence/
 ```
 
 ### Disabling Plugins
@@ -84,7 +84,7 @@ hades-enhanced --plugins-dir /path/to/my/plugins -r /evidence/
 To run without any plugins:
 
 ```bash
-hades-enhanced --disable-plugins -r /evidence/
+hades scan --disable-plugins -r /evidence/
 ```
 
 ---

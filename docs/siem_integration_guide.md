@@ -30,52 +30,50 @@ HADES provides native SIEM (Security Information and Event Management) integrati
 ### Scan and output in CEF format
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ --siem-format cef
+hades scan -r /evidence/ --siem-format cef
 ```
 
 ### Scan and output in Syslog RFC 5424 format
 
 ```bash
-python core/hades_enhanced_cli.py suspicious.jpg --siem-format syslog
+hades scan suspicious.jpg --siem-format syslog
 ```
 
 ### Export as STIX 2.1 bundle
 
 ```bash
-python core/hades_enhanced_cli.py suspicious.jpg --siem-format stix > threat_bundle.json
+hades scan suspicious.jpg --siem-format stix '>' threat_bundle.json
 ```
 
 ### Export in LEEF format for QRadar
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ --siem-format leef
+hades scan -r /evidence/ --siem-format leef
 ```
 
 ### Export in Elastic Common Schema JSON
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ --siem-format ecs
+hades scan -r /evidence/ --siem-format ecs
 ```
 
 ### Forward alerts to a remote syslog server
 
 ```bash
-python core/hades_enhanced_cli.py --monitor /evidence/ \
+hades monitor /evidence/ \
     --siem-format syslog --siem-output syslog --siem-target 10.0.0.50:514
 ```
 
 ### Export to a file
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format ecs --siem-output file --siem-target /var/log/hades/ecs.json
 ```
 
 ### Re-export a previous scan
 
-```bash
-python core/hades_enhanced_cli.py --export-scan abc-123-def --siem-format cef
-```
+The `hades` command has no re-export option in v1.7.4. Re-run the scan with the `--siem-*` options above, or fetch a stored API scan result with `GET /api/v1/scan/{scan_id}` (see the [API Reference](api_reference.md)).
 
 ---
 
@@ -425,7 +423,7 @@ index = security
 Forward HADES output to Splunk:
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format syslog --siem-output syslog --siem-target splunk-hec.corp:514
 ```
 
@@ -438,7 +436,7 @@ index = security
 ```
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format cef --siem-output file --siem-target /var/log/hades/cef.log
 ```
 
@@ -498,7 +496,7 @@ index=security sourcetype="hades:syslog" (yaraMatches="*script*" OR yaraMatches=
 Forward HADES output to QRadar:
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format leef --siem-output syslog --siem-target qradar.corp:514
 ```
 
@@ -540,7 +538,7 @@ LAST 7 DAYS
 Forward HADES output to ArcSight:
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format cef --siem-output syslog --siem-target arcsight.corp:514
 ```
 
@@ -597,7 +595,7 @@ setup.template.pattern: "hades-scans-*"
 Forward HADES output to file for Filebeat:
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format ecs --siem-output file --siem-target /var/log/hades/ecs.json
 ```
 
@@ -690,7 +688,7 @@ if $programname == 'HADES' then @@127.0.0.1:25226
 4. Forward HADES output to the local syslog:
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format cef --siem-output syslog --siem-target 127.0.0.1:514
 ```
 
@@ -768,10 +766,10 @@ HADES includes a native Splunk HEC connector for direct event delivery without s
 | `sourcetype` | string | No       | Splunk sourcetype                          |
 | `verify_ssl` | bool   | No       | Verify TLS certificates (default: `true`)  |
 
-**CLI usage:**
+**Enable forwarding** (on the API server; `--siem-auto-forward` forwards all scan results):
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ --siem-auto-forward
+hades serve --siem-auto-forward
 ```
 
 **Test the connection:**
@@ -811,10 +809,10 @@ Direct Elasticsearch ingestion via the REST API, supporting single-document and 
 
 The connector uses the `/_doc` endpoint for single events and the `/_bulk` API for batch delivery.
 
-**CLI usage:**
+**Enable forwarding** (on the API server; `--siem-auto-forward` forwards all scan results):
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ --siem-auto-forward
+hades serve --siem-auto-forward
 ```
 
 ---
@@ -845,10 +843,10 @@ Direct delivery to Microsoft Sentinel via the Log Analytics Data Collector API w
 
 The connector constructs a `SharedKey` authorization header with an HMAC-SHA256 signature per Microsoft's Data Collector API specification.
 
-**CLI usage:**
+**Enable forwarding** (on the API server; `--siem-auto-forward` forwards all scan results):
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ --siem-auto-forward
+hades serve --siem-auto-forward
 ```
 
 ---
@@ -1058,15 +1056,15 @@ Add a `siem` section to `cli/hades_config.json`:
 
 ```bash
 # Forward scan results to syslog as they complete
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format syslog --siem-output syslog --siem-target 10.0.0.50:514
 
 # Forward monitor alerts via HTTP
-python core/hades_enhanced_cli.py --monitor /evidence/incoming \
+hades monitor /evidence/incoming \
     --siem-format ecs --siem-output http --siem-target https://siem-collector.corp/api/events
 
 # Write to file for log shipper pickup
-python core/hades_enhanced_cli.py --monitor /evidence/incoming \
+hades monitor /evidence/incoming \
     --siem-format ecs --siem-output file --siem-target /var/log/hades/ecs.json
 ```
 

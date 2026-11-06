@@ -34,10 +34,10 @@ Metrics are auto-enabled when `prometheus_client` is installed. Control via CLI:
 
 ```bash
 # Explicitly enable
-hades-enhanced --serve --metrics
+hades serve --metrics
 
 # Disable
-hades-enhanced --serve --no-metrics
+hades serve --no-metrics
 ```
 
 Or via environment variable:

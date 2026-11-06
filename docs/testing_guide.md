@@ -47,7 +47,7 @@ pip install pytest pytest-asyncio
 ```bash
 python -c "import pytest; print(pytest.__version__)"
 python cli/main.py --help
-python core/hades_enhanced_cli.py --help
+hades --help
 ```
 
 !!! note "Optional Dependencies"
@@ -453,7 +453,7 @@ Before any release, ALL of the following must pass:
 |-------|---------|--------|
 | Full test suite | `python -m pytest core/ cli/ config/ plugins/ tests/ demo/ grafana/ kubernetes/ -v --tb=short` | 0 failures |
 | CLI smoke test | `python cli/main.py --help` | Exit 0 |
-| Enhanced CLI | `python core/hades_enhanced_cli.py --help` | Exit 0 |
+| CLI | `hades --help` | Exit 0 |
 | Detection corpus | `python -m pytest tests/test_corpus_full_validation.py -v -s` | TPR >= 90%, FPR <= 10% |
 | Enterprise tests | `python -m pytest core/test_auth_*.py core/test_storage_*.py -v` | 0 failures |
 | Type check | `mypy --ignore-missing-imports core/*.py cli/*.py` | No errors |

@@ -222,16 +222,18 @@ Multiple keys are supported simultaneously, enabling zero-downtime rotation.
 ### 2.2 Create an Admin User (RBAC)
 
 ```bash
-python core/hades_enhanced_cli.py --create-admin
+hades admin create-admin admin
 ```
 
-This prompts for username and password. The admin account can then manage other users.
+> **Known issue in v1.7.4:** in the compiled `hades` binary, `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`) instead of running. The fix is tracked for the next release. Until then these commands cannot be used from the shipped binary.
+
+This prompts for the password and prints the new admin's API key. The admin account can then manage other users.
 
 ### 2.3 Create Analyst and Viewer Accounts
 
 ```bash
-python core/hades_enhanced_cli.py --create-user analyst1 --user-role analyst
-python core/hades_enhanced_cli.py --create-user viewer1 --user-role viewer
+hades admin create-user analyst1 --role analyst
+hades admin create-user viewer1 --role viewer
 ```
 
 Role permissions:
@@ -366,7 +368,7 @@ pip install "hades-scanner[observability]"
 Start the API with metrics enabled:
 
 ```bash
-python core/hades_enhanced_cli.py --serve --port 8666 --metrics
+hades serve --port 8666 --metrics
 ```
 
 Verify metrics are exposed:
@@ -426,7 +428,7 @@ HADES provides a health endpoint and a CLI probe for container orchestrators:
 curl http://localhost:8666/api/v1/health
 
 # CLI probe (exits 0 on healthy, 1 on failure -- suitable for Kubernetes liveness/readiness)
-python core/hades_enhanced_cli.py --health-check
+hades serve --health-check
 ```
 
 ### 4.7 JSON Metrics Endpoint
@@ -508,13 +510,13 @@ pip install --upgrade hades-scanner
 pip install --upgrade "hades-scanner[full]"
 
 # 5. Run database migrations if the release notes mention schema changes
-python core/hades_enhanced_cli.py --migrate-db
+hades admin migrate
 
 # 6. Validate YARA rules (new version may add rules)
-python core/hades_enhanced_cli.py --validate-rules-strict
+hades rules validate
 
 # 7. Verify the CLI starts cleanly
-python core/hades_enhanced_cli.py --help
+hades --help
 
 # 8. Start the service
 sudo systemctl start hades
@@ -522,6 +524,8 @@ sudo systemctl start hades
 # 9. Verify health
 curl http://localhost:8666/api/v1/health
 ```
+
+> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 ### 6.3 Upgrade Steps (Docker)
 
@@ -565,7 +569,7 @@ kubectl rollout status deployment/hades-api
 kubectl rollout status deployment/hades-worker
 
 # 5. Verify health
-kubectl exec deploy/hades-api -- python core/hades_enhanced_cli.py --health-check
+kubectl exec deploy/hades-api -- hades serve --health-check
 ```
 
 ### 6.5 Rollback
@@ -592,5 +596,5 @@ pg_restore -h localhost -U hades -d hades --clean --if-exists /backups/pre_upgra
 - [ ] Prometheus metrics are flowing: check Grafana Overview dashboard
 - [ ] Run a test scan: `curl -X POST http://localhost:8666/api/v1/scan -H "X-API-Key: KEY" -F "file=@test.jpg"`
 - [ ] Verify RBAC login works: `curl -X POST http://localhost:8666/api/v1/auth/login -H "Content-Type: application/json" -d '{"username":"admin","password":"..."}'`
-- [ ] Check playbook engine: `python core/hades_enhanced_cli.py --playbook-status`
+- [ ] Check playbook engine: `hades admin playbook status`
 - [ ] Verify no alert rules are firing in Alertmanager: `curl http://localhost:9093/api/v2/alerts`
