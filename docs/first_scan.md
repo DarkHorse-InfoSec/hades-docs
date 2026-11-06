@@ -7,13 +7,13 @@ This tutorial walks through scanning files with HADES using the CLI, REST API, a
 The simplest way to use HADES:
 
 ```bash
-hades-enhanced suspicious_image.jpg
+hades scan suspicious_image.jpg
 ```
 
 Or, if running from source:
 
 ```bash
-python core/hades_enhanced_cli.py suspicious_image.jpg
+hades scan suspicious_image.jpg
 ```
 
 ### Understanding the Output
@@ -61,19 +61,19 @@ Each section of the output tells you something specific:
 Scan all supported files in a directory:
 
 ```bash
-hades-enhanced -r /path/to/evidence/
+hades scan -r /path/to/evidence/
 ```
 
 Add verbose output to see per-file details:
 
 ```bash
-hades-enhanced -r -v /path/to/evidence/
+hades scan -r -v /path/to/evidence/
 ```
 
 Filter by file type:
 
 ```bash
-hades-enhanced -r --file-types .jpg .png .pdf /path/to/evidence/
+hades scan -r --file-types .jpg,.png,.pdf /path/to/evidence/
 ```
 
 ---
@@ -161,16 +161,16 @@ By default, HADES runs basic metadata extraction, YARA matching, and heuristic a
 
 ```bash
 # Enable ML anomaly detection
-hades-enhanced --ml-detect -r /evidence/
+hades scan --ml-detect -r /evidence/
 
 # Enable threat intelligence enrichment
-hades-enhanced --threat-intel -r /evidence/
+hades scan --threat-intel -r /evidence/
 
 # Enable behavioral analysis and MITRE mapping
-hades-enhanced --behavioral --mitre-map -r /evidence/
+hades scan --behavioral --mitre-map -r /evidence/
 
 # Enable everything
-hades-enhanced --ml-detect --threat-intel --behavioral --mitre-map -r /evidence/
+hades scan --ml-detect --threat-intel --behavioral --mitre-map -r /evidence/
 ```
 
 ---
@@ -181,13 +181,13 @@ Export scan results in different formats:
 
 ```bash
 # JSON report
-hades-enhanced -r /evidence/ --format json --output report.json
+hades scan -r /evidence/ --format json --output report.json
 
 # HTML report
-hades-enhanced -r /evidence/ --format html --output report.html
+hades scan -r /evidence/ --format html --output report.html
 
 # CSV report
-hades-enhanced -r /evidence/ --format csv --output report.csv
+hades scan -r /evidence/ --format csv --output report.csv
 ```
 
 ---

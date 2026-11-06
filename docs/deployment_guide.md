@@ -169,7 +169,7 @@ curl -X PUT http://localhost:8666/api/v1/siem/config \
 **Configure via CLI:**
 
 ```bash
-python core/hades_enhanced_cli.py --monitor /watched/ \
+hades monitor /watched/ \
   --siem-format syslog --siem-output syslog --siem-target 10.0.0.50:514
 ```
 
@@ -193,7 +193,7 @@ curl -X POST http://localhost:8666/api/v1/monitor/start \
 Or via the CLI:
 
 ```bash
-python core/hades_enhanced_cli.py --monitor /app/scan-data --alert-threshold 5
+hades monitor /app/scan-data --alert-threshold 5
 ```
 
 ### ML Model Management
@@ -203,7 +203,7 @@ The ML anomaly detection engine uses an Isolation Forest model trained on metada
 **Generate a baseline model** from known-good files:
 
 ```bash
-python core/hades_enhanced_cli.py --ml-train /path/to/known-good-files/
+hades intel ml-train /path/to/known-good-files/
 ```
 
 **Check model status:**
@@ -381,10 +381,10 @@ For environments where Docker is not available:
 pip install -r requirements.txt
 
 # Start the API server
-python core/hades_enhanced_cli.py --serve --port 8666
+hades serve --port 8666
 
-# Or run directly
-python core/hades_api.py --host 0.0.0.0 --port 8666
+# Or run the standalone server program
+hades-server --host 0.0.0.0 --port 8666
 ```
 
 For process management, use systemd, supervisord, or a similar process manager to keep the server running.
@@ -400,7 +400,8 @@ After=network.target
 Type=simple
 User=hades
 WorkingDirectory=/opt/hades
-ExecStart=/opt/hades/venv/bin/python core/hades_enhanced_cli.py --serve --port 8666
+# Path to the downloaded hades binary (see the Installation guide)
+ExecStart=/opt/hades/hades serve --port 8666
 Restart=always
 RestartSec=5
 Environment=HADES_API_KEY=your-production-key

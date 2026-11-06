@@ -71,7 +71,7 @@ print('Corpus generated: 8 malicious + 4 clean files.')
 **Command:**
 
 ```bash
-python cli/hades_cli.py demo_workspace/evidence/exif_php_backdoor.jpg -v
+hades scan demo_workspace/evidence/exif_php_backdoor.jpg -v
 ```
 
 **Expected output:** Scanner identifies the PHP backdoor pattern in the Artist EXIF field. Verbose mode shows each metadata field examined and the specific detection that fired.
@@ -91,7 +91,7 @@ python cli/hades_cli.py demo_workspace/evidence/exif_php_backdoor.jpg -v
 **Command:**
 
 ```bash
-python cli/hades_cli.py -r -v demo_workspace/evidence/
+hades scan -r -v demo_workspace/evidence/
 ```
 
 **Expected output:** Each file is scanned. Findings include:
@@ -120,7 +120,7 @@ python cli/hades_cli.py -r -v demo_workspace/evidence/
 **Command:**
 
 ```bash
-python cli/hades_cli.py -r -v demo_workspace/clean/
+hades scan -r -v demo_workspace/clean/
 ```
 
 **Expected output:** All files scanned with minimal or no findings. Clean files should score well below the threat threshold.
@@ -139,7 +139,7 @@ python cli/hades_cli.py -r -v demo_workspace/clean/
 **Command:**
 
 ```bash
-python cli/hades_cli.py -a demo_workspace/evidence/exif_php_backdoor.jpg -v
+hades scan demo_workspace/evidence/exif_php_backdoor.jpg -v
 ```
 
 **Expected output:** Additional YARA-based detections fire alongside the heuristic findings. Rule names and severity levels are displayed.
@@ -154,7 +154,9 @@ python cli/hades_cli.py -a demo_workspace/evidence/exif_php_backdoor.jpg -v
   - `suspicious_metadata.yar`, anomalous field patterns
   - `metadata_threats.yar`, embedded executables
 - Custom rules can be added to `rules/` or passed via `--yara-rules`
-- Validate rules: `python scripts/validate_rules.py`
+- Validate rules: `hades rules validate`
+
+> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 ---
 
@@ -166,10 +168,10 @@ python cli/hades_cli.py -a demo_workspace/evidence/exif_php_backdoor.jpg -v
 
 ```bash
 # Scan with threat score sorting
-python core/hades_enhanced_cli.py -r demo_workspace/evidence/ --sort-by score
+hades scan -r demo_workspace/evidence/ --sort-by score
 
 # Filter to high-severity only
-python core/hades_enhanced_cli.py -r demo_workspace/evidence/ --min-score 50 --sort-by score
+hades scan -r demo_workspace/evidence/ --min-score 50 --sort-by score
 ```
 
 **Expected output:** Each file gets a numeric threat score (0-100). Results sorted highest-first. The `--min-score 50` filter shows only confirmed threats.
@@ -191,16 +193,16 @@ python core/hades_enhanced_cli.py -r demo_workspace/evidence/ --min-score 50 --s
 
 ```bash
 # JSON report (machine-readable, for SIEM ingestion)
-python cli/hades_cli.py -r demo_workspace/evidence/ \
-  -o demo_workspace/reports/report.json --report-format json
+hades scan -r demo_workspace/evidence/ \
+  --output demo_workspace/reports/report.json --format json
 
 # HTML report (human-readable, for stakeholders)
-python cli/hades_cli.py -r demo_workspace/evidence/ \
-  -o demo_workspace/reports/report.html --report-format html
+hades scan -r demo_workspace/evidence/ \
+  --output demo_workspace/reports/report.html --format html
 
 # CSV report (for spreadsheet analysis)
-python cli/hades_cli.py -r demo_workspace/evidence/ \
-  -o demo_workspace/reports/report.csv --report-format csv
+hades scan -r demo_workspace/evidence/ \
+  --output demo_workspace/reports/report.csv --format csv
 ```
 
 **Expected output:** Report files created in `demo_workspace/reports/`. JSON includes structured findings with severity scores, field names, and recommendations. HTML includes a formatted table. CSV is importable into Excel/Google Sheets.
@@ -220,10 +222,10 @@ python cli/hades_cli.py -r demo_workspace/evidence/ \
 **Command:**
 
 ```bash
-python cli/hades_cli.py -R demo_workspace/evidence/exif_xss_injection.jpg
+hades sanitize --dry-run demo_workspace/evidence/exif_xss_injection.jpg
 ```
 
-**Expected output:** Displays sanitization recommendations for each dangerous metadata field found.
+**Expected output:** Reports what sanitizing the file would remove, and whether its format is supported, without changing the file.
 
 **Talking points:**
 - Sanitization removes attack payloads from metadata fields
@@ -241,7 +243,7 @@ python cli/hades_cli.py -R demo_workspace/evidence/exif_xss_injection.jpg
 
 ```bash
 # Start the server (runs on port 8666 by default)
-python core/hades_enhanced_cli.py --serve --port 8666 &
+hades serve --port 8666 '&'
 
 # Wait for startup
 sleep 3
@@ -290,7 +292,7 @@ kill %1
 **What:** Open the built-in web dashboard for visual scanning.
 
 **Steps:**
-1. Start the API server: `python core/hades_enhanced_cli.py --serve --port 8666`
+1. Start the API server: `hades serve --port 8666`
 2. Open browser to `http://localhost:8666/dashboard/`
 3. Enter API key: `your-api-key-here`
 4. Navigate sections: Scan, Monitor, Cases, Audit Trail, System
@@ -336,16 +338,16 @@ hades scan -r --ml-detect demo_workspace/evidence/
 
 ```bash
 # CEF format (ArcSight)
-python core/hades_enhanced_cli.py -r demo_workspace/evidence/ --siem-format cef
+hades scan -r demo_workspace/evidence/ --siem-format cef
 
 # Syslog format (RFC 5424)
-python core/hades_enhanced_cli.py -r demo_workspace/evidence/ --siem-format syslog
+hades scan -r demo_workspace/evidence/ --siem-format syslog
 
 # STIX 2.1 bundle
-python core/hades_enhanced_cli.py -r demo_workspace/evidence/ --siem-format stix
+hades scan -r demo_workspace/evidence/ --siem-format stix
 
 # ECS for Elastic
-python core/hades_enhanced_cli.py -r demo_workspace/evidence/ --siem-format ecs
+hades scan -r demo_workspace/evidence/ --siem-format ecs
 ```
 
 **Expected output:** Scan results formatted for the selected SIEM platform.
@@ -390,10 +392,10 @@ False Negative Rate:   0% (0/28 malicious files missed)
 
 ```bash
 # Quick benchmark (~30 seconds)
-python core/hades_enhanced_cli.py --benchmark-quick
+hades benchmark --quick
 
 # Full benchmark (~2-5 minutes)
-python core/hades_enhanced_cli.py --benchmark
+hades benchmark
 ```
 
 **Expected output:** Table showing:
@@ -406,7 +408,7 @@ python core/hades_enhanced_cli.py --benchmark
 **Talking points:**
 - Cross-platform benchmarks (uses psutil, not Unix-specific `resource`)
 - Results saved to JSON for trend tracking
-- Standalone mode: `python core/benchmarks.py --quick`
+- Quick mode: `hades benchmark --quick`
 
 ---
 

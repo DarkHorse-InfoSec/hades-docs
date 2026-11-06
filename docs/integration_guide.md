@@ -51,12 +51,13 @@ FORMAT = cef_extension::$1
 ### 4. HADES CLI: Forward to Splunk HEC
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format cef \
     --siem-output http \
-    --siem-target https://splunk.internal:8088/services/collector/event \
-    --siem-header "Authorization: Splunk <HEC_TOKEN>"
+    --siem-target https://splunk.internal:8088/services/collector/event
 ```
+
+`hades scan` cannot add HTTP headers, and Splunk HEC requires an `Authorization: Splunk <HEC_TOKEN>` header. For an authenticated HEC endpoint, configure the Splunk HEC connector on the API server (see the [SIEM Integration Guide](siem_integration_guide.md)) and start it with `hades serve --siem-auto-forward`.
 
 ### 5. HADES API Configuration
 
@@ -91,7 +92,7 @@ HADES exports scan results in Elastic Common Schema (ECS) 8.x JSON format. The r
 ### 1. HADES CLI: Write ECS to File
 
 ```bash
-python core/hades_enhanced_cli.py --monitor /evidence/ \
+hades monitor /evidence/ \
     --siem-format ecs \
     --siem-output file \
     --siem-target /var/log/hades/ecs.json
@@ -175,10 +176,10 @@ HADES generates STIX 2.1 JSON bundles that can be ingested into Microsoft Sentin
 ### 1. HADES CLI: Export STIX
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ \
+hades scan -r /evidence/ \
     --siem-format stix \
     --siem-output http \
-    --siem-target "https://<WORKSPACE_ID>.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
+    --siem-target 'https://<WORKSPACE_ID>.ods.opinsights.azure.com/api/logs?api-version=2016-04-01'
 ```
 
 ### 2. Log Analytics Workspace Setup
@@ -234,7 +235,7 @@ HADES produces IBM LEEF 2.0 messages that QRadar ingests through its syslog rece
 ### 1. HADES CLI: Forward LEEF to QRadar
 
 ```bash
-python core/hades_enhanced_cli.py --monitor /evidence/ \
+hades monitor /evidence/ \
     --siem-format leef \
     --siem-output syslog \
     --siem-target 10.0.0.100:514
@@ -297,7 +298,7 @@ For any syslog-compatible receiver (rsyslog, syslog-ng, Graylog, Fluentd), HADES
 ### 1. HADES CLI: UDP Syslog Forwarding
 
 ```bash
-python core/hades_enhanced_cli.py --monitor /evidence/ \
+hades monitor /evidence/ \
     --siem-format syslog \
     --siem-output syslog \
     --siem-target 10.0.0.50:514
@@ -358,7 +359,7 @@ log {
 All SIEM configurations above work with the HADES file monitor for continuous, real-time alert forwarding. Start a monitored session with SIEM output enabled:
 
 ```bash
-python core/hades_enhanced_cli.py --monitor /watched/directory \
+hades monitor /watched/directory \
     --siem-format cef \
     --siem-output syslog \
     --siem-target 10.0.0.50:514 \
@@ -374,7 +375,7 @@ The `--alert-threshold` flag sets the minimum threat score (0-10) that triggers 
 When running HADES as an API server, SIEM forwarding is configured in `cli/hades_config.json` and activated at startup:
 
 ```bash
-python core/hades_enhanced_cli.py --serve --port 8666
+hades serve --port 8666
 ```
 
 The API server reads the `siem` section of the config file and initializes the `SIEMForwarder` background thread, which queues and delivers events asynchronously. Multiple targets with different formats can be configured simultaneously.

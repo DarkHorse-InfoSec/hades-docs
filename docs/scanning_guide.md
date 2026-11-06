@@ -45,7 +45,7 @@ hades scan -r /path/to/evidence/
 Only scan images and PDFs:
 
 ```bash
-hades scan -r --file-types .jpg .png .gif .pdf /path/to/evidence/
+hades scan -r --file-types .jpg,.png,.gif,.pdf /path/to/evidence/
 ```
 
 ### Verbose recursive scan

@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## Known issues in v1.7.4
+
+Found while checking these docs against the shipped binaries on 2026-11-06. Each was reproduced on the signed v1.7.4 Windows binary from an empty working directory:
+
+- `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`). Fixed in source; the fix ships with the next release.
+- `hades rules validate` exits with "CI rule validator not found": the validator was not included in the build.
+- `hades serve --generate-encryption-key` and `hades admin list-tenants` report "Enterprise storage module not available": the storage module is not included in the v1.7.4 build.
+
+## Documentation now matches the shipped commands
+
+The guides previously used `hades-enhanced` and `python core/hades_enhanced_cli.py`, which are not part of the product: HADES ships `hades` and `hades-server`. Every command is now written in its `hades <command>` form, and the [CLI Reference](cli_reference.md) is generated from the shipped command-line parser.
+
 ## Removed in v1.7.3 and v1.7.4
 
 The full release notes for these versions are not in this file yet. These removals affect documented features, so they are recorded here:

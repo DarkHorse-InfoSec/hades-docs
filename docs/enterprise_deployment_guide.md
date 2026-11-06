@@ -69,8 +69,10 @@ Role-Based Access Control manages users, API keys, and permissions.
 ### Create Admin User
 
 ```bash
-python core/hades_enhanced_cli.py --create-admin admin_username
+hades admin create-admin admin_username
 ```
+
+> **Known issue in v1.7.4:** in the compiled `hades` binary, `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`) instead of running. The fix is tracked for the next release. Until then these commands cannot be used from the shipped binary.
 
 You will be prompted for a password. The command outputs the API key.
 
@@ -78,16 +80,16 @@ You will be prompted for a password. The command outputs the API key.
 
 ```bash
 # Create analyst
-python core/hades_enhanced_cli.py --create-user analyst1 --user-role analyst
+hades admin create-user analyst1 --role analyst
 
 # Create viewer
-python core/hades_enhanced_cli.py --create-user viewer1 --user-role viewer
+hades admin create-user viewer1 --role viewer
 ```
 
 ### List Users
 
 ```bash
-python core/hades_enhanced_cli.py --list-users
+hades admin list-users
 ```
 
 ### Enable RBAC in Config
@@ -161,8 +163,10 @@ AES-256-GCM encryption for sensitive database fields.
 ### 1. Generate Key
 
 ```bash
-python core/hades_enhanced_cli.py --generate-encryption-key
+hades serve --generate-encryption-key
 ```
+
+> **Known issue in v1.7.4:** in the compiled binary, `hades serve --generate-encryption-key` exits with "Enterprise storage module not available": the storage module is not included in the v1.7.4 build. The fix is tracked for the next release.
 
 This outputs a base64-encoded key. Store securely.
 
@@ -218,14 +222,16 @@ Isolate data across organizational boundaries using column-based tenant isolatio
 ### Create Tenants
 
 ```bash
-python core/hades_enhanced_cli.py --create-tenant "Acme Corp"
-python core/hades_enhanced_cli.py --create-tenant "Beta Inc"
+hades admin create-tenant 'Acme Corp'
+hades admin create-tenant 'Beta Inc'
 ```
+
+> **Known issue in v1.7.4:** in the compiled `hades` binary, `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`) instead of running. The fix is tracked for the next release. Until then these commands cannot be used from the shipped binary.
 
 ### List Tenants
 
 ```bash
-python core/hades_enhanced_cli.py --list-tenants
+hades admin list-tenants
 ```
 
 ### Assign Users to Tenants
@@ -260,7 +266,7 @@ curl -X POST http://localhost:8666/api/v1/admin/tenants \
 ### View License Info
 
 ```bash
-python core/hades_enhanced_cli.py --license-info
+hades admin license
 ```
 
 ### Set License Key
@@ -284,7 +290,10 @@ Via config:
 Via CLI flag:
 
 ```bash
-python core/hades_enhanced_cli.py --license-key "your-key" --license-info
+hades admin license --key "your-key"
+
+# Show the active licence
+hades admin license
 ```
 
 ### Tiers
@@ -373,10 +382,10 @@ HADES v0.7.1 includes built-in Prometheus metrics, Grafana dashboards, and alert
 pip install "hades-scanner[observability]"
 
 # Enable metrics on the API server
-hades-enhanced --serve --metrics
+hades serve --metrics
 
 # Run a quick health probe
-hades-enhanced --health-check
+hades serve --health-check
 ```
 
 Key environment variables:
@@ -462,10 +471,10 @@ pip install --upgrade "hades-scanner[full]"
 
 ```bash
 # Check CLI works
-python core/hades_enhanced_cli.py --help
+hades --help
 
 # Check API starts
-python core/hades_enhanced_cli.py --serve --port 8666
+hades serve --port 8666
 
 # Run tests
 python -m pytest core/ cli/ config/ plugins/ tests/ demo/ grafana/ kubernetes/ -v --tb=short
@@ -501,13 +510,15 @@ redis-cli -u redis://localhost:6379/0 PING
 Key must be exactly 32 bytes (256 bits). Generate with:
 
 ```bash
-python core/hades_enhanced_cli.py --generate-encryption-key
+hades serve --generate-encryption-key
 ```
+
+> **Known issue in v1.7.4:** in the compiled binary, `hades serve --generate-encryption-key` exits with "Enterprise storage module not available": the storage module is not included in the v1.7.4 build. The fix is tracked for the next release.
 
 ### License validation failed
 
 Check that the key is correctly set (no trailing whitespace). View current status:
 
 ```bash
-python core/hades_enhanced_cli.py --license-info
+hades admin license
 ```

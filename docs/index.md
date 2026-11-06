@@ -74,7 +74,7 @@ Full install instructions + troubleshooting: see [Installation Guide](installati
 Scan a suspicious file:
 
 ```bash
-hades-enhanced suspicious_image.jpg
+hades scan suspicious_image.jpg
 ```
 
 Sample output:

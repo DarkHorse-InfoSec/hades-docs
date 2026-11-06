@@ -119,7 +119,7 @@ hades scan -r /path/to/evidence/
 ### Filter by file type
 
 ```bash
-hades scan -r --file-types .jpg .png .pdf /path/to/evidence/
+hades scan -r --file-types .jpg,.png,.pdf /path/to/evidence/
 ```
 
 ### Verbose output (shows every metadata field inspected)

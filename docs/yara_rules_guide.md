@@ -54,7 +54,7 @@ The rules directory is configured in `cli/hades_config.json`:
 You can also place rules in a custom directory and point HADES to it:
 
 ```bash
-hades-enhanced -r /evidence/ --plugins-dir /path/to/custom/rules/
+hades scan -r /evidence/ --plugins-dir /path/to/custom/rules/
 ```
 
 ---
@@ -118,8 +118,10 @@ rule HADES_CUSTOM_SUSPICIOUS_HEADER {
 Run the rule validation script:
 
 ```bash
-python scripts/validate_rules.py
+hades rules validate
 ```
+
+> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 This checks for syntax errors, duplicate rule names, and missing metadata fields.
 
@@ -128,13 +130,13 @@ This checks for syntax errors, duplicate rule names, and missing metadata fields
 Scan a known-good file corpus to check for false positives:
 
 ```bash
-hades-enhanced -r /path/to/known-good-files/ --format json
+hades scan -r /path/to/known-good-files/ --format json
 ```
 
 Then scan a test file that should trigger the rule:
 
 ```bash
-hades-enhanced test_file.jpg -v
+hades scan test_file.jpg -v
 ```
 
 ---
@@ -154,10 +156,10 @@ Or use the CLI:
 
 ```bash
 # List available templates
-hades-enhanced --list-templates
+hades rules list-templates
 
 # Build a rule from a template
-hades-enhanced --build-rule metadata_injection
+hades rules build metadata_injection
 ```
 
 ---
@@ -170,7 +172,7 @@ hades-enhanced --build-rule metadata_injection
 - Rules requiring only basic string matching are compatible with YARA 3.8+; module-based rules require YARA 4.0+.
 
 !!! tip "Rule validation"
-    Always run `python scripts/validate_rules.py` after modifying rules to catch syntax errors before they affect production scanning.
+    Always run `hades rules validate` after modifying rules to catch syntax errors before they affect production scanning.
 
 ---
 

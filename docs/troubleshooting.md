@@ -133,14 +133,12 @@ YARA is a core dependency but HADES degrades gracefully without it. The `YARA_AV
 Validate all rules before deploying:
 
 ```bash
-python scripts/validate_rules.py
+hades rules validate
 ```
 
-For strict CI-mode validation (non-zero exit on failure):
+> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
-```bash
-python scripts/validate_rules_ci.py
-```
+`hades rules validate` is the strict, CI-level validator: it exits non-zero when any rule fails.
 
 Common issues:
 - Duplicate rule identifiers across files: each rule name must be globally unique.
@@ -300,7 +298,7 @@ netstat -ano | findstr :8666
 Kill the conflicting process or use a different port:
 
 ```bash
-python core/hades_enhanced_cli.py --serve --port 9000
+hades serve --port 9000
 ```
 
 In Docker, remap the host port:
@@ -341,9 +339,11 @@ curl -H "X-API-Key: your-key-here" http://localhost:8666/api/v1/health
 3. If using RBAC, ensure the API key is associated with a valid user. Rotate a compromised key:
 
 ```bash
-python core/hades_enhanced_cli.py --create-admin
-# This generates a new admin user with API key
+hades admin create-admin admin2
+# Prompts for a password, then prints the new admin user's API key
 ```
+
+> **Known issue in v1.7.4:** in the compiled `hades` binary, `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`) instead of running. The fix is tracked for the next release. Until then these commands cannot be used from the shipped binary.
 
 4. In Docker, pass the key via environment:
 
@@ -452,7 +452,7 @@ Common mistakes:
 
 ```bash
 cd /path/to/darkhorse-hades
-python core/hades_enhanced_cli.py --serve
+hades serve
 ```
 
 2. Verify the installation:
@@ -493,19 +493,19 @@ deploy:
 2. Use the file ingestion engine with size filtering:
 
 ```bash
-python core/hades_enhanced_cli.py --max-file-size 100000000 -r /evidence/
+hades scan --max-file-size 100000000 -r /evidence/
 ```
 
 3. For batch processing of large directories, enable the async pipeline with bounded concurrency:
 
 ```bash
-python core/hades_enhanced_cli.py --async --concurrency 2 -r /large-evidence/
+hades scan --async --concurrency 2 -r /large-evidence/
 ```
 
 4. Enable the scan cache to avoid re-processing files:
 
 ```bash
-python core/hades_enhanced_cli.py --cache -r /evidence/
+hades scan --cache -r /evidence/
 ```
 
 ---
@@ -521,7 +521,7 @@ python core/hades_enhanced_cli.py --cache -r /evidence/
 1. Check supported types:
 
 ```bash
-python core/hades_enhanced_cli.py --help
+hades --help
 # See --file-types flag for filtering
 ```
 
@@ -558,7 +558,7 @@ If ExifTool returns no metadata, the file format genuinely has no extractable me
 1. The async pipeline (`AsyncScanPipeline`) uses timeouts on ExifTool invocations. Enable it:
 
 ```bash
-python core/hades_enhanced_cli.py --async -r /evidence/
+hades scan --async -r /evidence/
 ```
 
 2. If using the basic CLI and a scan is stuck, kill the ExifTool process:
@@ -574,7 +574,7 @@ taskkill /F /IM exiftool.exe
 3. Identify the problematic file and exclude it:
 
 ```bash
-python core/hades_enhanced_cli.py -r /evidence/ --exclude "*.problematic"
+hades scan -r /evidence/ --exclude-types .problematic
 ```
 
 4. Report the file to the ExifTool maintainer if it triggers a reproducible hang.
@@ -592,7 +592,7 @@ python core/hades_enhanced_cli.py -r /evidence/ --exclude "*.problematic"
 1. The async pipeline automatically restarts crashed ExifTool processes. Verify it is enabled:
 
 ```bash
-python core/hades_enhanced_cli.py --async -r /evidence/
+hades scan --async -r /evidence/
 ```
 
 2. If crashes are frequent, update ExifTool:
@@ -625,7 +625,7 @@ export HADES_EXIFTOOL_PERSISTENT=false
 1. Force a cache bypass for a specific scan:
 
 ```bash
-python core/hades_enhanced_cli.py --no-cache /path/to/file.jpg
+hades scan --no-cache /path/to/file.jpg
 ```
 
 2. Clear the cache entirely:
@@ -651,13 +651,13 @@ redis-cli FLUSHDB
 1. Reduce concurrency to isolate the issue:
 
 ```bash
-python core/hades_enhanced_cli.py --async --concurrency 1 -r /evidence/
+hades scan --async --concurrency 1 -r /evidence/
 ```
 
 2. Enable profiling to identify the bottleneck:
 
 ```bash
-python core/hades_enhanced_cli.py --async --profile -r /evidence/
+hades scan --async --profile -r /evidence/
 ```
 
 3. Kill and restart. The pipeline supports graceful shutdown:
@@ -796,7 +796,7 @@ docker exec hades-api ls -la /app/rules/
 4. Validate rule syntax before mounting:
 
 ```bash
-python scripts/validate_rules.py
+hades rules validate
 ```
 
 ---
@@ -897,7 +897,7 @@ redis-cli -h localhost -p 6379 ping
 3. Pass the URL to HADES:
 
 ```bash
-python core/hades_enhanced_cli.py --serve --redis-url redis://localhost:6379/0
+hades serve --redis-url redis://localhost:6379/0
 ```
 
 4. In-memory fallback is functional for single-instance deployments. Multi-instance deployments (Docker scaling, Kubernetes) require Redis for shared state. Without it, each instance maintains independent rate limits and sessions.
@@ -915,8 +915,10 @@ python core/hades_enhanced_cli.py --serve --redis-url redis://localhost:6379/0
 1. Generate a new encryption key:
 
 ```bash
-python core/hades_enhanced_cli.py --generate-encryption-key
+hades serve --generate-encryption-key
 ```
+
+> **Known issue in v1.7.4:** in the compiled binary, `hades serve --generate-encryption-key` exits with "Enterprise storage module not available": the storage module is not included in the v1.7.4 build. The fix is tracked for the next release.
 
 This creates `config/encryption.key`. The file contains a 256-bit random key, base64-encoded.
 
@@ -948,8 +950,10 @@ config/encryption.key
 1. Verify the user's role:
 
 ```bash
-python core/hades_enhanced_cli.py --list-users
+hades admin list-users
 ```
+
+> **Known issue in v1.7.4:** in the compiled `hades` binary, `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`) instead of running. The fix is tracked for the next release. Until then these commands cannot be used from the shipped binary.
 
 2. The default roles and permissions are:
    - **admin**: Full access to all endpoints.
@@ -959,7 +963,7 @@ python core/hades_enhanced_cli.py --list-users
 3. Reassign a role:
 
 ```bash
-python core/hades_enhanced_cli.py --create-user analyst1 --user-role analyst
+hades admin create-user analyst1 --role analyst
 ```
 
 4. If using API key authentication, ensure the API key belongs to the correct user. Rotate if compromised:
@@ -983,13 +987,13 @@ curl -X POST http://localhost:8666/api/v1/auth/users/<user_id>/rotate-key \
 1. Verify the key format. HADES license keys follow the pattern: `HADES-{TIER}-XXXX-XXXX`
 
 ```bash
-python core/hades_enhanced_cli.py --license-key HADES-PRO-XXXX-XXXX
+hades admin license --key HADES-PRO-XXXX-XXXX
 ```
 
 2. Check expiration:
 
 ```bash
-python core/hades_enhanced_cli.py --license-info
+hades admin license
 ```
 
 3. License tiers gate specific features:
@@ -1012,7 +1016,7 @@ python core/hades_enhanced_cli.py --license-info
 1. Verify tenant isolation is enabled:
 
 ```bash
-python core/hades_enhanced_cli.py --list-tenants
+hades admin list-tenants
 ```
 
 2. All API requests in a multi-tenant deployment must include tenant identification. The tenant is resolved from the API key.
@@ -1027,7 +1031,7 @@ curl -H "X-API-Key: admin-key" http://localhost:8666/api/v1/admin/tenants
 4. If data has leaked, audit the access log:
 
 ```bash
-python core/hades_enhanced_cli.py --audit-verify
+hades case verify
 ```
 
 ---

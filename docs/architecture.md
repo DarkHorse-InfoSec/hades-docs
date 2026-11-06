@@ -7,9 +7,8 @@ This document describes the system architecture of HADES, including the module d
 ```mermaid
 graph TB
     subgraph "Entry Points"
-        CLI[CLI - hades_cli.py]
-        ECLI[Enhanced CLI - hades_enhanced_cli.py]
-        API[REST API - hades_api.py]
+        CLI[hades CLI - cli/main.py]
+        API[REST API - hades_api.py, hades-server]
         DASH[Web Dashboard - dashboard/]
     end
 
@@ -60,8 +59,7 @@ graph TB
         TENANT[Multi-Tenant - storage/tenant.py]
     end
 
-    CLI --> EXIF
-    ECLI --> EDE
+    CLI --> EDE
     API --> EDE
     DASH --> API
 

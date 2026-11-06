@@ -61,10 +61,10 @@ Each finding is annotated with:
 
 ```bash
 # Enable MITRE mapping for scan results
-hades-enhanced --mitre-map -r /evidence/
+hades scan --mitre-map -r /evidence/
 
 # Combine with behavioral analysis
-hades-enhanced --mitre-map --behavioral -r /evidence/
+hades scan --mitre-map --behavioral -r /evidence/
 ```
 
 The CLI output includes MITRE technique badges next to each finding:

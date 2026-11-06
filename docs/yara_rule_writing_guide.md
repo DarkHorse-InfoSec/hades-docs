@@ -210,8 +210,10 @@ rule HADES_METADATA_PHP_BACKDOOR {
 ### Validate Syntax
 
 ```bash
-python scripts/validate_rules.py
+hades rules validate
 ```
+
+> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 This checks for:
 
@@ -224,7 +226,7 @@ This checks for:
 
 ```bash
 # Scan known-good files to check for false positives
-hades-enhanced -r /path/to/known-good/ --format json --output fp_check.json
+hades scan -r /path/to/known-good/ --format json --output fp_check.json
 ```
 
 ### Test Against Malicious Samples
@@ -242,7 +244,7 @@ python -m pytest tests/test_corpus_full_validation.py -v -s
 
 1. Follow the naming convention: `HADES_<CATEGORY>_<SPECIFIC>`
 2. Include all required metadata fields
-3. Run `python scripts/validate_rules.py` -- no errors
+3. Run `hades rules validate` -- no errors
 4. Test against both malicious samples and clean file corpus
 5. Document the attack technique the rule detects
 6. Provide a MITRE ATT&CK reference where applicable
