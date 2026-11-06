@@ -52,7 +52,7 @@ docker compose -f docker/docker-compose.yml up -d
 
 This starts the HADES API server and the secure file viewer.
 
-### Enterprise Stack (PostgreSQL + Redis)
+### Enterprise Stack (Redis)
 
 ```bash
 docker compose -f docker/docker-compose.yml --profile enterprise up -d
@@ -60,7 +60,6 @@ docker compose -f docker/docker-compose.yml --profile enterprise up -d
 
 The enterprise profile adds:
 
-- PostgreSQL 16 for persistent storage
 - Redis 7 for rate limiting, caching, and pub/sub
 
 ---
@@ -73,8 +72,7 @@ The enterprise profile adds:
 | `HADES_PORT` | API server port | `8666` |
 | `HADES_WORKERS` | Uvicorn worker count | `1` |
 | `HADES_LOG_LEVEL` | Logging level (debug, info, warning, error) | `info` |
-| `HADES_DB_BACKEND` | Database backend (`sqlite` or `postgres`) | `sqlite` |
-| `HADES_DB_DSN` | PostgreSQL connection string | None |
+| `HADES_DB_BACKEND` | Database backend; `sqlite` is the only accepted value | `sqlite` |
 | `HADES_REDIS_URL` | Redis connection URL | None |
 | `HADES_ENCRYPTION_KEY` | AES-256-GCM encryption key (base64) | None |
 | `HADES_LICENSE_KEY` | License key for tier features | None |
@@ -152,7 +150,7 @@ docker run -d \
 ```
 
 !!! note "Worker considerations"
-    Each worker runs an independent uvicorn process. With SQLite, each worker has its own database connection. For shared state (scan results, monitoring), use PostgreSQL with the enterprise stack.
+    Each worker runs an independent uvicorn process. With SQLite, each worker has its own database connection. SQLite is the only database backend (PostgreSQL was removed in v1.7.3), so there is no shared database between workers.
 
 ### Load Balancing
 
@@ -166,7 +164,7 @@ Load Balancer --> +--> hades-api-2 (container)
 
 Requirements:
 
-- Use PostgreSQL for shared scan result storage
+- Each instance keeps its own SQLite database (SQLite is the only backend), so scan history is per instance
 - Use Redis for distributed rate limiting and session state
 - Run the file monitor on only one instance per watched directory
 - Train ML models centrally and distribute to all instances
@@ -295,22 +293,8 @@ If an engine reports `degraded`:
 - Check that YARA rules are present in the rules directory
 - Verify Python dependencies are installed (`docker exec hades-api pip list`)
 
-### Database Connection Issues
-
-For PostgreSQL:
-
-```bash
-docker exec hades-api python -c "
-import psycopg2
-psycopg2.connect('postgresql://hades:password@hades-postgres:5432/hades')
-print('Connection successful')
-"
-```
-
----
-
 ## Next Steps
 
 - [Deployment Guide](deployment_guide.md) -- General deployment guidance
-- [Enterprise Deployment](enterprise_deployment_guide.md) -- RBAC, SSO, PostgreSQL, Redis
+- [Enterprise Deployment](enterprise_deployment_guide.md) -- RBAC, Redis, encryption, multi-tenancy
 - [CLI Reference](cli_reference.md) -- All CLI flags and options

@@ -215,7 +215,7 @@ This creates a ZIP file containing scan results, the audit log, file hashes, and
 | Topic | Guide |
 |-------|-------|
 | Comprehensive scanning workflows | [docs/scanning_guide.md](scanning_guide.md) |
-| Automated response playbooks | [docs/playbook documentation](../core/playbook_engine.py) |
+| Automated response playbooks | [IR triage guide](ir_triage_guide.md) |
 | Case management and evidence chain | [docs/first_scan.md](first_scan.md) |
 | SIEM integration (Splunk, QRadar, Elastic) | [docs/siem_integration_guide.md](siem_integration_guide.md) |
 | Threat intelligence feeds | [docs/threat_intel_guide.md](threat_intel_guide.md) |

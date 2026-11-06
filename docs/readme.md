@@ -1,5 +1,7 @@
 # HADES Enhanced Detection Engine v0.7.1
 
+> **Archived:** this is the v0.7.1 README, kept for history. It does not describe the current product: its install commands, `--database-url` options and PostgreSQL examples no longer apply (PostgreSQL support was removed in v1.7.3). For the current documentation start at the [documentation home](index.md).
+
 **Enterprise Metadata Forensics & Threat Intelligence Platform**
 
 ![License](https://img.shields.io/badge/License-Proprietary-red)

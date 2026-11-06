@@ -85,13 +85,13 @@ All threat intelligence settings are stored in `cli/hades_config.json` under the
 Enrich scan results with cloud threat intelligence data:
 
 ```bash
-python core/hades_enhanced_cli.py -r --threat-intel /path/to/evidence/
+hades scan -r --threat-intel /path/to/evidence/
 ```
 
 Use specific providers only:
 
 ```bash
-python core/hades_enhanced_cli.py -r --threat-intel --ti-providers virustotal malwarebazaar /path/to/evidence/
+hades scan -r --threat-intel --ti-providers virustotal malwarebazaar /path/to/evidence/
 ```
 
 ### Standalone IOC Lookup
@@ -99,25 +99,25 @@ python core/hades_enhanced_cli.py -r --threat-intel --ti-providers virustotal ma
 Look up a file hash:
 
 ```bash
-python core/hades_enhanced_cli.py --ti-lookup d41d8cd98f00b204e9800998ecf8427e
+hades intel lookup d41d8cd98f00b204e9800998ecf8427e
 ```
 
 Look up an IP address:
 
 ```bash
-python core/hades_enhanced_cli.py --ti-lookup 192.168.1.100
+hades intel lookup 192.168.1.100
 ```
 
 Look up a URL:
 
 ```bash
-python core/hades_enhanced_cli.py --ti-lookup "https://suspicious-domain.example.com/payload"
+hades intel lookup "https://suspicious-domain.example.com/payload"
 ```
 
 Use specific providers for a lookup:
 
 ```bash
-python core/hades_enhanced_cli.py --ti-lookup 8.8.8.8 --ti-providers abuseipdb otx
+hades intel lookup 8.8.8.8 --providers abuseipdb otx
 ```
 
 ### Offline Mode
@@ -125,11 +125,11 @@ python core/hades_enhanced_cli.py --ti-lookup 8.8.8.8 --ti-providers abuseipdb o
 Use only cached results without making any API calls:
 
 ```bash
-python core/hades_enhanced_cli.py --ti-lookup d41d8cd98f00b204e9800998ecf8427e --ti-offline
+hades intel lookup d41d8cd98f00b204e9800998ecf8427e --offline
 ```
 
 ```bash
-python core/hades_enhanced_cli.py -r --threat-intel --ti-offline /path/to/evidence/
+hades scan -r --threat-intel --ti-offline /path/to/evidence/
 ```
 
 ### Cache Statistics
@@ -137,55 +137,22 @@ python core/hades_enhanced_cli.py -r --threat-intel --ti-offline /path/to/eviden
 View the current state of the threat intel cache:
 
 ```bash
-python core/hades_enhanced_cli.py --ti-cache-stats
+hades intel cache-stats
 ```
 
-## REST API Endpoints
+## REST API
 
-When the HADES API server is running, three threat intelligence endpoints are available:
+The API server does not expose IOC lookup or cache endpoints; use `hades intel lookup` and `hades intel cache-stats` for those. Over the API, hash reputation is part of the scan itself: when `HADES_THREAT_INTEL=true` is set in the server environment, each scanned file's SHA-256 is looked up in MalwareBazaar (if `MALWAREBAZAAR_API_KEY` is set) and then VirusTotal (if `VIRUSTOTAL_API_KEY` is set), and a match is reported in the scan result.
 
-### GET /api/v1/threat-intel/lookup
-
-Look up an IOC against configured providers.
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     "http://localhost:8666/api/v1/threat-intel/lookup?ioc=d41d8cd98f00b204e9800998ecf8427e"
-```
-
-Optional query parameter `providers` (comma-separated) to restrict which providers are queried:
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     "http://localhost:8666/api/v1/threat-intel/lookup?ioc=8.8.8.8&providers=abuseipdb,otx"
-```
-
-### GET /api/v1/threat-intel/cache/stats
-
-Retrieve cache statistics:
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     http://localhost:8666/api/v1/threat-intel/cache/stats
-```
-
-### DELETE /api/v1/threat-intel/cache
-
-Flush the entire threat intel cache:
-
-```bash
-curl -X DELETE -H "X-API-Key: your-api-key-here" \
-     http://localhost:8666/api/v1/threat-intel/cache
-```
+The feed scheduler is available at `GET /api/v1/threat-intel/scheduler` (status) and `POST /api/v1/threat-intel/scheduler` (trigger an update); see the [API Reference](api_reference.md#threat-intelligence).
 
 ## Cache Management
 
 The threat intelligence system uses an in-memory cache backed by SQLite to store lookup results. This reduces API calls, improves performance, and enables offline operation.
 
 - **TTL**: Cached entries expire after `cache_ttl_hours` (default: 24 hours). Expired entries are automatically refreshed on the next lookup.
-- **Statistics**: Use `--ti-cache-stats` or the `/api/v1/threat-intel/cache/stats` endpoint to view hit/miss ratios and entry counts.
-- **Flushing**: Use the `DELETE /api/v1/threat-intel/cache` endpoint to clear all cached entries. This is useful after updating provider API keys or when you suspect stale data.
-- **Offline mode**: When `--ti-offline` is set, only cached results are returned. No API calls are made to external providers.
+- **Statistics**: Use `hades intel cache-stats` to view hit/miss ratios and entry counts.
+- **Offline mode**: With `hades intel lookup --offline` or `hades scan --ti-offline`, only cached results are returned. No API calls are made to external providers.
 
 ## Privacy Considerations
 
@@ -202,7 +169,7 @@ When using cloud threat intelligence, HADES sends the following data to external
 
 For environments where no external communication is permitted:
 1. Set `offline_mode: true` in the config to prevent all API calls
-2. Use `--ti-offline` on the command line
+2. Use `--offline` (`hades intel lookup`) or `--ti-offline` (`hades scan`) on the command line
 3. Pre-populate the cache by running lookups in a connected environment, then transfer the cache database
 
 ## Troubleshooting
@@ -234,5 +201,5 @@ Free-tier API keys have rate limits. If you encounter 429 errors:
 ### Cache not working
 
 - Ensure the HADES process has write permissions to the working directory (cache is stored as a SQLite database)
-- Check `--ti-cache-stats` to verify the cache is being populated
+- Check `hades intel cache-stats` to verify the cache is being populated
 - If the cache database is corrupted, delete it and let HADES recreate it on next run

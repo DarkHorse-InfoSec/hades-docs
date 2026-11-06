@@ -127,7 +127,7 @@ Heuristic findings flag statistically unusual patterns that do not match a speci
 
 ### ML Anomaly Detection
 
-The ML engine uses an ensemble of models (Isolation Forest + Random Forest, optionally XGBoost) trained on normal metadata distributions. Files that deviate significantly from the baseline are flagged. ML findings complement signature-based detection by catching novel threats that lack known signatures.
+The ML stage is a signed, supervised XGBoost classifier over 33 metadata and structure features, trained and signed by DarkHorse. Files whose feature profile looks malicious are flagged. ML findings complement signature-based detection by catching novel threats that lack known signatures.
 
 ---
 

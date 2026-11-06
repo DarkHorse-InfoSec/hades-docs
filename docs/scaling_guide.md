@@ -39,9 +39,9 @@ Nginx automatically load-balances across all API instances using least-connectio
 
 | File | Use Case | Description |
 |------|----------|-------------|
-| `docker-compose.yml` | Development | Single API + viewer, optional PostgreSQL/Redis |
-| `docker-compose.scale.yml` | Production | PostgreSQL + Redis + API + scalable workers |
-| `docker-compose.ha.yml` | High availability | Nginx LB + PgBouncer + Redis Sentinel + multi-API + workers |
+| `docker-compose.yml` | Development | Single API + viewer, optional Redis |
+| `docker-compose.scale.yml` | Production | Redis + API + scalable workers |
+| `docker-compose.ha.yml` | High availability | Nginx LB + Redis Sentinel + multi-API + workers |
 
 ## Redis Configuration
 
@@ -79,58 +79,9 @@ sentinel failover-timeout hades-master 10000
 sentinel parallel-syncs hades-master 1
 ```
 
-## PostgreSQL Scaling
+## Database
 
-### Connection Pooling with PgBouncer
-
-PgBouncer sits between HADES and PostgreSQL, pooling database connections:
-
-```
-# PgBouncer settings (in docker-compose.ha.yml)
-POOL_MODE=transaction         # Recommended for HADES
-MAX_CLIENT_CONN=200           # Max connections from HADES
-DEFAULT_POOL_SIZE=25          # Connections to PostgreSQL
-```
-
-Benefits:
-- Reduces PostgreSQL connection overhead
-- Handles connection spikes gracefully
-- Required when running multiple API instances
-
-### Read Replicas
-
-For read-heavy workloads (many scan result retrievals vs. new scans):
-
-1. Configure a PostgreSQL streaming replica
-2. Direct read queries to the replica via a separate DSN
-3. Keep write queries (new scans, audit log) on the primary
-
-### Table Partitioning
-
-For databases exceeding 100M scan records, partition the scans table by date:
-
-```sql
--- Example: monthly partitions
-CREATE TABLE scans (
-    id SERIAL,
-    created_at TIMESTAMP NOT NULL,
-    tenant_id TEXT,
-    results_json TEXT
-) PARTITION BY RANGE (created_at);
-
-CREATE TABLE scans_2026_01 PARTITION OF scans
-    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
-```
-
-### Backup and Recovery
-
-```bash
-# Automated backup
-pg_dump -h localhost -U hades -Fc hades > hades_backup_$(date +%Y%m%d).dump
-
-# Restore
-pg_restore -h localhost -U hades -d hades hades_backup.dump
-```
+SQLite is the only database backend (PostgreSQL support was removed in v1.7.3). Each API instance and worker keeps its own SQLite file, so scan history is per instance; there is no shared database, connection pool or read replica to scale. Shared state between instances (rate limits, sessions, cache, the task queue) lives in Redis.
 
 ## Load Balancing
 
@@ -210,12 +161,7 @@ spec:
             - containerPort: 8666
           env:
             - name: HADES_DB_BACKEND
-              value: postgresql
-            - name: HADES_DB_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: hades-secrets
-                  key: db-dsn
+              value: sqlite
             - name: HADES_REDIS_URL
               value: redis://redis-svc:6379/0
           resources:
@@ -323,7 +269,6 @@ volumeMounts:
 | Scan queue depth | Redis `LLEN hades:tasks` | > 1000 |
 | Worker count | Docker / Kubernetes | < minimum replicas |
 | Error rate | API logs | > 1% of requests |
-| PostgreSQL connections | `pg_stat_activity` | > 80% of `max_connections` |
 | Redis memory usage | `redis-cli info memory` | > 80% of `maxmemory` |
 | Disk usage (scan data) | Host / PVC | > 85% capacity |
 | CPU usage per instance | Docker stats / metrics | > 80% sustained |

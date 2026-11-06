@@ -261,7 +261,7 @@ curl -s -H "X-API-Key: your-api-key-here" \
 
 # List plugins
 curl -s -H "X-API-Key: your-api-key-here" \
-  http://localhost:8666/api/v1/plugins/list | python -m json.tool
+  http://localhost:8666/api/v1/plugins | python -m json.tool
 
 # Stop the server
 kill %1
@@ -306,29 +306,25 @@ kill %1
 
 ## 11. ML Anomaly Detection
 
-**What:** Use Isolation Forest to detect statistical outliers in metadata feature vectors.
+**What:** Show the signed ML classifier's verdict alongside the rule-based engines.
 
 **Commands:**
 
 ```bash
 # Check model status
-python core/hades_enhanced_cli.py --ml-status
+hades intel ml-status
 
-# Train on known-good files
-python core/hades_enhanced_cli.py --ml-train demo_workspace/clean/
-
-# Scan with ML enabled
-python core/hades_enhanced_cli.py -r --ml-detect demo_workspace/evidence/
+# Scan with the ML stage outcome reported per file
+hades scan -r --ml-detect demo_workspace/evidence/
 ```
 
-**Expected output:** ML status shows model availability. Training builds an Isolation Forest from the 33 features of `MetadataFeatureExtractor` (v1.7.1). ML-enabled scans report anomaly scores alongside traditional detections.
+**Expected output:** ML status shows the signed model's verification status. ML-enabled scans report anomaly scores and contributing features alongside traditional detections (Professional licence or higher).
 
 **Talking points:**
-- 33 features extracted per file (v1.7.1): metadata field count and size, field-name and field-value entropy, base64 / URL / executable string counts, PE and PDF analyzer signals, publisher-signature trust and known-clean-format flags. The `--ml-ensemble` path uses a separate 25-feature extractor.
-- Isolation Forest identifies files that are statistically unusual vs. the baseline
+- A supervised XGBoost classifier (production model v1.18.0) over 33 features per file: metadata field count and size, field-name and field-value entropy, base64 / URL / executable string counts, PE and PDF analyzer signals, publisher-signature trust and known-clean-format flags
+- The model is signed; HADES verifies the signature at load and refuses a model that fails it
 - Works alongside (not replacing) YARA and heuristic detection
-- Requires scikit-learn: `pip install scikit-learn`
-- Graceful degradation: ML features silently disabled if sklearn is unavailable
+- Bundled in the binary: nothing to install, and nothing is trained on the customer's machine
 
 ---
 

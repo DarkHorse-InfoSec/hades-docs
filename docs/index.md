@@ -20,7 +20,7 @@ HADES analyzes hidden and malformed metadata across common file types -- images,
 
     ---
 
-    Isolation Forest and ensemble models trained on 25 metadata features flag files that deviate from normal patterns -- catching novel threats that rules miss.
+    A signed XGBoost classifier over 33 metadata and structure features flags files that look malicious even when no rule fires -- catching novel threats that rules miss.
 
 -   **Threat Intelligence**
 
@@ -44,7 +44,7 @@ HADES analyzes hidden and malformed metadata across common file types -- images,
 
     ---
 
-    RBAC, SSO (OIDC/SAML), PostgreSQL, Redis, encryption at rest, multi-tenancy, and license tiers for production deployments.
+    RBAC, Redis, encryption at rest, multi-tenancy, and license tiers for production deployments.
 
 </div>
 
@@ -136,7 +136,7 @@ HADES occupies a distinct niche in the security tooling landscape. It is the onl
 |---|---|
 | YARA rules | 144 across 55 rule files |
 | Supported file formats | JPEG, PNG, GIF, TIFF, PDF, DOCX, SVG, MP4, MP3, ZIP, RAR, HTML, and more |
-| ML features | 25 in the ensemble extractor; 33 in the production classifier schema |
+| ML features | 33 (production classifier v1.18.0, feature schema 9) |
 | SIEM formats | 5 (Syslog, CEF, STIX, LEEF, ECS) |
 | Threat intel providers | 4 (VirusTotal, AbuseIPDB, OTX, MalwareBazaar) |
 
@@ -146,7 +146,7 @@ HADES occupies a distinct niche in the security tooling landscape. It is the onl
 
 - [Quick Start Guide](quick_start.md) -- Get scanning in 5 minutes
 - [API Reference](api_reference.md) -- REST API endpoint documentation
-- [Enterprise Deployment](enterprise_deployment_guide.md) -- RBAC, SSO, PostgreSQL, Redis
+- [Enterprise Deployment](enterprise_deployment_guide.md) -- RBAC, Redis, encryption, multi-tenancy
 - [Plugin Development](plugin_development_guide.md) -- Extend HADES with custom detections
 - [Architecture](architecture.md) -- System design and module relationships
 

@@ -19,18 +19,17 @@ This guide covers common issues encountered when installing, configuring, and op
   - [1.5 pikepdf Build Failure](#15-pikepdf-build-failure)
   - [1.6 olefile Import Error](#16-olefile-import-error)
   - [1.7 bcrypt or cryptography Wheel Build Failure](#17-bcrypt-or-cryptography-wheel-build-failure)
-  - [1.8 psycopg2-binary Platform Error](#18-psycopg2-binary-platform-error)
-  - [1.9 uvloop Not Available on Windows](#19-uvloop-not-available-on-windows)
-  - [1.10 py7zr Missing for Archive Extraction](#110-py7zr-missing-for-archive-extraction)
+  - [1.8 uvloop Not Available on Windows](#18-uvloop-not-available-on-windows)
+  - [1.9 py7zr Missing for Archive Extraction](#19-py7zr-missing-for-archive-extraction)
 - [2. API Server Issues](#2-api-server-issues)
   - [2.1 Port Already in Use](#21-port-already-in-use)
   - [2.2 API Key Authentication Failures](#22-api-key-authentication-failures)
   - [2.3 CORS Errors in Browser](#23-cors-errors-in-browser)
   - [2.4 WebSocket Connection Drops](#24-websocket-connection-drops)
   - [2.5 422 Validation Error on Upload](#25-422-validation-error-on-upload)
-  - [2.6 Server Fails to Start — Module Import Error](#26-server-fails-to-start--module-import-error)
+  - [2.6 Server Fails to Start: Module Import Error](#26-server-fails-to-start-module-import-error)
 - [3. Scanning Issues](#3-scanning-issues)
-  - [3.1 File Too Large — Memory Exhaustion](#31-file-too-large--memory-exhaustion)
+  - [3.1 File Too Large: Memory Exhaustion](#31-file-too-large-memory-exhaustion)
   - [3.2 Unsupported File Type Returns Empty Results](#32-unsupported-file-type-returns-empty-results)
   - [3.3 ExifTool Process Hangs](#33-exiftool-process-hangs)
   - [3.4 ExifTool Process Crashes Mid-Scan](#34-exiftool-process-crashes-mid-scan)
@@ -44,20 +43,15 @@ This guide covers common issues encountered when installing, configuring, and op
   - [4.5 Worker Container Cannot Reach Redis](#45-worker-container-cannot-reach-redis)
   - [4.6 Container OOM Killed](#46-container-oom-killed)
 - [5. Enterprise Feature Issues](#5-enterprise-feature-issues)
-  - [5.1 PostgreSQL Connection Refused](#51-postgresql-connection-refused)
-  - [5.2 Redis Fallback to In-Memory](#52-redis-fallback-to-in-memory)
-  - [5.3 Encryption Key Not Found](#53-encryption-key-not-found)
-  - [5.4 RBAC — Permission Denied After User Creation](#54-rbac--permission-denied-after-user-creation)
-  - [5.5 SSO Callback Fails with Invalid Token](#55-sso-callback-fails-with-invalid-token)
-  - [5.6 License Key Rejected](#56-license-key-rejected)
-  - [5.7 Multi-Tenant Isolation Leak](#57-multi-tenant-isolation-leak)
+  - [5.1 Redis Fallback to In-Memory](#51-redis-fallback-to-in-memory)
+  - [5.2 Encryption Key Not Found](#52-encryption-key-not-found)
+  - [5.3 RBAC: Permission Denied After User Creation](#53-rbac-permission-denied-after-user-creation)
+  - [5.4 License Key Rejected](#54-license-key-rejected)
+  - [5.5 Multi-Tenant Isolation Leak](#55-multi-tenant-isolation-leak)
 - [6. ML Detection Issues](#6-ml-detection-issues)
-  - [6.1 Not Enough Training Samples](#61-not-enough-training-samples)
-  - [6.2 Model File Not Found](#62-model-file-not-found)
-  - [6.3 XGBoost Unavailable — Ensemble Fallback](#63-xgboost-unavailable--ensemble-fallback)
-  - [6.4 Feature Extraction Returns NaN](#64-feature-extraction-returns-nan)
-  - [6.5 High False Positive Rate After Training](#65-high-false-positive-rate-after-training)
-  - [6.6 Model Incompatible After scikit-learn Upgrade](#66-model-incompatible-after-scikit-learn-upgrade)
+  - [6.1 ML Stage Not Running](#61-ml-stage-not-running)
+  - [6.2 "ML training on this host is not supported"](#62-ml-training-on-this-host-is-not-supported)
+  - [6.3 A Clean File Is Flagged by ML](#63-a-clean-file-is-flagged-by-ml)
 
 ---
 
@@ -78,7 +72,7 @@ sudo apt-get install libimage-exiftool-perl
 # macOS
 brew install exiftool
 
-# Windows — download from https://exiftool.org
+# Windows - download from https://exiftool.org
 # Rename exiftool(-k).exe to exiftool.exe and place it on PATH
 ```
 
@@ -114,7 +108,7 @@ sudo apt-get install build-essential libssl-dev libmagic-dev
 xcode-select --install
 brew install openssl
 
-# Windows — install Visual C++ Build Tools
+# Windows - install Visual C++ Build Tools
 # https://visualstudio.microsoft.com/visual-cpp-build-tools/
 ```
 
@@ -164,7 +158,7 @@ Common issues:
 **Solution:**
 
 ```bash
-# Linux — install BLAS/LAPACK first
+# Linux - install BLAS/LAPACK first
 sudo apt-get install libopenblas-dev liblapack-dev gfortran
 
 # Use pre-built wheels (preferred)
@@ -253,35 +247,7 @@ pip install hades-scanner
 
 ---
 
-### 1.8 psycopg2-binary Platform Error
-
-**Symptom:** `psycopg2-binary` fails to install on Alpine Linux or ARM architectures.
-
-**Cause:** The `-binary` variant ships pre-compiled wheels for common platforms only.
-
-**Solution:**
-
-For Alpine, install the source package with system dependencies:
-
-```bash
-apk add postgresql-dev gcc musl-dev
-pip install psycopg2
-```
-
-For ARM (e.g., Raspberry Pi, Apple Silicon):
-
-```bash
-pip install psycopg2-binary --only-binary=:all:
-# If no wheel exists:
-brew install libpq  # macOS ARM
-pip install psycopg2 --no-binary=psycopg2
-```
-
-PostgreSQL is optional. Without it, HADES uses SQLite (WAL mode) as the database backend.
-
----
-
-### 1.9 uvloop Not Available on Windows
+### 1.8 uvloop Not Available on Windows
 
 **Symptom:** Warning about uvloop at startup on Windows.
 
@@ -291,7 +257,7 @@ PostgreSQL is optional. Without it, HADES uses SQLite (WAL mode) as the database
 
 ---
 
-### 1.10 py7zr Missing for Archive Extraction
+### 1.9 py7zr Missing for Archive Extraction
 
 **Symptom:** 7-Zip archives (`.7z`) are skipped during file ingestion.
 
@@ -474,7 +440,7 @@ Common mistakes:
 
 ---
 
-### 2.6 Server Fails to Start — Module Import Error
+### 2.6 Server Fails to Start: Module Import Error
 
 **Symptom:** `ModuleNotFoundError` or `ImportError` when running `--serve`.
 
@@ -507,7 +473,7 @@ Import failures for optional modules (integrations, auth, storage) are logged as
 
 ## 3. Scanning Issues
 
-### 3.1 File Too Large — Memory Exhaustion
+### 3.1 File Too Large: Memory Exhaustion
 
 **Symptom:** Process killed (OOM) or `MemoryError` when scanning large files (>500 MB).
 
@@ -697,7 +663,7 @@ python core/hades_enhanced_cli.py --async --profile -r /evidence/
 3. Kill and restart. The pipeline supports graceful shutdown:
 
 ```bash
-# Send SIGINT (Ctrl+C) — the pipeline drains active tasks and exits
+# Send SIGINT (Ctrl+C) - the pipeline drains active tasks and exits
 ```
 
 ---
@@ -907,49 +873,7 @@ docker compose -f docker/docker-compose.observability.yml up -d
 
 ## 5. Enterprise Feature Issues
 
-### 5.1 PostgreSQL Connection Refused
-
-**Symptom:** `psycopg2.OperationalError: connection refused` when using `--db-backend postgresql`.
-
-**Cause:** PostgreSQL is unreachable. Common reasons: wrong DSN, PostgreSQL not started, firewall blocking port 5432, or the database does not exist.
-
-**Solution:**
-
-1. Verify PostgreSQL is running:
-
-```bash
-pg_isready -h localhost -p 5432
-```
-
-2. Verify the DSN:
-
-```bash
-python core/hades_enhanced_cli.py --serve \
-  --db-backend postgresql \
-  --db-dsn "postgresql://hades_user:password@localhost:5432/hades_db"
-```
-
-3. Create the database if it does not exist:
-
-```sql
-CREATE DATABASE hades_db;
-CREATE USER hades_user WITH PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE hades_db TO hades_user;
-```
-
-4. In Docker Compose, ensure the API service depends on PostgreSQL and waits for readiness:
-
-```yaml
-depends_on:
-  hades-postgres:
-    condition: service_healthy
-```
-
-5. If PostgreSQL is unavailable, HADES falls back to SQLite automatically. Check logs for `Falling back to SQLite backend`.
-
----
-
-### 5.2 Redis Fallback to In-Memory
+### 5.1 Redis Fallback to In-Memory
 
 **Symptom:** Logs show `Redis unavailable, using in-memory fallback`. Rate limiting, sessions, and distributed locks operate in-process only.
 
@@ -980,7 +904,7 @@ python core/hades_enhanced_cli.py --serve --redis-url redis://localhost:6379/0
 
 ---
 
-### 5.3 Encryption Key Not Found
+### 5.2 Encryption Key Not Found
 
 **Symptom:** `FileNotFoundError: encryption.key not found` or `Encryption key not configured` when using `--encrypt`.
 
@@ -1013,7 +937,7 @@ config/encryption.key
 
 ---
 
-### 5.4 RBAC — Permission Denied After User Creation
+### 5.3 RBAC: Permission Denied After User Creation
 
 **Symptom:** A newly created user receives HTTP 403 on endpoints they should have access to.
 
@@ -1042,48 +966,13 @@ python core/hades_enhanced_cli.py --create-user analyst1 --user-role analyst
 
 ```bash
 # Via API endpoint
-curl -X POST http://localhost:8666/api/v1/auth/rotate-key \
+curl -X POST http://localhost:8666/api/v1/auth/users/<user_id>/rotate-key \
   -H "X-API-Key: admin-key"
 ```
 
 ---
 
-### 5.5 SSO Callback Fails with Invalid Token
-
-**Symptom:** OIDC or SAML callback returns `Invalid token` or `Signature verification failed`.
-
-**Cause:** Clock skew between the HADES server and the identity provider, expired tokens, or misconfigured issuer/audience.
-
-**Solution:**
-
-1. Sync system clock:
-
-```bash
-# Linux
-sudo ntpdate -u pool.ntp.org
-# Or with systemd
-sudo timedatectl set-ntp true
-```
-
-2. For OIDC, verify the configuration:
-   - `issuer` must match the IdP's discovery document.
-   - `audience` (client ID) must match the registered application.
-   - The signing key (JWKS) must be reachable from the HADES server.
-
-3. For SAML, verify:
-   - The IdP certificate is current and correctly configured.
-   - The assertion consumer service URL matches the HADES callback URL.
-   - Response and assertion are both signed (or match your IdP's policy).
-
-4. Enable debug logging to see the full token/assertion:
-
-```bash
-HADES_LOG_LEVEL=debug python core/hades_enhanced_cli.py --serve
-```
-
----
-
-### 5.6 License Key Rejected
+### 5.4 License Key Rejected
 
 **Symptom:** `Invalid license key` or `License expired` when using `--license-key`.
 
@@ -1105,14 +994,14 @@ python core/hades_enhanced_cli.py --license-info
 
 3. License tiers gate specific features:
    - **Free**: Core scanning, basic detection.
-   - **Professional**: ML ensemble, behavioral analysis, vulnerability management.
-   - **Enterprise**: All features including log analysis, multi-tenant, SSO.
+   - **Professional**: ML classifier, behavioral analysis, vulnerability management.
+   - **Enterprise**: All features including log analysis and multi-tenant.
 
 4. Contact DarkHorse Information Security LLC for key reissuance if the key is valid but rejected.
 
 ---
 
-### 5.7 Multi-Tenant Isolation Leak
+### 5.5 Multi-Tenant Isolation Leak
 
 **Symptom:** Scan results or cases from one tenant appear in another tenant's queries.
 
@@ -1145,199 +1034,54 @@ python core/hades_enhanced_cli.py --audit-verify
 
 ## 6. ML Detection Issues
 
-### 6.1 Not Enough Training Samples
+### 6.1 ML Stage Not Running
 
-**Symptom:** `InsufficientDataError` or `Need at least N samples to train` when running `--ml-baseline` or `--ml-train`.
+**Symptom:** No `ml_anomaly` findings on any file.
 
-**Cause:** Isolation Forest and Random Forest require a minimum number of samples to build meaningful models. The single-model detector (`ml_detection.py`) needs at least 10 samples. The ensemble (`ml_ensemble.py`) may require more for the supervised Random Forest component.
+**Cause:** The ML stage runs only on Professional, Team and Enterprise licences. On a licensed install, the signed model bundle (`models/baseline_classifier_v1.*`) is missing, failed signature verification, or could not be loaded. HADES refuses an unverified model and scans without the ML stage; the other stages are unaffected.
 
 **Solution:**
 
-1. Collect a representative corpus of known-good files:
+1. Check the model state:
 
 ```bash
-# Scan a directory of clean files to build the baseline
-python core/hades_enhanced_cli.py --ml-train /path/to/known-good-files/
+hades intel ml-status
 ```
 
-2. The training directory should contain at least 50 files across multiple formats for robust models. Include JPEG, PNG, PDF, DOCX, and other formats you expect to encounter.
+2. `verification_status` names the cause: `model file missing`, `signature verification failed`, `metadata load failed`, `model load failed` or `xgboost not installed`.
 
-3. For the ensemble detector with labeled data, import a CSV of labeled samples:
+3. For a missing or refused bundle, reinstall HADES from the release so the bundle files match their signature. Do not edit or replace them: any change fails verification by design.
 
-```bash
-# CSV format: file_path,label (0=benign, 1=malicious)
-python core/hades_enhanced_cli.py --ml-ensemble --import-labels labels.csv
-```
-
-4. Use the demo sample generator to create initial training data:
-
-```bash
-python core/hades_enhanced_cli.py --generate-demo-samples
-```
+4. If `plugins.plugin_config.ml_anomaly.model_path` is set in your config, it must point at a signed bundle. A path to a missing bundle disables ML; it is never replaced by the bundled model.
 
 ---
 
-### 6.2 Model File Not Found
+### 6.2 "ML training on this host is not supported"
 
-**Symptom:** `FileNotFoundError` referencing a `.joblib` file in the `models/` directory, or `Model not loaded` warnings during ML scans.
+**Symptom:** `hades intel ml-train` or `hades intel ml-baseline` exits with this message.
 
-**Cause:** The ML model has not been trained yet, or the model file was deleted/moved.
+**Cause:** Local training was retired. The model is trained and signed by DarkHorse; a locally trained model could not be loaded, because only a bundle signed with the DarkHorse model-signing key is accepted. The commands read and write nothing.
 
-**Solution:**
-
-1. Check if a model exists:
-
-```bash
-ls -la models/
-```
-
-2. Train a new baseline model:
-
-```bash
-python core/hades_enhanced_cli.py --ml-baseline
-```
-
-3. For the ensemble detector:
-
-```bash
-python core/hades_enhanced_cli.py --ml-ensemble --ml-train /path/to/training-data/
-```
-
-4. Verify model status:
-
-```bash
-python core/hades_enhanced_cli.py --ml-status
-```
-
-5. Models are not included in the git repository (the `models/` directory contains only `.gitkeep`). Each deployment must train its own models. In Docker, persist the `models/` directory via a volume:
-
-```yaml
-volumes:
-  - model-data:/app/models
-```
+**Solution:** Nothing to fix. Check the model in use with `hades intel ml-status`, and report files you believe are misclassified with `hades feedback false-positive` (see 6.3).
 
 ---
 
-### 6.3 XGBoost Unavailable — Ensemble Fallback
+### 6.3 A Clean File Is Flagged by ML
 
-**Symptom:** Log message: `XGBoost not available, using 2-model ensemble (Isolation Forest + Random Forest)`.
-
-**Cause:** The `xgboost` Python package is not installed. The ML ensemble detector uses three models when XGBoost is available, and falls back to two models without it.
+**Symptom:** An ML anomaly finding on a file you know is benign.
 
 **Solution:**
 
-1. Install XGBoost:
+1. Look at `contributing_features` in the finding to see what drove the score, and at the file's other findings: ML is one input to the verdict.
+
+2. Report it, giving the verdict HADES returned and why you believe it is wrong:
 
 ```bash
-pip install xgboost
+hades feedback false-positive /path/to/file --verdict HIGH \
+  --explanation "Signed installer from our software vendor, distributed internally"
 ```
 
-2. This is informational, not an error. The 2-model ensemble (Isolation Forest + Random Forest) is fully functional and provides strong detection. XGBoost adds incremental accuracy for edge cases.
-
-3. Verify availability:
-
-```bash
-python -c "import xgboost; print(xgboost.__version__)"
-```
-
----
-
-### 6.4 Feature Extraction Returns NaN
-
-**Symptom:** ML anomaly scores are `NaN` or `None`. Log shows `Feature extraction produced NaN values`.
-
-**Cause:** The metadata feature extractor computes 15-25 numeric features from file metadata. Files with no extractable metadata produce all-zero or NaN feature vectors.
-
-**Solution:**
-
-1. Verify ExifTool is extracting metadata:
-
-```bash
-exiftool -j /path/to/file.jpg
-```
-
-2. If the file genuinely has no metadata, ML detection is not applicable. The engine should return a neutral score rather than NaN. If NaN is returned, this is a bug in feature normalization.
-
-3. Retrain with a diverse corpus that includes metadata-sparse files:
-
-```bash
-python core/hades_enhanced_cli.py --ml-train /path/to/diverse-corpus/
-```
-
-4. As a workaround, disable ML for the scan:
-
-```bash
-python core/hades_enhanced_cli.py -r /evidence/
-# Without --ml-detect or --ml-ensemble, ML is not invoked
-```
-
----
-
-### 6.5 High False Positive Rate After Training
-
-**Symptom:** Many benign files score above the anomaly threshold. The corpus validation reports FPR > 10%.
-
-**Cause:** The training data is not representative of the files being scanned. The Isolation Forest learns "normal" from the training set; if the training set is narrow (e.g., only JPEG files), other formats appear anomalous.
-
-**Solution:**
-
-1. Retrain with a broader corpus:
-
-```bash
-# Include all file types you expect to scan
-python core/hades_enhanced_cli.py --ml-train /path/to/representative-files/
-```
-
-2. Adjust the anomaly threshold. The default contamination parameter is set for ~5% anomaly rate. Increase it if your environment has a higher benign diversity.
-
-3. Use the ensemble detector with labeled data for supervised learning:
-
-```bash
-python core/hades_enhanced_cli.py --ml-ensemble --import-labels /path/to/labels.csv
-```
-
-4. Run the corpus validation to measure FPR:
-
-```bash
-python -m pytest tests/test_corpus_full_validation.py -v -s
-```
-
-The target is TPR >= 90% and FPR <= 10%.
-
----
-
-### 6.6 Model Incompatible After scikit-learn Upgrade
-
-**Symptom:** `ModuleNotFoundError` or `AttributeError` when loading a previously trained model after upgrading scikit-learn.
-
-**Cause:** scikit-learn serializes models with `joblib`. Models trained on one version may not deserialize on a different version due to internal class changes.
-
-**Solution:**
-
-1. Retrain the model on the new scikit-learn version:
-
-```bash
-# Delete the old model
-rm models/*.joblib
-
-# Retrain
-python core/hades_enhanced_cli.py --ml-baseline
-```
-
-2. Pin scikit-learn in your deployment to avoid unintended upgrades:
-
-```bash
-pip install scikit-learn==1.4.0
-```
-
-3. In Docker, the model is rebuilt on each fresh deployment. Persist trained models via a volume if you want to avoid retraining:
-
-```yaml
-volumes:
-  - ml-models:/app/models
-```
-
-When upgrading scikit-learn, rebuild the volume contents.
+The file itself is never uploaded. Only its SHA-256 (computed locally), the verdict you report and your explanation are sent. Confirmed false positives are fixed in a later release, either in the model or on the known-clean list that is checked before the model runs.
 
 ---
 

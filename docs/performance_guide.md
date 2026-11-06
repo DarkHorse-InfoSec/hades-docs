@@ -75,28 +75,6 @@ hades-enhanced --serve --scan-cache --cache-ttl 3600 --cache-max-size 10000
 
 With Redis enabled, cache is shared across all API instances.
 
-### PostgreSQL Tuning
-
-For enterprise deployments using PostgreSQL:
-
-```ini
-# postgresql.conf recommendations for HADES workloads
-shared_buffers = 256MB          # 25% of available RAM
-effective_cache_size = 768MB    # 75% of available RAM
-work_mem = 16MB
-maintenance_work_mem = 128MB
-max_connections = 200
-checkpoint_completion_target = 0.9
-wal_buffers = 16MB
-```
-
-Connection pooling with PgBouncer (recommended for > 50 concurrent connections):
-
-```bash
-# docker-compose.ha.yml includes PgBouncer preconfigured
-docker compose -f docker/docker-compose.ha.yml up -d
-```
-
 ### Redis Configuration
 
 Redis serves as scan cache backend, rate limiter, and task queue:
@@ -130,7 +108,7 @@ hades-enhanced --serve \
 docker compose -f docker/docker-compose.scale.yml up -d
 ```
 
-Uses PostgreSQL, Redis, and 2 worker replicas.
+Uses Redis and 2 worker replicas.
 
 ### Enterprise
 
@@ -145,7 +123,7 @@ export HADES_ASYNC_PIPELINE=true
 export HADES_CACHE_ENABLED=true
 ```
 
-Uses a dedicated PostgreSQL host.
+Each instance keeps its own SQLite database.
 
 ### Large Enterprise
 
@@ -155,7 +133,7 @@ docker compose -f docker/docker-compose.ha.yml up -d \
     --scale hades-worker=12
 ```
 
-Full HA deployment with nginx load balancer, PgBouncer, Redis Sentinel, on multiple hosts behind a load balancer with dedicated database and Redis clusters.
+Full HA deployment with nginx load balancer and Redis Sentinel, on multiple hosts behind a load balancer with a dedicated Redis cluster.
 
 ### Kubernetes (Horizontal Pod Autoscaling)
 
@@ -322,7 +300,6 @@ For detailed setup, PromQL examples, and alerting configuration, see the **[Obse
 | Scan queue depth | > 1000 | Add more workers |
 | Scan latency p95 | > 2s | Check ExifTool process, disk I/O |
 | Memory usage | > 80% limit | Reduce workers or increase limits |
-| PostgreSQL connections | > 80% pool | Increase pool size or add PgBouncer |
 | Redis memory | > 80% maxmemory | Increase limit or reduce cache TTL |
 | Error rate | > 1% | Check logs for failing scans |
 
@@ -354,16 +331,17 @@ docker stats
 ### High Memory Usage
 
 1. **Reduce workers:** Each worker consumes memory independently.
-2. **Check ML models:** ML ensemble loads models into memory. Disable with `--disable-ml` if not needed.
+2. **ML model:** the signed classifier is loaded once per process; it is small next to per-file parsing and is not a tuning lever.
 3. **Reduce cache size:** `--cache-max-size 5000` limits in-memory cache.
 4. **Use Redis:** External Redis moves cache out of process memory.
 
 ### Database Connection Errors
 
-1. **Check PostgreSQL status:** `pg_isready -h localhost -U hades`
-2. **Check connection pool:** Monitor active connections vs. `max_connections`.
-3. **Use PgBouncer:** Connection pooling reduces connection overhead.
-4. **Check DSN:** Verify `HADES_DB_DSN` format: `postgresql://user:pass@host:5432/dbname`
+SQLite is the only database backend (PostgreSQL was removed in v1.7.3).
+
+1. **Check the health check:** `hades serve --health-check` reports any leftover setting from the removed PostgreSQL backend (`HADES_DB_BACKEND`, `HADES_DB_DSN`); remove it.
+2. **Check the database path:** the process needs write access to the SQLite file and its directory (WAL mode creates `-wal` and `-shm` files beside it).
+3. **One writer per file:** do not point several hosts at one SQLite file on network storage.
 
 ### Redis Connection Errors
 
@@ -376,4 +354,4 @@ docker stats
 1. **Check Redis queue:** `redis-cli llen hades:tasks`
 2. **Check worker logs:** `docker logs hades-worker-1`
 3. **Verify HADES_MODE:** Worker containers must have `HADES_MODE=worker` set.
-4. **Check connectivity:** Workers need access to both Redis and PostgreSQL.
+4. **Check connectivity:** Workers need access to Redis.
