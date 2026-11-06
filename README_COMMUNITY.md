@@ -90,7 +90,7 @@ The tables below are taken from the license module of HADES v1.7.1 (`core/auth/l
 | SIEM export | | x | x | x |
 | Monitoring and playbooks | | x | x | x |
 | Plugins | | x | x | x |
-| RBAC and SSO | | | x | x |
+| RBAC | | | x | x |
 | Cloud storage scanning | | | x | x |
 | CI/CD integration | | | x | x |
 | Chat integrations (Slack, Teams) | | | x | x |
@@ -220,7 +220,7 @@ Tier is the lowest tier whose license unlocks the route (v1.7.1 `core/hades_api.
 | `/ws` | WS | Free | WebSocket for live updates |
 | `/api/v1/evidence/*` | GET/POST | Free | Evidence chain and case management |
 | `/api/v1/mitre/*` | GET | Pro | MITRE ATT&CK mappings |
-| `/api/v1/ml/ensemble/*` | GET | Pro | ML ensemble status |
+| `/api/v1/ml/status` | GET | Pro | ML classifier status |
 | `/api/v1/behavioral/*` | GET | Pro | Campaign detection |
 | `/api/v1/monitor/*` | GET/POST | Pro | File monitoring |
 | `/api/v1/plugins/*` | GET/POST | Pro | Plugin management |
@@ -258,7 +258,7 @@ File Input
 [Deep Format Analysis] -- PDF, Office, SVG, polyglot
     |
     v
-[ML Anomaly Detection] -- Isolation Forest + Random Forest + XGBoost (Pro+)
+[ML Anomaly Detection] -- signed XGBoost classifier, 33 features (Pro+)
     |
     v
 [Behavioral Analysis] -- Campaign correlation, IOC graph (Pro+)
@@ -285,7 +285,7 @@ A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, YA
 | Windows x86_64 | Path A; binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped |
 | macOS | Not yet available; no release date |
 
-Pro+ tier features (Redis caching, PostgreSQL backend, Prometheus metrics, distributed workers) optionally use external services that you provision in your own infrastructure; the HADES binary connects to them but does not embed them.
+Pro+ tier features (Redis caching, Prometheus metrics, distributed workers) optionally use external services that you provision in your own infrastructure; the HADES binary connects to them but does not embed them.
 
 ---
 
@@ -300,7 +300,7 @@ Pro+ tier features (Redis caching, PostgreSQL backend, Prometheus metrics, distr
 
 ## License
 
-Proprietary License. See [LICENSE](LICENSE) for the full license agreement. Source code, YARA rule sets, scoring algorithms, and ML feature definitions are also designated trade secrets under the Defend Trade Secrets Act of 2016 (18 U.S.C. Sections 1836-1839) and corresponding state Uniform Trade Secrets Act statutes; see `TRADE_SECRETS.md` in the source repository for the formal designation. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
+Proprietary License. See the [End User License Agreement](docs/legal/HADES_EULA_v1.4.0.docx) for the full license agreement. Source code, YARA rule sets, scoring algorithms, and ML feature definitions are also designated trade secrets under the Defend Trade Secrets Act of 2016 (18 U.S.C. Sections 1836-1839) and corresponding state Uniform Trade Secrets Act statutes; see `TRADE_SECRETS.md` in the source repository for the formal designation. For enterprise security-audit or source-review needs under NDA, contact `support@darkhorseinfosec.com`.
 
 Copyright (c) 2024-2026 DarkHorse Information Security LLC. All rights reserved.
 

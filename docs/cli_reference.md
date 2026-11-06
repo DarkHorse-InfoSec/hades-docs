@@ -178,7 +178,6 @@ hades-enhanced --ti-lookup 8.8.8.8 --ti-providers abuseipdb otx --ti-offline
 | `--ml-train DIR` | Train ML model on known-good files in DIR | None |
 | `--ml-baseline` | Generate a baseline model from synthetic data | `false` |
 | `--ml-status` | Display ML engine status | `false` |
-| `--ml-ensemble` | Use ensemble ML detector (Isolation Forest + Random Forest + XGBoost) | `false` |
 
 **Examples:**
 
@@ -191,9 +190,6 @@ hades-enhanced --ml-baseline
 
 # Train on known-good files
 hades-enhanced --ml-train /path/to/known-good/
-
-# Use ensemble detector
-hades-enhanced -r --ml-ensemble /evidence/
 ```
 
 ---
@@ -267,8 +263,7 @@ hades-enhanced --export-case CASE_UUID
 
 | Flag | Description | Default |
 |---|---|---|
-| `--db-backend BACKEND` | Database backend: `sqlite`, `postgres` | `sqlite` |
-| `--db-dsn DSN` | Database connection string | None |
+| `--db-backend BACKEND` | Database backend; `sqlite` is the only accepted value (PostgreSQL was removed in v1.7.3) | `sqlite` |
 | `--redis-url URL` | Redis connection URL | None |
 | `--encrypt` | Enable encryption at rest | `false` |
 | `--generate-encryption-key` | Generate a new AES-256 encryption key | `false` |

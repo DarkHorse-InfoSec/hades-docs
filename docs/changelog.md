@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## Removed in v1.7.3 and v1.7.4
+
+The full release notes for these versions are not in this file yet. These removals affect documented features, so they are recorded here:
+
+- **v1.7.4 (2026-11-06): SSO removed.** The OIDC and SAML endpoints (`/api/v1/auth/sso/...`) and the `auth.sso` configuration section are gone. Use RBAC users with per-user API keys.
+- **v1.7.3 (2026-10-01): PostgreSQL removed.** SQLite is the only database backend. `--db-backend postgres` and `--db-dsn` are command-line errors; a leftover `HADES_DB_BACKEND=postgres` or `HADES_DB_DSN` makes `hades serve --health-check` report unhealthy.
+- **v1.7.3 (2026-10-01): ML ensemble removed.** `core/ml_ensemble.py`, the `--ml-ensemble` flag and `GET /api/v1/ml/ensemble/status` are gone; the scan path never used them. The ML stage is the signed XGBoost classifier (production model v1.18.0, 33 features); see the [ML Detection Guide](ml_detection_guide.md).
+- **Not served by v1.7.4:** the API reference previously listed `POST /api/v1/ml/retrain`, `GET /api/v1/ml/features`, `GET /api/v1/threat-intel/lookup`, `GET /api/v1/threat-intel/cache/stats` and `DELETE /api/v1/threat-intel/cache`. The v1.7.4 API server does not serve them (they were removed from the docs to match). Use `hades intel lookup` and `hades intel cache-stats` on the command line.
+
+---
+
 ## [0.6.0] - 2026-02-19
 
 ### Added

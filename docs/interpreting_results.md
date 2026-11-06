@@ -126,7 +126,7 @@ The `enhanced_detection` section comes from the `EnhancedDetectionEngine`:
 
 ## ML Anomaly Results
 
-When ML detection is enabled (`--ml-detect` or `--ml-ensemble`), the `ml_anomaly` section appears for flagged files:
+When the ML stage is reported (`hades scan --ml-detect`, Professional licence or higher), the `ml_anomaly` section appears for flagged files:
 
 ```json
 {

@@ -212,14 +212,7 @@ python core/hades_enhanced_cli.py --ml-train /path/to/known-good-files/
 curl -H "X-API-Key: your-api-key" http://localhost:8666/api/v1/ml/status
 ```
 
-**Retrain the model** after accumulating new samples:
-
-```bash
-curl -X POST -H "X-API-Key: your-api-key" \
-     http://localhost:8666/api/v1/ml/retrain
-```
-
-The ML model file is stored at the path configured in `hades_config.json` under `ml_detection.model_path`. Mount this path as a volume if you want the model to persist across container restarts.
+The ML model is a signed classifier trained by DarkHorse and shipped with HADES. HADES does not train or retrain it, and there is no retrain endpoint.
 
 ### Threat Intelligence Provider Setup
 
@@ -353,9 +346,9 @@ docker compose -f docker/docker-compose.yml logs hades-api
 ```
 
 Common causes:
-- Missing or invalid `hades_config.json` — ensure the config volume is mounted correctly
-- Port 8666 already in use — change the port mapping in the compose file
-- Permission denied on volume mounts — ensure the `hades` user (UID in Dockerfile) has write access to `logs/` and `scan-data/`
+- Missing or invalid `hades_config.json` - ensure the config volume is mounted correctly
+- Port 8666 already in use - change the port mapping in the compose file
+- Permission denied on volume mounts - ensure the `hades` user (UID in Dockerfile) has write access to `logs/` and `scan-data/`
 
 ### Health Check Fails
 

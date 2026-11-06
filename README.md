@@ -19,7 +19,7 @@ HADES scans files for hidden threats buried in metadata, detects malicious patte
 ## Key Capabilities
 
 - **Deep metadata extraction** -- EXIF, IPTC, XMP, document properties, and embedded fields across images, documents, video, audio, archives, and web files
-- **Threat detection** -- YARA rules, ML anomaly detection (Isolation Forest + Random Forest + XGBoost ensemble), IOC matching, and heuristic scoring
+- **Threat detection** -- YARA rules, ML detection (a signed XGBoost classifier over 33 metadata and structure features), IOC matching, and heuristic scoring
 - **Deep file format analysis** -- Native parsing for PDF (JavaScript, OpenAction, embedded files), Office (macros, OLE, DDE, template injection), SVG threats, and polyglot file detection
 - **PDF advanced analysis** -- Shadow attacks (incremental update abuse), stream filter chain obfuscation, and XDP container detection
 - **Office advanced analysis** -- Hidden text, track changes, OLE Equation Editor exploits (CVE-2017-11882), formula injection, SVG CSS injection, custom XML inspection, and VBA stomping (source/p-code mismatch) detection
@@ -113,9 +113,9 @@ Pre-v1.4 distribution via pip from the Cloudsmith private registry at `dl.clouds
 
 HADES supports production deployments with:
 
-- **Access control** -- RBAC with admin/analyst/viewer roles, SSO via OIDC and SAML, API key authentication
+- **Access control** -- RBAC with admin/analyst/viewer roles, API key authentication
 - **Data security** -- AES-256-GCM field-level encryption at rest, multi-tenant isolation
-- **Storage backends** -- PostgreSQL with connection pooling, Redis for state management and caching
+- **Storage** -- SQLite (the only database backend), Redis for state management and caching
 - **Observability** -- Prometheus metrics exporter with 20+ metrics, four pre-built Grafana dashboards, Alertmanager integration
 - **Deployment** -- Kubernetes Helm chart with HPA, Kustomize overlays, Docker Compose configurations for horizontal scaling and high availability
 - **Playbook automation** -- Event-driven response engine with configurable triggers and action chains (case creation, SIEM forwarding, Slack/Teams notification, webhooks, evidence export, quarantine)
@@ -136,7 +136,7 @@ HADES supports production deployments with:
                                   |
               +-------------------v--------------------+
               |         Detection Pipeline             |
-              |  YARA | ML Ensemble | Heuristics | IOC |
+              |  YARA | ML Classifier | Heuristics | IOC |
               |  Deep Format | Firmware | Behavioral   |
               |  Stego | Anti-Forensic | Archive/Media  |
               +-------------------+--------------------+
@@ -171,7 +171,7 @@ HADES supports production deployments with:
 
 ## License
 
-Proprietary and confidential. Copyright (c) 2024-2026 DarkHorse Information Security LLC. All rights reserved. See [LICENSE](LICENSE) for the full license agreement.
+Proprietary and confidential. Copyright (c) 2024-2026 DarkHorse Information Security LLC. All rights reserved. See the [End User License Agreement](docs/legal/HADES_EULA_v1.4.0.docx) for the full license agreement.
 
 ---
 

@@ -243,10 +243,8 @@ Role permissions:
 
 ```bash
 # Via the API (requires admin role)
-curl -X POST https://hades.example.com/api/v1/auth/api-key/rotate \
-  -H "X-API-Key: current-admin-key" \
-  -H "Content-Type: application/json" \
-  -d '{"username": "analyst1"}'
+curl -X POST https://hades.example.com/api/v1/auth/users/<user_id>/rotate-key \
+  -H "X-API-Key: current-admin-key"
 ```
 
 ### 2.5 Key Storage Best Practices
@@ -272,7 +270,7 @@ curl -X POST https://hades.example.com/api/v1/auth/api-key/rotate \
 
 ### 3.1 SQLite (WAL Mode) Backup
 
-HADES uses SQLite in WAL (Write-Ahead Logging) mode by default. WAL allows concurrent reads during backup, but requires a specific approach for consistent snapshots.
+HADES uses SQLite in WAL (Write-Ahead Logging) mode; it is the only database backend (PostgreSQL support was removed in v1.7.3). WAL allows concurrent reads during backup, but requires a specific approach for consistent snapshots.
 
 **Hot backup using sqlite3 `.backup` command:**
 
@@ -316,49 +314,7 @@ echo "0 2 * * * root /opt/hades/backup_sqlite.sh >> /var/log/hades-backup.log 2>
   | sudo tee /etc/cron.d/hades-backup
 ```
 
-### 3.2 PostgreSQL Backup
-
-When using the PostgreSQL backend (`docker-compose.full-stack.yml`), use `pg_dump` for logical backups.
-
-**Single database dump:**
-
-```bash
-pg_dump -h localhost -U hades -d hades -Fc \
-  -f "/backups/hades_pg_$(date +%Y%m%d_%H%M%S).dump"
-```
-
-**Restore from dump:**
-
-```bash
-pg_restore -h localhost -U hades -d hades --clean --if-exists \
-  "/backups/hades_pg_20260301_020000.dump"
-```
-
-**Docker Compose backup (containerized PostgreSQL):**
-
-```bash
-docker compose -f docker/docker-compose.full-stack.yml exec postgres \
-  pg_dump -U hades -Fc hades > "/backups/hades_pg_$(date +%Y%m%d_%H%M%S).dump"
-```
-
-**Automated PostgreSQL backup script:**
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-BACKUP_DIR="/backups/hades-pg"
-mkdir -p "$BACKUP_DIR"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
-docker compose -f /opt/hades/docker/docker-compose.full-stack.yml exec -T postgres \
-  pg_dump -U hades -Fc hades > "${BACKUP_DIR}/hades_${TIMESTAMP}.dump"
-
-# Retain 30 days
-find "$BACKUP_DIR" -name "*.dump" -mtime +30 -delete
-echo "[$(date)] PostgreSQL backup complete: ${BACKUP_DIR}/hades_${TIMESTAMP}.dump"
-```
-
-### 3.3 Redis State
+### 3.2 Redis State
 
 Redis stores ephemeral state (rate limiting, sessions, cache, distributed locks). It is not a primary data store in HADES. However, if persistence of Redis data is desired:
 
@@ -366,7 +322,7 @@ Redis stores ephemeral state (rate limiting, sessions, cache, distributed locks)
 - For manual backup: `docker compose exec redis redis-cli BGSAVE`
 - The AOF (Append Only File) at `/data/appendonly.aof` inside the container provides crash recovery.
 
-### 3.4 Supplementary Backups
+### 3.3 Supplementary Backups
 
 Also back up these artifacts:
 - `config/cli/hades_config.json` (application configuration)
@@ -388,7 +344,7 @@ The project ships a ready-to-use Docker Compose file with Prometheus v2.50, Graf
 # Standalone observability (assumes HADES API is already running)
 docker compose -f docker/docker-compose.observability.yml up -d
 
-# Full stack with PostgreSQL + Redis + API + Workers + Observability
+# Full stack with Redis + API + Workers + Observability
 docker compose -f docker/docker-compose.full-stack.yml up -d
 ```
 
@@ -499,7 +455,6 @@ These match the limits defined in `docker-compose.full-stack.yml` and the Helm c
 |------------------|------------|-----------|---------------|-------------|
 | API server        | 500m       | 2000m     | 512 Mi        | 2 Gi        |
 | Background worker | 1000m      | 2000m     | 1 Gi          | 2 Gi        |
-| PostgreSQL        | --         | 2000m     | --            | 1 Gi        |
 | Redis             | --         | 1000m     | --            | 768 Mi      |
 | Prometheus        | --         | 1000m     | --            | 1 Gi        |
 | Grafana           | --         | 1000m     | --            | 512 Mi      |
@@ -510,7 +465,6 @@ These match the limits defined in `docker-compose.full-stack.yml` and the Helm c
 | Data                        | Estimate                                 |
 |----------------------------|------------------------------------------|
 | SQLite scan database        | ~1 KB per scan result                     |
-| PostgreSQL database         | Start with 20 Gi PVC, monitor growth      |
 | Redis                       | 512 MB maxmemory (LRU eviction)          |
 | YARA rules                  | < 10 MB                                   |
 | ML models (`.joblib`)       | 5-50 MB per model                         |
@@ -523,7 +477,6 @@ These match the limits defined in `docker-compose.full-stack.yml` and the Helm c
 
 - The Helm chart enables HPA (Horizontal Pod Autoscaler) by default: API scales at 70% CPU utilization (2-8 replicas), workers scale on `hades_queue_depth` metric (2-16 replicas).
 - Docker Compose scaling: `docker compose -f docker/docker-compose.full-stack.yml up -d --scale hades-worker=4`
-- ML detection (ensemble mode with Isolation Forest + Random Forest) adds approximately 500 MB RAM per worker. Add 1 GB headroom when using `--ml-ensemble`.
 - File monitor should run on exactly one instance per watched directory to prevent duplicate alerts.
 
 ---
@@ -576,9 +529,8 @@ curl http://localhost:8666/api/v1/health
 # 1. Pull or build the new image
 docker build -f docker/hades-full.dockerfile -t hades-scanner:NEW_VERSION .
 
-# 2. Back up volumes (PostgreSQL example)
-docker compose -f docker/docker-compose.full-stack.yml exec -T postgres \
-  pg_dump -U hades -Fc hades > /backups/pre_upgrade_$(date +%Y%m%d).dump
+# 2. Back up the SQLite databases (see 3.1)
+sqlite3 /path/to/hades_scan.db ".backup '/backups/pre_upgrade_$(date +%Y%m%d).db'"
 
 # 3. Update the image tag in docker-compose.full-stack.yml or .env
 #    e.g., set HADES_IMAGE_TAG=NEW_VERSION

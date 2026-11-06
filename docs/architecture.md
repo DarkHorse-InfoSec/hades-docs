@@ -19,7 +19,6 @@ graph TB
         YARA[YARA Rules - rules/]
         DFA[DeepFormatAnalyzer - deep_format_analyzer.py]
         ML[MLDetectionEngine - ml_detection.py]
-        ENS[EnsembleDetector - ml_ensemble.py]
     end
 
     subgraph "Forensic Analyzers"
@@ -50,13 +49,13 @@ graph TB
     end
 
     subgraph "Storage"
-        DB[(Database - SQLite/PostgreSQL)]
+        DB[(Database - SQLite)]
         REDIS[(Redis - State/Cache)]
         FS[File System - Logs/Models]
     end
 
     subgraph "Enterprise"
-        AUTH[RBAC/SSO - auth/]
+        AUTH[RBAC - auth/]
         ENC[Encryption - storage/encryption.py]
         TENANT[Multi-Tenant - storage/tenant.py]
     end
@@ -111,8 +110,7 @@ graph TB
 | `metadata_parser_engine.py` | Pillow, PyExifTool | `HADESMetadataParser`, `MetadataAnalysisResult`, `MetadataField`, `FileForensics` |
 | `enhanced_detection_engine.py` | `metadata_parser_engine`, yara-python (optional) | `EnhancedDetectionEngine`, `EnhancedDetectionResult` |
 | `deep_format_analyzer.py` | pikepdf (optional), olefile (optional) | `DeepFormatAnalyzer`, `PDFAnalyzer`, `OfficeAnalyzer`, `PolyglotDetector`, `SVGAnalyzer` |
-| `ml_detection.py` | scikit-learn (optional), numpy | `MLDetectionEngine`, `MetadataFeatureExtractor`, `AnomalyDetector` |
-| `ml_ensemble.py` | scikit-learn (optional), xgboost (optional) | `EnsembleAnomalyDetector`, `ExtendedFeatureExtractor`, `LabeledDataManager` |
+| `ml_detection.py` | xgboost, numpy, scikit-learn | `MLDetectionEngine`, `MetadataFeatureExtractor`, `SignedXGBClassifier`, `AnomalyDetector` (legacy) |
 | `behavioral_analysis.py` | None | `CampaignDetector`, `FileRelationshipGraph` |
 | `mitre_mapping.py` | None | `MITREMapper` |
 | `cloud_threat_intel.py` | requests | `ThreatIntelManager`, provider classes |
@@ -147,9 +145,8 @@ graph TB
 | Module | Depends On | Exports |
 |---|---|---|
 | `auth/rbac.py` | bcrypt, PyJWT | `UserManager`, `get_current_user`, `require_role` |
-| `auth/sso.py` | PyJWT | `OIDCProvider`, `SAMLProvider` |
 | `auth/license.py` | None | `LicenseManager`, `require_license` |
-| `storage/database.py` | psycopg2 (optional) | `DatabaseBackend`, `SQLiteBackend`, `PostgresBackend` |
+| `storage/database.py` | None (SQLite) | `DatabaseBackend`, `SQLiteBackend` |
 | `storage/redis_state.py` | redis (optional) | `RedisStateManager` |
 | `storage/encryption.py` | cryptography | `EncryptionManager`, `EncryptedDatabaseBackend` |
 | `storage/tenant.py` | None | `TenantManager`, `TenantContext` |
@@ -187,7 +184,7 @@ flowchart LR
 
 4. **IOC Matching**: Extracted indicators (hashes, URLs, IPs) compared against IOC databases. Produces IOC match findings.
 
-5. **ML Anomaly Detection**: `MetadataFeatureExtractor` computes a 15-25 feature vector; `AnomalyDetector` or `EnsembleAnomalyDetector` scores it. Produces anomaly results with contributing features.
+5. **ML Anomaly Detection**: `MetadataFeatureExtractor` computes the 33-feature vector (schema 9) and the signed XGBoost classifier `SignedXGBClassifier` (production model v1.18.0) scores it; the model is refused if its signature does not verify. Runs as the ML Anomaly Detector plugin on Professional+ tiers. Produces anomaly results with contributing features.
 
 6. **Deep Format Analysis**: `DeepFormatAnalyzer` natively parses PDF, Office, SVG, and polyglot files. Produces format-specific findings.
 
@@ -221,8 +218,7 @@ graph TB
     end
 
     subgraph "Backend Layer"
-        SQLite[(SQLite - Default)]
-        Postgres[(PostgreSQL - Enterprise)]
+        SQLite[(SQLite)]
         ENC[EncryptedBackend]
     end
 
@@ -241,14 +237,12 @@ graph TB
     CS --> ENC
 
     ENC --> SQLite
-    ENC --> Postgres
 
     API --> Redis
     API --> Memory
 ```
 
-- **Default**: SQLite with WAL mode (single-file, zero-config)
-- **Enterprise**: PostgreSQL with connection pooling
+- **Database**: SQLite with WAL mode (single-file, zero-config). PostgreSQL support was removed in v1.7.3; SQLite is the only backend.
 - **Encryption**: Optional AES-256-GCM field-level encryption wraps any backend
 - **Redis**: Distributed rate limiting, sessions, pub/sub, caching. Falls back to in-memory when unavailable.
 
@@ -270,13 +264,13 @@ The REST API is built on FastAPI with:
 |---|---|---|
 | `/api/v1/` | `hades_api.py` | Core scanning, health, rules, plugins |
 | `/api/v1/evidence/` | `evidence_api_endpoints.py` | Audit log, cases, evidence export |
-| `/api/v1/auth/` | `auth/auth_routes.py` | Login, user CRUD, SSO, license |
+| `/api/v1/auth/` | `auth/auth_routes.py` | Login, user CRUD, API keys, license |
 | `/api/v1/admin/` | `storage/storage_routes.py` | Database, Redis, encryption, tenants |
 | `/api/v1/integrations/` | `integrations/*_routes.py` | Network, email, cloud, CI/CD, chat |
 | `/api/v1/mitre/` | `mitre_mapping.py` | ATT&CK matrix, technique lookup |
 | `/api/v1/behavioral/` | `behavioral_analysis.py` | Campaign detection |
 | `/api/v1/rules/` | `yara_rule_builder.py` | Rule templates, rule building |
-| `/api/v1/ml/` | `ml_detection.py`, `ml_ensemble.py` | ML status, retrain, features |
+| `/api/v1/ml/` | `ml_detection.py` | ML status |
 | `/dashboard/` | `dashboard/` | Static SPA files |
 | `/ws` | `hades_api.py` | WebSocket endpoint |
 

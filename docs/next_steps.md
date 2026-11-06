@@ -11,13 +11,13 @@ HADES v1.0.0 is the first General Availability release. All core technical featu
 
 ## Table of Contents
 
-1. [v1.0.0 Release Status](#v100-release-status)
-2. [Immediate Next Steps](#immediate-next-steps)
-3. [v1.1.0 Feature Roadmap](#v110-feature-roadmap)
-4. [Testing & Validation Expansion](#testing--validation-expansion)
-5. [Infrastructure & Operations](#infrastructure--operations)
-6. [Business Execution](#business-execution)
-7. [Long-Term Vision](#long-term-vision)
+1. [v1.0.0 Release Status](#1-v100-release-status)
+2. [Immediate Next Steps](#2-immediate-next-steps)
+3. [v1.1.0 Feature Roadmap](#3-v110-feature-roadmap)
+4. [Testing & Validation Expansion](#4-testing--validation-expansion)
+5. [Infrastructure & Operations](#5-infrastructure--operations)
+6. [Business Execution](#6-business-execution)
+7. [Long-Term Vision](#7-long-term-vision)
 
 ---
 
@@ -142,7 +142,7 @@ The current test suite uses synthetic files. Expanding to real-world samples is 
 - [ ] Identify false negatives and create new YARA rules or heuristics
 - [ ] Target: TPR >= 85% on real-world samples (lower than synthetic due to noise)
 
-See [Real-World Validation Guide](real_world_validation_guide.md) for step-by-step procedures.
+See Real-World Validation Guide (not yet published) for step-by-step procedures.
 
 ### 4.2 Live SIEM Connector Testing
 
@@ -192,7 +192,7 @@ See [Real-World Validation Guide](real_world_validation_guide.md) for step-by-st
 ### 5.1 Cloud Deployment
 
 - [ ] Create Terraform modules for AWS deployment (ECS/EKS, RDS, ElastiCache)
-- [ ] Create Terraform modules for Azure deployment (AKS, PostgreSQL, Redis Cache)
+- [ ] Create Terraform modules for Azure deployment (AKS, Redis Cache)
 - [ ] Create Terraform modules for GCP deployment (GKE, Cloud SQL, Memorystore)
 - [ ] Document managed database and Redis configuration
 
@@ -223,7 +223,7 @@ The technical product is feature-complete. The following business execution item
 |------|----------------|--------------|
 | **Community** (free) | Individual practitioners | CLI scan, basic API, evidence chain, scan analytics; IOC and heuristic stages only |
 | **Professional** | Small security teams | + YARA, ML, full engine, SIEM export, threat intel, MITRE mapping, monitoring, playbooks, plugins |
-| **Team** | Security teams, MSPs | + RBAC, SSO, cloud scanning, CI/CD, chat integrations, encrypted storage |
+| **Team** | Security teams, MSPs | + RBAC, cloud scanning, CI/CD, chat integrations, encrypted storage |
 | **Enterprise** | Large organizations | + multi-tenant administration |
 
 **Action items:**
@@ -243,7 +243,7 @@ The technical product is feature-complete. The following business execution item
 ### 6.3 HADES-as-a-Service (SaaS)
 
 - [ ] Deploy cloud infrastructure (Terraform)
-- [ ] Set up managed PostgreSQL and Redis
+- [ ] Set up managed Redis
 - [ ] Implement API gateway with usage-based metering
 - [ ] Create billing integration
 - [ ] Begin SOC 2 Type I audit preparation

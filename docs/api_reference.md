@@ -38,7 +38,7 @@ API keys are configured in `cli/hades_config.json` under the `api.api_keys` arra
 
 ### JWT / RBAC Authentication (Enterprise)
 
-When RBAC is enabled (`auth.rbac_enabled: true` in config), users can authenticate via the login endpoint to receive a per-user API key. User management, role-based access control, and SSO are available through the `/api/v1/auth/` endpoints documented below.
+When RBAC is enabled (`auth.rbac_enabled: true` in config), users can authenticate via the login endpoint to receive a per-user API key. User management and role-based access control are available through the `/api/v1/auth/` endpoints documented below.
 
 ---
 
@@ -219,7 +219,7 @@ Retrieve a previously stored scan result by its ID.
 **Headers:** `X-API-Key` (required)
 
 **Path Parameters:**
-- `scan_id` (string, required) — UUID returned from a prior scan.
+- `scan_id` (string, required) - UUID returned from a prior scan.
 
 **Response (200):**
 
@@ -263,9 +263,9 @@ Upload a file, strip its metadata, and download the sanitized version.
 **Headers:** `X-API-Key` (required)
 
 **Request:** `multipart/form-data` with:
-- `file` (required) — The file to sanitize.
-- `remove_all` (optional, string) — Set to `"true"` to remove all metadata fields. Default: `"false"`.
-- `fields_to_remove` (optional, repeated string) — Specific metadata field names to remove. Ignored when `remove_all` is `"true"`.
+- `file` (required) - The file to sanitize.
+- `remove_all` (optional, string) - Set to `"true"` to remove all metadata fields. Default: `"false"`.
+- `fields_to_remove` (optional, repeated string) - Specific metadata field names to remove. Ignored when `remove_all` is `"true"`.
 
 **Response (200):** The sanitized file is returned as a binary download with filename `sanitized_<original_name>`.
 
@@ -278,7 +278,7 @@ Upload a file, strip its metadata, and download the sanitized version.
 }
 ```
 
-**Example — remove all metadata:**
+**Example - remove all metadata:**
 
 ```bash
 curl -X POST \
@@ -289,7 +289,7 @@ curl -X POST \
      http://localhost:8666/api/v1/sanitize
 ```
 
-**Example — remove specific fields:**
+**Example - remove specific fields:**
 
 ```bash
 curl -X POST \
@@ -305,9 +305,9 @@ curl -X POST \
 
 ## Authentication & User Management
 
-The authentication endpoints manage user login, RBAC user administration, API key rotation, license information, and SSO flows. These endpoints are registered at `/api/v1/auth/` and require the enterprise auth module (`core/auth/`).
+The authentication endpoints manage user login, RBAC user administration, API key rotation and license information. (SSO, the OIDC and SAML endpoints, was removed in v1.7.4.) These endpoints are registered at `/api/v1/auth/` and require the enterprise auth module (`core/auth/`).
 
-**Requirements:** RBAC must be enabled in `cli/hades_config.json` with `auth.rbac_enabled: true`. SSO endpoints require either OIDC or SAML provider configuration.
+**Requirements:** RBAC must be enabled in `cli/hades_config.json` with `auth.rbac_enabled: true`.
 
 ---
 
@@ -336,7 +336,7 @@ Authenticate with username and password. Returns the user's API key, role, and t
 }
 ```
 
-**Response (401) — invalid credentials:**
+**Response (401), invalid credentials:**
 
 ```json
 {
@@ -345,7 +345,7 @@ Authenticate with username and password. Returns the user's API key, role, and t
 }
 ```
 
-**Response (501) — RBAC not configured:**
+**Response (501), RBAC not configured:**
 
 ```json
 {
@@ -438,7 +438,7 @@ Create a new user. Requires admin role.
 }
 ```
 
-**Response (400) — missing fields:**
+**Response (400), missing fields:**
 
 ```json
 {
@@ -447,7 +447,7 @@ Create a new user. Requires admin role.
 }
 ```
 
-**Response (409) — duplicate username:**
+**Response (409), duplicate username:**
 
 ```json
 {
@@ -475,7 +475,7 @@ Update a user's role, active status, or tenant assignment. Requires admin role.
 **Headers:** `X-API-Key` (required, admin user key)
 
 **Path Parameters:**
-- `user_id` (string, required) — The ID of the user to update.
+- `user_id` (string, required), The ID of the user to update.
 
 **Request body (JSON):**
 
@@ -497,7 +497,7 @@ Update a user's role, active status, or tenant assignment. Requires admin role.
 }
 ```
 
-**Response (404) — user not found:**
+**Response (404), user not found:**
 
 ```json
 {
@@ -524,7 +524,7 @@ Rotate a user's API key. Admin users can rotate any key; non-admin users can onl
 **Headers:** `X-API-Key` (required)
 
 **Path Parameters:**
-- `user_id` (string, required) — The ID of the user whose key to rotate.
+- `user_id` (string, required), The ID of the user whose key to rotate.
 
 **Response (200):**
 
@@ -536,7 +536,7 @@ Rotate a user's API key. Admin users can rotate any key; non-admin users can onl
 }
 ```
 
-**Response (403) — insufficient permissions:**
+**Response (403), insufficient permissions:**
 
 ```json
 {
@@ -570,7 +570,6 @@ Return current license information. Returns free tier defaults when no license k
   "max_users": 50,
   "features": [
     "rbac",
-    "sso",
     "multi_tenant",
     "siem_forwarding",
     "threat_intel",
@@ -582,7 +581,7 @@ Return current license information. Returns free tier defaults when no license k
 }
 ```
 
-**Response (200) — free tier (no license key):**
+**Response (200), free tier (no license key):**
 
 ```json
 {
@@ -599,103 +598,8 @@ Return current license information. Returns free tier defaults when no license k
 **Example:**
 
 ```bash
-curl -H "X-API-Key: your-api-key-here" \
+curl -H "X-API-Key: hades-dev-key-2024" \
      http://localhost:8666/api/v1/auth/license
-```
-
----
-
-### GET /api/v1/auth/sso/oidc/authorize
-
-Start an OIDC single sign-on authorization flow. Returns the authorization URL to redirect the user to the identity provider.
-
-**Headers:** `X-API-Key` (required)
-
-**Requirements:** OIDC provider must be configured in `cli/hades_config.json` under `auth.sso.oidc`.
-
-**Response (200):**
-
-```json
-{
-  "authorization_url": "https://idp.example.com/oauth2/authorize?client_id=hades&...",
-  "state": "rAnDoM_StAtE_tOkEn",
-  "nonce": "rAnDoM_nOnCe_vAlUe"
-}
-```
-
-**Response (501) — OIDC not configured:**
-
-```json
-{
-  "error": "Not Implemented",
-  "message": "OIDC not configured"
-}
-```
-
-**Example:**
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     http://localhost:8666/api/v1/auth/sso/oidc/authorize
-```
-
----
-
-### POST /api/v1/auth/sso/oidc/callback
-
-Handle the OIDC callback after the user authenticates with the identity provider. Validates the ID token and provisions the user via JIT (just-in-time) provisioning if RBAC is enabled.
-
-**Headers:** `X-API-Key` (required)
-
-**Request body (JSON):**
-
-| Field      | Type   | Required | Description                           |
-|------------|--------|----------|---------------------------------------|
-| `id_token` | string | Yes      | The ID token received from the IdP    |
-
-**Response (200) — with RBAC:**
-
-```json
-{
-  "api_key": "hades-key-sso-provisioned...",
-  "role": "analyst",
-  "user_id": "usr-sso-12345",
-  "username": "jdoe@example.com",
-  "sso_provider": "oidc"
-}
-```
-
-**Response (200) — without RBAC:**
-
-```json
-{
-  "sso_user": {
-    "sub": "auth0|12345",
-    "email": "jdoe@example.com",
-    "name": "Jane Doe",
-    "groups": ["analysts", "incident-response"]
-  },
-  "sso_provider": "oidc"
-}
-```
-
-**Response (401) — invalid token:**
-
-```json
-{
-  "error": "Unauthorized",
-  "message": "Token validation failed: expired"
-}
-```
-
-**Example:**
-
-```bash
-curl -X POST \
-     -H "X-API-Key: your-api-key-here" \
-     -H "Content-Type: application/json" \
-     -d '{"id_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6..."}' \
-     http://localhost:8666/api/v1/auth/sso/oidc/callback
 ```
 
 ---
@@ -728,7 +632,7 @@ Return the database backend type, connection status, and table row counts.
 }
 ```
 
-**Response (503) — no backend configured:**
+**Response (503) - no backend configured:**
 
 ```json
 {
@@ -769,7 +673,7 @@ Run database schema migrations. Accepts a list of SQL migration statements.
 }
 ```
 
-**Response (503) — no backend configured:**
+**Response (503) - no backend configured:**
 
 ```json
 {
@@ -795,7 +699,7 @@ Return the Redis connection status. Returns a not-configured response when Redis
 
 **Headers:** `X-API-Key` (required)
 
-**Response (200) — connected:**
+**Response (200) - connected:**
 
 ```json
 {
@@ -804,7 +708,7 @@ Return the Redis connection status. Returns a not-configured response when Redis
 }
 ```
 
-**Response (200) — not configured:**
+**Response (200) - not configured:**
 
 ```json
 {
@@ -828,7 +732,7 @@ Return the encryption subsystem status. Never exposes the actual encryption key.
 
 **Headers:** `X-API-Key` (required)
 
-**Response (200) — enabled:**
+**Response (200) - enabled:**
 
 ```json
 {
@@ -837,7 +741,7 @@ Return the encryption subsystem status. Never exposes the actual encryption key.
 }
 ```
 
-**Response (200) — not configured:**
+**Response (200) - not configured:**
 
 ```json
 {
@@ -881,7 +785,7 @@ List all tenants. Requires the tenant management subsystem to be enabled.
 ]
 ```
 
-**Response (503) — tenant management not configured:**
+**Response (503) - tenant management not configured:**
 
 ```json
 {
@@ -942,7 +846,7 @@ Update a tenant's name, configuration, or active status.
 **Headers:** `X-API-Key` (required)
 
 **Path Parameters:**
-- `tenant_id` (string, required) — The ID of the tenant to update.
+- `tenant_id` (string, required) - The ID of the tenant to update.
 
 **Request body (JSON):**
 
@@ -964,7 +868,7 @@ Update a tenant's name, configuration, or active status.
 }
 ```
 
-**Response (404) — tenant not found:**
+**Response (404) - tenant not found:**
 
 ```json
 {
@@ -1079,7 +983,7 @@ Look up a specific MITRE ATT&CK technique by its ID.
 }
 ```
 
-**Response (400) — missing parameter:**
+**Response (400) - missing parameter:**
 
 ```json
 {
@@ -1088,7 +992,7 @@ Look up a specific MITRE ATT&CK technique by its ID.
 }
 ```
 
-**Response (404) — technique not found:**
+**Response (404) - technique not found:**
 
 ```json
 {
@@ -1108,143 +1012,9 @@ curl -H "X-API-Key: your-api-key-here" \
 
 ## Threat Intelligence
 
-The threat intelligence endpoints provide cloud-based IOC lookups, cache management, enrichment, and feed scheduling powered by `core/cloud_threat_intel.py` and `core/threat_intel_scheduler.py`.
+The API exposes one threat intelligence resource: the feed scheduler below, powered by `core/threat_intel_scheduler.py`. There is no standalone IOC-lookup or cache endpoint.
 
-**Requirements:** Provider API keys must be configured in `~/.hades/.env` under the relevant `*_API_KEY` env vars (or in `cli/hades_config.json` under `threat_intel.providers` for legacy-config installs). The `requests` HTTP client and all other dependencies are bundled inline in the Nuitka binary as of v1.4.x; you do NOT need to `pip install requests` separately.
-
----
-
-### GET /api/v1/threat-intel/lookup
-
-Look up an indicator of compromise (hash, IP, URL, or domain) against configured threat intelligence providers.
-
-**Headers:** `X-API-Key` (required)
-
-**Query Parameters:**
-
-| Parameter   | Type   | Required | Description                                                    |
-|-------------|--------|----------|----------------------------------------------------------------|
-| `ioc`       | string | Yes      | The indicator to look up (file hash, IP address, URL, domain)  |
-| `providers` | string | No       | Comma-separated provider names to query (default: all configured) |
-
-**Response (200):**
-
-```json
-{
-  "ioc": "d41d8cd98f00b204e9800998ecf8427e",
-  "ioc_type": "hash",
-  "consensus": {
-    "verdict": "malicious",
-    "confidence": 85,
-    "provider_count": 3,
-    "verdicts": {
-      "malicious": 2,
-      "suspicious": 1,
-      "clean": 0
-    }
-  },
-  "results": [
-    {
-      "source": "virustotal",
-      "verdict": "malicious",
-      "confidence": 92,
-      "details": "Detected by 45/70 engines",
-      "raw_response": {}
-    },
-    {
-      "source": "malwarebazaar",
-      "verdict": "malicious",
-      "confidence": 100,
-      "details": "Known malware sample: Emotet",
-      "raw_response": {}
-    },
-    {
-      "source": "otx",
-      "verdict": "suspicious",
-      "confidence": 60,
-      "details": "Found in 3 OTX pulses",
-      "raw_response": {}
-    }
-  ]
-}
-```
-
-**Response (400) — missing IOC parameter:**
-
-```json
-{
-  "error": "Bad Request",
-  "message": "'ioc' query parameter is required"
-}
-```
-
-**Example — hash lookup:**
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     "http://localhost:8666/api/v1/threat-intel/lookup?ioc=d41d8cd98f00b204e9800998ecf8427e"
-```
-
-**Example — IP lookup with specific providers:**
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     "http://localhost:8666/api/v1/threat-intel/lookup?ioc=8.8.8.8&providers=abuseipdb,otx"
-```
-
----
-
-### GET /api/v1/threat-intel/cache/stats
-
-Retrieve statistics about the threat intelligence result cache.
-
-**Headers:** `X-API-Key` (required)
-
-**Response (200):**
-
-```json
-{
-  "total_entries": 142,
-  "hit_count": 580,
-  "miss_count": 142,
-  "hit_rate": 0.803,
-  "expired_entries": 12,
-  "cache_size_bytes": 45056,
-  "oldest_entry": "2026-02-17T08:00:00+00:00",
-  "newest_entry": "2026-02-18T14:30:00+00:00"
-}
-```
-
-**Example:**
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     http://localhost:8666/api/v1/threat-intel/cache/stats
-```
-
----
-
-### DELETE /api/v1/threat-intel/cache
-
-Flush all cached threat intelligence results. Use this after rotating API keys or when cached data is suspected to be stale.
-
-**Headers:** `X-API-Key` (required)
-
-**Response (200):**
-
-```json
-{
-  "message": "Threat intel cache cleared",
-  "entries_removed": 142
-}
-```
-
-**Example:**
-
-```bash
-curl -X DELETE -H "X-API-Key: your-api-key-here" \
-     http://localhost:8666/api/v1/threat-intel/cache
-```
+Hash reputation lookups happen inside scans. When `HADES_THREAT_INTEL=true` is set in the server environment, the detection engine computes the SHA-256 of each file it analyzes and looks it up in MalwareBazaar (if `MALWAREBAZAAR_API_KEY` is set) and then VirusTotal (if `VIRUSTOTAL_API_KEY` is set). A match is reported in the scan result's threat intelligence section and raises the detection confidence. Only the hash leaves the host, never the file. See `docs/threat_intel_runbook.md` for setup. For an ad-hoc lookup of a hash, URL or IP, use the CLI: `hades intel lookup <ioc>`.
 
 ---
 
@@ -1288,7 +1058,7 @@ Return the status of the threat intelligence feed scheduler, including per-feed 
 **Example:**
 
 ```bash
-curl -H "X-API-Key: your-api-key-here" \
+curl -H "X-API-Key: hades-dev-key-2024" \
      http://localhost:8666/api/v1/threat-intel/scheduler
 ```
 
@@ -1316,7 +1086,7 @@ Force an immediate pull of all configured threat intelligence feeds.
 
 ```bash
 curl -X POST \
-     -H "X-API-Key: your-api-key-here" \
+     -H "X-API-Key: hades-dev-key-2024" \
      http://localhost:8666/api/v1/threat-intel/scheduler
 ```
 
@@ -1395,7 +1165,7 @@ Build a YARA rule from a named template with the provided parameters. Returns th
 }
 ```
 
-**Response (400) — missing template:**
+**Response (400) - missing template:**
 
 ```json
 {
@@ -1404,7 +1174,7 @@ Build a YARA rule from a named template with the provided parameters. Returns th
 }
 ```
 
-**Response (400) — invalid template name:**
+**Response (400) - invalid template name:**
 
 ```json
 {
@@ -1427,205 +1197,55 @@ curl -X POST \
 
 ## ML Anomaly Detection
 
-The ML anomaly detection endpoints expose the machine-learning-based metadata anomaly detection engine powered by `core/ml_detection.py`. These endpoints require `scikit-learn` and `numpy` to be installed.
+The ML endpoints report on the machine-learning classifier the detection engine uses: a signed XGBoost model bundle (`models/baseline_classifier_v1.*`) whose RSA-PSS signature is verified before it loads. A bundle that is missing or fails verification is refused, and scans continue without the ML stage. Both endpoints require an API key and a licence with the `ml_detection` feature (Professional and above).
+
+The model is trained, gated and signed by DarkHorse and ships inside the binaries. There is no retrain endpoint and no feature-extraction endpoint: earlier versions of this page documented `POST /api/v1/ml/retrain` and `GET /api/v1/ml/features`, which were never served by the API server.
 
 ---
 
 ### GET /api/v1/ml/status
 
-Returns the current state of the ML detection engine, including whether a model is loaded and training statistics.
+Reports whether ML scoring is active and, when it is, which model is in use. It reads the classifier inside the running detection engine, the one that scores files.
 
 **Headers:** `X-API-Key` (required)
 
-**Response (200):**
+**Rate limit:** 60 requests per minute.
+
+**Response (200), model verified and active:**
 
 ```json
 {
-  "model_loaded": true,
-  "is_trained": true,
-  "feature_count": 15,
-  "training_samples": 500,
-  "contamination": 0.1,
-  "model_path": "models/baseline_model.joblib"
+  "ml_enabled": true,
+  "plugin_loaded": true,
+  "model_verified": true,
+  "verification_status": "ok",
+  "model_version": "1.18.0",
+  "feature_schema_version": 9,
+  "feature_count": 33
 }
 ```
 
-When the ML module is not available:
+**Response (200), ML not active.** `ml_enabled` is `false` and `verification_status` names the reason: `model file missing`, `signature verification failed`, `metadata load failed`, `model load failed`, `xgboost not installed`, `ML plugin not loaded`, `ML engine not initialized` or `detection engine unavailable`. `model_version` and `feature_schema_version` are `null` for a model that did not verify. The detail behind the reason, which can include a server path, is written to the server log and is not returned.
 
 ```json
 {
-  "available": false,
-  "message": "ML detection module not available. Install scikit-learn and numpy."
+  "ml_enabled": false,
+  "plugin_loaded": true,
+  "model_verified": false,
+  "verification_status": "signature verification failed",
+  "model_version": null,
+  "feature_schema_version": null,
+  "feature_count": 33
 }
 ```
+
+**Response (403):** the licence does not include `ml_detection`.
 
 **Example:**
 
 ```bash
-curl -H "X-API-Key: your-api-key-here" \
+curl -H "X-API-Key: hades-dev-key-2024" \
      http://localhost:8666/api/v1/ml/status
-```
-
----
-
-### POST /api/v1/ml/retrain
-
-Trigger model retraining using accumulated training samples. The model is retrained in place and the updated version is saved.
-
-**Headers:** `X-API-Key` (required)
-
-**Response (200):**
-
-```json
-{
-  "message": "Model retrained successfully",
-  "training_samples": 750,
-  "model_path": "models/baseline_model.joblib"
-}
-```
-
-**Response (400) if no training samples are available:**
-
-```json
-{
-  "error": "Bad Request",
-  "message": "No training samples available. Run scans or use --ml-train first."
-}
-```
-
-**Response (503) if the ML module is not available:**
-
-```json
-{
-  "error": "Service Unavailable",
-  "message": "ML detection module not available"
-}
-```
-
-**Example:**
-
-```bash
-curl -X POST \
-     -H "X-API-Key: your-api-key-here" \
-     http://localhost:8666/api/v1/ml/retrain
-```
-
----
-
-### GET /api/v1/ml/features
-
-Extract the metadata feature vector for a specific file without scoring it. Useful for debugging and understanding what the model sees.
-
-**Headers:** `X-API-Key` (required)
-
-**Query Parameters:**
-
-| Parameter   | Type   | Required | Description                     |
-|-------------|--------|----------|---------------------------------|
-| `file_path` | string | Yes      | Absolute path to the file to extract features from |
-
-**Response (200):**
-
-```json
-{
-  "file_path": "/evidence/suspicious.jpg",
-  "features": {
-    "file_size": 245760,
-    "file_size_log": 12.41,
-    "entropy": 7.92,
-    "metadata_field_count": 15,
-    "metadata_total_length": 342,
-    "has_gps": 0,
-    "has_thumbnail": 1,
-    "suspicious_field_count": 0,
-    "creation_modify_delta": 3600.0,
-    "extension_mimetype_mismatch": 0,
-    "header_magic_valid": 1,
-    "embedded_file_count": 0,
-    "null_byte_ratio": 0.02,
-    "printable_ratio": 0.15,
-    "longest_run_length": 128
-  },
-  "feature_vector": [245760, 12.41, 7.92, 15, 342, 0, 1, 0, 3600.0, 0, 1, 0, 0.02, 0.15, 128]
-}
-```
-
-**Response (400) — missing file_path:**
-
-```json
-{
-  "error": "Bad Request",
-  "message": "'file_path' query parameter is required"
-}
-```
-
-**Response (404) — file not found:**
-
-```json
-{
-  "error": "Not Found",
-  "message": "File not found: /nonexistent/file.jpg"
-}
-```
-
-**Example:**
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     "http://localhost:8666/api/v1/ml/features?file_path=/evidence/suspicious.jpg"
-```
-
----
-
-### GET /api/v1/ml/ensemble/status
-
-Return the status of the ML ensemble detector, including the number of features and feature names used by the extended feature extractor.
-
-**Headers:** `X-API-Key` (required)
-
-**Requirements:** The `ml_ensemble` module must be available (`scikit-learn` and `numpy` installed).
-
-**Response (200):**
-
-```json
-{
-  "ensemble_available": true,
-  "feature_count": 25,
-  "feature_names": [
-    "file_size",
-    "file_size_log",
-    "entropy",
-    "metadata_field_count",
-    "metadata_total_length",
-    "has_gps",
-    "has_thumbnail",
-    "suspicious_field_count",
-    "creation_modify_delta",
-    "extension_mimetype_mismatch",
-    "header_magic_valid",
-    "embedded_file_count",
-    "null_byte_ratio",
-    "printable_ratio",
-    "longest_run_length",
-    "script_tag_count",
-    "php_pattern_count",
-    "shell_command_count",
-    "iframe_count",
-    "encoding_layer_depth",
-    "suspicious_url_count",
-    "sql_pattern_count",
-    "binary_in_text_ratio",
-    "metadata_entropy",
-    "field_name_anomaly_score"
-  ]
-}
-```
-
-**Example:**
-
-```bash
-curl -H "X-API-Key: your-api-key-here" \
-     http://localhost:8666/api/v1/ml/ensemble/status
 ```
 
 ---
@@ -1671,7 +1291,7 @@ List detected threat campaigns with related files, shared indicators, and confid
 }
 ```
 
-**Response (200) — no campaigns detected:**
+**Response (200) - no campaigns detected:**
 
 ```json
 {
@@ -1986,14 +1606,14 @@ Search the plugin marketplace by keyword, category, or supported file type.
 }
 ```
 
-**Example — keyword search:**
+**Example - keyword search:**
 
 ```bash
 curl -H "X-API-Key: your-api-key-here" \
      "http://localhost:8666/api/v1/plugins/marketplace/search?query=steganography"
 ```
 
-**Example — filter by category:**
+**Example - filter by category:**
 
 ```bash
 curl -H "X-API-Key: your-api-key-here" \
@@ -2023,7 +1643,7 @@ Install a plugin from the marketplace by name. The plugin is downloaded, SHA-256
 }
 ```
 
-**Response (400) — missing name:**
+**Response (400) - missing name:**
 
 ```json
 {
@@ -2032,7 +1652,7 @@ Install a plugin from the marketplace by name. The plugin is downloaded, SHA-256
 }
 ```
 
-**Response (404) — plugin not found:**
+**Response (404) - plugin not found:**
 
 ```json
 {
@@ -2060,7 +1680,7 @@ Uninstall a plugin by name. Removes the plugin from the plugins directory.
 **Headers:** `X-API-Key` (required)
 
 **Path Parameters:**
-- `name` (string, required) — The name of the plugin to uninstall.
+- `name` (string, required) - The name of the plugin to uninstall.
 
 **Response (200):**
 
@@ -2071,7 +1691,7 @@ Uninstall a plugin by name. Removes the plugin from the plugins directory.
 }
 ```
 
-**Response (404) — plugin not found:**
+**Response (404) - plugin not found:**
 
 ```json
 {
@@ -2111,7 +1731,7 @@ Check for available updates across all installed plugins.
 }
 ```
 
-**Response (200) — no updates available:**
+**Response (200) - no updates available:**
 
 ```json
 {
@@ -2136,7 +1756,7 @@ Update a specific installed plugin to its latest version.
 **Headers:** `X-API-Key` (required)
 
 **Path Parameters:**
-- `name` (string, required) — The name of the plugin to update.
+- `name` (string, required) - The name of the plugin to update.
 
 **Response (200):**
 
@@ -2147,7 +1767,7 @@ Update a specific installed plugin to its latest version.
 }
 ```
 
-**Response (404) — plugin not found or update failed:**
+**Response (404) - plugin not found or update failed:**
 
 ```json
 {
@@ -2226,7 +1846,7 @@ For `cef`, `syslog`, and `leef` formats, the `data` field contains a string inst
 }
 ```
 
-**Response (400) — missing fields:**
+**Response (400) - missing fields:**
 
 ```json
 {
@@ -2235,7 +1855,7 @@ For `cef`, `syslog`, and `leef` formats, the `data` field contains a string inst
 }
 ```
 
-**Response (400) — invalid format:**
+**Response (400) - invalid format:**
 
 ```json
 {
@@ -2244,7 +1864,7 @@ For `cef`, `syslog`, and `leef` formats, the `data` field contains a string inst
 }
 ```
 
-**Response (404) — scan not found:**
+**Response (404) - scan not found:**
 
 ```json
 {
@@ -2337,11 +1957,11 @@ Update the SIEM forwarding configuration. The new configuration replaces the exi
 | `type`     | string | Yes      | `syslog`, `file`, or `http`                     |
 | `host`     | string | Syslog   | Syslog destination hostname or IP               |
 | `port`     | integer| Syslog   | Syslog destination port                         |
-| `protocol` | string | No       | `udp` (default) or `tcp` — syslog only          |
+| `protocol` | string | No       | `udp` (default) or `tcp` - syslog only          |
 | `format`   | string | No       | Override format for this target                 |
 | `path`     | string | File     | File path for file-type targets                 |
 | `url`      | string | HTTP     | URL for HTTP-type targets                       |
-| `headers`  | object | No       | Additional HTTP headers — http only             |
+| `headers`  | object | No       | Additional HTTP headers - http only             |
 
 **Response (200):**
 
@@ -2367,7 +1987,7 @@ Update the SIEM forwarding configuration. The new configuration replaces the exi
 }
 ```
 
-**Response (400) — invalid target type:**
+**Response (400) - invalid target type:**
 
 ```json
 {
@@ -2464,12 +2084,9 @@ The API reads configuration from `cli/hades_config.json`. Key settings:
 | `scanning.max_file_size_mb`      | 50      | Maximum upload file size in megabytes    |
 | `api.api_keys`                   | `["your-api-key-here"]` | List of valid API keys    |
 | `scanning.custom_yara_directory` | `rules/`| Directory containing YARA rule files     |
-| `version`                        | `0.7.1` | Version string returned by health check  |
 | `auth.rbac_enabled`              | `false` | Enable RBAC user management              |
 | `auth.license_key`               | `null`  | Enterprise license key (or `HADES_LICENSE_KEY` env var) |
-| `auth.sso.oidc`                  | `{}`    | OIDC provider configuration              |
-| `auth.sso.saml`                  | `{}`    | SAML provider configuration              |
-| `database`                       | `{}`    | Database backend configuration           |
+| `database`                       | `{}`    | Database settings (SQLite is the only backend) |
 | `encryption.enabled`             | `false` | Enable field-level encryption            |
 | `redis`                          | `{}`    | Redis state manager configuration        |
 | `tenants.enabled`                | `false` | Enable multi-tenant support              |
@@ -2643,7 +2260,7 @@ Get full details of a specific execution, including trigger event and action res
 
 ## Scan Result Persistence
 
-Scan results are stored in a SQLite database at `core/scan_results.db`. Each scan is assigned a UUID (`scan_id`) that can be used to retrieve results later via `GET /api/v1/scan/{scan_id}`. The database is created automatically on first run. When enterprise storage is enabled, results are additionally stored via the configured database backend (SQLite or PostgreSQL).
+Scan results are stored in a SQLite database at `core/scan_results.db`. Each scan is assigned a UUID (`scan_id`) that can be used to retrieve results later via `GET /api/v1/scan/{scan_id}`. The database is created automatically on first run. When enterprise storage is enabled, results are additionally stored in the enterprise SQLite store (SQLite is the only backend).
 
 ## Interactive API Documentation
 

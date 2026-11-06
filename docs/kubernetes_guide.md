@@ -7,7 +7,7 @@ This guide describes the planned Helm chart and Kustomize overlays for Kubernete
 **Related guides:**
 - [Observability Guide](observability_guide.md) -- Prometheus metrics, Grafana dashboards, alerting
 - [Performance Guide](performance_guide.md) -- Tuning, profiling, benchmarking, deployment patterns
-- [Enterprise Deployment Guide](enterprise_deployment_guide.md) -- RBAC, SSO, PostgreSQL, Redis, encryption
+- [Enterprise Deployment Guide](enterprise_deployment_guide.md) -- RBAC, Redis, encryption
 
 ## Prerequisites
 
@@ -71,8 +71,7 @@ helm install hades kubernetes/helm/hades -f my-values.yaml
 
 | Value | Default | Description |
 |-------|---------|-------------|
-| `database.backend` | `sqlite` | Database backend (`sqlite` or `postgresql`) |
-| `database.dsn` | `""` | PostgreSQL connection string |
+| `database.backend` | `sqlite` | Database backend. `sqlite` is the only supported value; the chart fails to render with any other (PostgreSQL was removed in v1.7.3) |
 
 #### Redis
 
@@ -118,7 +117,6 @@ Create a Kubernetes secret for sensitive values:
 ```bash
 kubectl create secret generic hades-secrets \
   --from-literal=api-key=your-production-key \
-  --from-literal=db-dsn=postgresql://user:pass@host/hades \
   --from-literal=encryption-key=your-encryption-key
 ```
 
@@ -160,7 +158,7 @@ kubernetes/kustomize/
   base/            # Base manifests
   overlays/
     dev/           # Single replica, SQLite
-    production/    # Multi-replica, PostgreSQL, Redis, HPA, TLS
+    production/    # Multi-replica, SQLite per pod, Redis, HPA, TLS
 ```
 
 ### Development
@@ -282,7 +280,6 @@ spec:
         - port: 8666
   egress:
     - ports:
-        - port: 5432   # PostgreSQL
         - port: 6379   # Redis
 ```
 
@@ -333,7 +330,7 @@ kubectl rollout undo deployment/hades-api -n hades
 
 ### Pre-Upgrade Checklist
 
-1. Back up PostgreSQL database if using external storage
+1. Back up the SQLite database volume
 2. Verify the new image is available in your container registry
 3. Review release notes for any configuration changes
 4. Test the upgrade in a dev/staging namespace first
@@ -345,13 +342,13 @@ kubectl rollout undo deployment/hades-api -n hades
 For teams not yet on Kubernetes, Docker Compose provides similar scaling capabilities with less operational complexity:
 
 ```bash
-# Scalable deployment (PostgreSQL + Redis + workers)
+# Scalable deployment (Redis + workers)
 docker compose -f docker/docker-compose.scale.yml up -d --scale hades-worker=4
 
 # High-availability deployment (nginx + multi-instance API)
 docker compose -f docker/docker-compose.ha.yml up -d --scale hades-api=4
 
-# Full stack with observability (PostgreSQL + Redis + API + workers + Prometheus + Grafana)
+# Full stack with observability (Redis + API + workers + Prometheus + Grafana)
 docker compose -f docker/docker-compose.full-stack.yml up -d
 ```
 

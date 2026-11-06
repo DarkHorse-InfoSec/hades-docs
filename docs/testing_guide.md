@@ -9,15 +9,15 @@ This guide covers the HADES test suite architecture, how to run tests at every l
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Test Suite Architecture](#test-suite-architecture)
-3. [Running Tests](#running-tests)
-4. [Test Categories](#test-categories)
-5. [Detection Corpus Validation](#detection-corpus-validation)
-6. [CI/CD Integration](#cicd-integration)
-7. [Writing New Tests](#writing-new-tests)
-8. [Quality Standards](#quality-standards)
-9. [Troubleshooting Test Failures](#troubleshooting-test-failures)
+1. [Prerequisites](#1-prerequisites)
+2. [Test Suite Architecture](#2-test-suite-architecture)
+3. [Running Tests](#3-running-tests)
+4. [Test Categories](#4-test-categories)
+5. [Detection Corpus Validation](#5-detection-corpus-validation)
+6. [CI/CD Integration](#6-cicd-integration)
+7. [Writing New Tests](#7-writing-new-tests)
+8. [Quality Standards](#8-quality-standards)
+9. [Troubleshooting Test Failures](#9-troubleshooting-test-failures)
 
 ---
 
@@ -51,7 +51,7 @@ python core/hades_enhanced_cli.py --help
 ```
 
 !!! note "Optional Dependencies"
-    Many HADES modules use optional imports (YARA, scikit-learn, PostgreSQL drivers, Redis, etc.). Tests for optional modules will **skip** automatically if the dependency is not installed. This is expected behavior, not a failure.
+    Many HADES modules use optional imports (YARA, scikit-learn, Redis, etc.). Tests for optional modules will **skip** automatically if the dependency is not installed. This is expected behavior, not a failure.
 
 ---
 
@@ -116,7 +116,7 @@ python -m pytest core/ cli/ config/ plugins/test_registry.py \
     --ignore=plugins/deepfake-detector -v --tb=short
 ```
 
-Some tests will be **skipped** when optional dependencies (PostgreSQL, Redis, etc.) are not installed.
+Some tests will be **skipped** when optional dependencies (Redis, etc.) are not installed.
 
 ### Quick Smoke Test
 
@@ -140,7 +140,7 @@ python -m pytest core/test_auth_*.py core/test_storage_*.py \
     core/test_enterprise_integration.py -v
 
 # Detection & ML tests
-python -m pytest core/test_ml_ensemble.py core/test_behavioral_analysis.py \
+python -m pytest core/test_ml_detection.py core/test_behavioral_analysis.py \
     core/test_mitre_mapping.py -v
 
 # Performance tests
@@ -215,7 +215,7 @@ Test individual classes and functions in isolation. Mock external dependencies (
 **Examples:**
 - `core/test_metadata_parser.py`: Tests `HADESMetadataParser` with synthetic file content
 - `core/test_gps_forensics.py`: Tests `GPSForensicsAnalyzer` coordinate parsing, Haversine distance, clustering
-- `core/test_ml_ensemble.py`: Tests feature extraction and model training with synthetic data
+- `core/test_ml_detection.py`: Tests feature extraction and signed-model loading and verification
 
 **Pattern:** Direct class instantiation, assertions on return values. No subprocess calls, no network access.
 
@@ -316,7 +316,7 @@ python -m pytest tests/test_malwarebazaar_validation.py -v
 python scripts/run_malware_validation.py
 ```
 
-See the [Real-World Validation Guide](real_world_validation_guide.md) for detailed procedures on expanding coverage with real samples.
+See the Real-World Validation Guide (not yet published) for detailed procedures on expanding coverage with real samples.
 
 ---
 
@@ -473,7 +473,7 @@ Before any release, ALL of the following must pass:
 ### Common Issues
 
 **ImportError on optional modules:**
-Tests that require optional dependencies (PostgreSQL, Redis, YARA, scikit-learn) will **skip**, not fail. This is expected if you haven't installed the full dependency set.
+Tests that require optional dependencies (Redis, YARA, scikit-learn) will **skip**, not fail. This is expected if you haven't installed the full dependency set.
 
 ```bash
 # Install everything

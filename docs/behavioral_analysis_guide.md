@@ -41,13 +41,13 @@ Groups from all three strategies are merged when they overlap, and campaign prof
 Enable behavioral analysis during a scan:
 
 ```bash
-hades-enhanced --behavioral -r /evidence/
+hades scan --behavioral -r /evidence/
 ```
 
 Combine with other detection engines for maximum coverage:
 
 ```bash
-hades-enhanced --behavioral --ml-ensemble --mitre-map --threat-intel -r /evidence/
+hades scan --behavioral --ml-detect --mitre-map --threat-intel -r /evidence/
 ```
 
 ### API
