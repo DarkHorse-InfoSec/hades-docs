@@ -80,7 +80,7 @@ The Nuitka-compiled binary ships its Python interpreter + all Python dependencie
 | Windows x86_64 | Path A; binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped |
 | macOS | Not yet available; no release date |
 
-The glibc floor of 2.34 was measured with `readelf` on the shipped v1.7.1 Linux binary; it is a property of the build host (Ubuntu 22.04). Check a target with `ldd --version`.
+The glibc floor of 2.34 was measured with `objdump -T` on both shipped v1.7.4 Linux binaries (2026-11-06); it is a property of the build host (Ubuntu 22.04). Check a target with `ldd --version`.
 
 ---
 
