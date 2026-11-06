@@ -2,7 +2,7 @@
 
 **The metadata forensics engine for security professionals.**
 
-![Version](https://img.shields.io/badge/Version-1.7.1-red)
+![Version](https://img.shields.io/badge/Version-1.7.4-red)
 ![License](https://img.shields.io/badge/License-Proprietary-red)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey)
 
