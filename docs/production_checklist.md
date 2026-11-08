@@ -3,7 +3,7 @@ Version: 1.0.0
 
 DarkHorse Information Security LLC
 
-> **NOTICE (2026-05-06):** This checklist remains structurally accurate, but its install-related items reference the pre-v1.4 distribution model (`pip install "hades-scanner[observability]"` etc.). Those commands no longer apply. HADES now ships as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or Homebrew tap (Path B); all dependencies including the observability stack are bundled inline. The operational items (monitoring, backup, RBAC, SSO, network policy, etc.) below are still the right boxes to check; only the install steps have changed. See [Installation Guide](installation.md) for current install paths.
+> **Updated 2026-11-08:** HADES ships as two self-contained binaries, `hades` and `hades-server`; there is no pip package and no container image (see [Installation Guide](installation.md)). The install, upgrade and rollback steps below use the binaries. Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap and are not shipped (see the [Kubernetes Guide](kubernetes_guide.md)). Items that only apply to those deployments say so. Run `hades doctor` to see which optional components (for example `prometheus_client`, `redis`, `bcrypt`) are present in your build.
 
 ---
 
@@ -192,14 +192,14 @@ HADES authenticates API requests via the `X-API-Key` header. The RBAC module in 
 
 The default development key (`your-api-key-here`) must be replaced before production use.
 
-**Option A: Environment variable (recommended for containers)**
+**Option A: Environment variable**
 
 ```bash
 export HADES_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(48))")
 echo "Generated key: $HADES_API_KEY"
 
-# Pass to Docker
-docker run -e HADES_API_KEY="$HADES_API_KEY" hades-scanner:latest
+# Start the API server with the key in its environment
+hades-server --port 8666
 ```
 
 **Option B: Config file (multi-key support)**
@@ -252,16 +252,8 @@ curl -X POST https://hades.example.com/api/v1/auth/users/<user_id>/rotate-key \
 ### 2.5 Key Storage Best Practices
 
 - Store API keys in a secrets manager (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault) rather than in plaintext config files.
-- For Docker deployments, use Docker secrets:
-  ```bash
-  echo "your-production-key" | docker secret create hades_api_key -
-  ```
-- For Kubernetes deployments, use the `hades-secrets` Secret referenced in the Helm chart `values.yaml`:
-  ```bash
-  kubectl create secret generic hades-secrets \
-    --from-literal=api-key="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')" \
-    --from-literal=encryption-key="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
-  ```
+- Keep the key out of shell history and scripts: put it in `~/.hades/.env`, which HADES loads at startup, readable only by the service account (`chmod 600`).
+- Docker secrets and Kubernetes Secrets apply only to the roadmap container deployments (see the [Kubernetes Guide](kubernetes_guide.md)); they are not part of a binary deployment.
 - Rotate keys on a regular schedule (every 90 days minimum).
 - Never commit keys to version control. Ensure `.env` files and `*.key` files are listed in `.gitignore`.
 - Use separate keys for each environment (development, staging, production).
@@ -320,9 +312,8 @@ echo "0 2 * * * root /opt/hades/backup_sqlite.sh >> /var/log/hades-backup.log 2>
 
 Redis stores ephemeral state (rate limiting, sessions, cache, distributed locks). It is not a primary data store in HADES. However, if persistence of Redis data is desired:
 
-- The `docker-compose.full-stack.yml` already enables `appendonly yes` with a data volume (`redis_data`).
-- For manual backup: `docker compose exec redis redis-cli BGSAVE`
-- The AOF (Append Only File) at `/data/appendonly.aof` inside the container provides crash recovery.
+- Enable `appendonly yes` in your Redis configuration for crash recovery.
+- For a manual backup: `redis-cli BGSAVE`
 
 ### 3.3 Supplementary Backups
 
@@ -336,50 +327,26 @@ Also back up these artifacts:
 
 ## 4. Monitoring
 
-HADES exposes Prometheus metrics at `/metrics` and provides pre-built Grafana dashboards.
+HADES exposes Prometheus metrics at `/metrics` on the API server.
 
 ### 4.1 Deploy the Observability Stack
 
-The project ships a ready-to-use Docker Compose file with Prometheus v2.50, Grafana 10.3, and Alertmanager v0.27:
-
-```bash
-# Standalone observability (assumes HADES API is already running)
-docker compose -f docker/docker-compose.observability.yml up -d
-
-# Full stack with Redis + API + Workers + Observability
-docker compose -f docker/docker-compose.full-stack.yml up -d
-```
-
-Services and ports:
-| Service      | Port | Purpose                              |
-|-------------|------|--------------------------------------|
-| Prometheus  | 9090 | Metric scraping, alerting rules      |
-| Grafana     | 3000 | Dashboards and visualization         |
-| Alertmanager| 9093 | Alert routing and notification       |
+Run your own Prometheus (and, if you use them, Grafana and Alertmanager) and scrape `http://<hades-host>:8666/metrics`. The Prometheus, Grafana and Alertmanager compose files and Grafana dashboards described in earlier versions of this checklist are not distributed with the binaries.
 
 ### 4.2 Enable Metrics on the HADES API
 
-Metrics collection requires the `prometheus_client` package:
+Metrics are on by default and switch off automatically when the `prometheus_client` component is not present in your build. Check with `hades doctor`, then:
 
 ```bash
-pip install "hades-scanner[observability]"
+hades-server --port 8666
+curl http://localhost:8666/metrics
 ```
 
-Start the API with metrics enabled:
-
-```bash
-hades serve --port 8666 --metrics
-```
-
-Verify metrics are exposed:
-
-```bash
-curl -s http://localhost:8666/metrics | head -20
-```
+A `503` reply reading `# Prometheus metrics disabled` usually means `prometheus_client` is missing from your build.
 
 ### 4.3 Prometheus Configuration
 
-The scrape configuration at `docker/prometheus/prometheus.yml` targets the HADES API:
+An example scrape configuration for your own Prometheus (replace `hades-api` with the HADES host):
 
 ```yaml
 scrape_configs:
@@ -394,7 +361,7 @@ If running multiple API instances behind a load balancer, add each instance as a
 
 ### 4.4 Pre-Built Alert Rules
 
-Seven alerting rules ship in `docker/prometheus/alerts.yml`:
+HADES defines seven alerting rules in its source tree; the rule files are not distributed with the binaries, so recreate the ones you want in your own Prometheus:
 
 | Alert                  | Condition                        | Severity |
 |-----------------------|----------------------------------|----------|
@@ -406,18 +373,16 @@ Seven alerting rules ship in `docker/prometheus/alerts.yml`:
 | HADESCacheDegraded    | Cache hit rate < 50% for 15 min  | info     |
 | HADESDown             | Service unreachable for 1 min    | critical |
 
-Configure notification targets in `docker/alertmanager/alertmanager.yml` (email, Slack, PagerDuty, etc.).
+Configure notification targets (email, Slack, PagerDuty, etc.) in your own Alertmanager.
 
 ### 4.5 Grafana Dashboards
 
-Four dashboards are auto-provisioned via `grafana/provisioning/`:
+HADES has four Grafana dashboards in its source tree; they are not distributed with the binaries:
 
 1. **HADES Overview** (`hades-overview.json`) -- Scan throughput, latency percentiles, threat distribution, error rate, cache hit rate
 2. **Pipeline** (`hades-pipeline.json`) -- Per-stage duration, ExifTool/YARA/ML timing, bottleneck analysis
 3. **Workers** (`hades-workers.json`) -- Active workers, queue depth, task rates, failure rate
 4. **Infrastructure** (`hades-infrastructure.json`) -- API request/response metrics, cache, auth attempts
-
-Default Grafana credentials: `admin` / value of `GRAFANA_PASSWORD` env var (default: `admin`). Change immediately on first login.
 
 ### 4.6 Health Check Probes
 
@@ -451,7 +416,7 @@ HADES publishes no measured capacity per profile. Multi-replica and worker deplo
 
 ### 5.2 Per-Component Resource Limits
 
-These match the limits defined in `docker-compose.full-stack.yml` and the Helm chart `values.yaml`:
+These are the limits planned for the roadmap container deployments (Docker Compose, Helm); they are not measured HADES requirements:
 
 | Component         | CPU Request | CPU Limit | Memory Request | Memory Limit |
 |------------------|------------|-----------|---------------|-------------|
@@ -477,8 +442,7 @@ These match the limits defined in `docker-compose.full-stack.yml` and the Helm c
 
 ### 5.4 Scaling Notes
 
-- The Helm chart enables HPA (Horizontal Pod Autoscaler) by default: API scales at 70% CPU utilization (2-8 replicas), workers scale on `hades_queue_depth` metric (2-16 replicas).
-- Docker Compose scaling: `docker compose -f docker/docker-compose.full-stack.yml up -d --scale hades-worker=4`
+- Horizontal scaling (Helm HPA, Docker Compose worker replicas) belongs to the roadmap container deployments. They (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap and are not shipped.
 - File monitor should run on exactly one instance per watched directory to prevent duplicate alerts.
 
 ---
@@ -492,109 +456,69 @@ These match the limits defined in `docker-compose.full-stack.yml` and the Helm c
 - [ ] Back up all databases (see Section 3).
 - [ ] Back up custom YARA rules and configuration files.
 - [ ] Back up ML models if trained on site-specific data.
-- [ ] Note the current version: `pip show hades-scanner | grep Version`
+- [ ] Note the current version: `hades --version`
 
-### 6.2 Upgrade Steps (pip Install)
+### 6.2 Upgrade Steps (Binary)
 
 ```bash
 # 1. Stop the running service
 sudo systemctl stop hades
 
-# 2. Activate the virtual environment
-source /opt/hades/venv/bin/activate
+# 2. Install the new release with the same path you installed with
+#    (Path A or Path B, see Installation > Upgrading)
 
-# 3. Upgrade the package
-pip install --upgrade hades-scanner
-
-# 4. For full dependencies (ML, observability, vulnerability, log analysis)
-pip install --upgrade "hades-scanner[full]"
-
-# 5. Run database migrations if the release notes mention schema changes
+# 3. Run database migrations if the release notes mention schema changes
 hades admin migrate
 
-# 6. Validate YARA rules (new version may add rules)
+# 4. Validate YARA rules (new version may add rules)
 hades rules validate
 
-# 7. Verify the CLI starts cleanly
-hades --help
+# 5. Verify the new version starts cleanly
+hades --version
 
-# 8. Start the service
+# 6. Start the service
 sudo systemctl start hades
 
-# 9. Verify health
+# 7. Verify health
 curl http://localhost:8666/api/v1/health
 ```
+
+See [Upgrading](installation.md#upgrading) for the download commands.
 
 > **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 ### 6.3 Upgrade Steps (Docker)
 
-```bash
-# 1. Pull or build the new image
-docker build -f docker/hades-full.dockerfile -t hades-scanner:NEW_VERSION .
-
-# 2. Back up the SQLite databases (see 3.1)
-sqlite3 /path/to/hades_scan.db ".backup '/backups/pre_upgrade_$(date +%Y%m%d).db'"
-
-# 3. Update the image tag in docker-compose.full-stack.yml or .env
-#    e.g., set HADES_IMAGE_TAG=NEW_VERSION
-
-# 4. Rolling restart (zero downtime with multiple replicas)
-docker compose -f docker/docker-compose.full-stack.yml up -d --no-deps hades-api
-
-# 5. Verify the new container is healthy
-docker compose -f docker/docker-compose.full-stack.yml ps
-curl http://localhost:8666/api/v1/health
-
-# 6. Upgrade workers
-docker compose -f docker/docker-compose.full-stack.yml up -d --no-deps hades-worker
-
-# 7. Monitor Grafana dashboards for error spikes after upgrade
-```
+Not applicable: there is no HADES container image. Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap and are not shipped (see the [Kubernetes Guide](kubernetes_guide.md)). A current deployment is the `hades-server` binary.
 
 ### 6.4 Upgrade Steps (Kubernetes / Helm)
 
-```bash
-# 1. Update values.yaml with the new image tag
-#    image.tag: "NEW_VERSION"
-
-# 2. Dry-run the upgrade
-helm upgrade hades ./kubernetes/helm/hades/ -f values.yaml --dry-run
-
-# 3. Apply the upgrade (Kubernetes handles rolling deployment)
-helm upgrade hades ./kubernetes/helm/hades/ -f values.yaml
-
-# 4. Watch rollout progress
-kubectl rollout status deployment/hades-api
-kubectl rollout status deployment/hades-worker
-
-# 5. Verify health
-kubectl exec deploy/hades-api -- hades serve --health-check
-```
+Not applicable for the same reason; see the [Kubernetes Guide](kubernetes_guide.md).
 
 ### 6.5 Rollback
 
 If the upgrade fails:
 
 ```bash
-# pip: reinstall the previous version
-pip install hades-scanner==PREVIOUS_VERSION
+# 1. Stop the service
+sudo systemctl stop hades
 
-# Docker: revert image tag and restart
-docker compose -f docker/docker-compose.full-stack.yml up -d
+# 2. Reinstall the previous release: Path A with the previous version number
+#    (see Installation > Upgrading)
 
-# Helm: rollback to previous release
-helm rollback hades
+# 3. If a schema migration caused issues, restore the SQLite databases from the
+#    backup taken before the upgrade (see Section 3)
 
-# Restore database from backup if schema migration caused issues
-pg_restore -h localhost -U hades -d hades --clean --if-exists /backups/pre_upgrade_YYYYMMDD.dump
+# 4. Start the service and check health
+sudo systemctl start hades
+curl http://localhost:8666/api/v1/health
 ```
 
 ### 6.6 Post-Upgrade Validation
 
 - [ ] Health endpoint returns `200`: `curl http://localhost:8666/api/v1/health`
-- [ ] Prometheus metrics are flowing: check Grafana Overview dashboard
+- [ ] Prometheus metrics are flowing: `curl http://localhost:8666/metrics`
 - [ ] Run a test scan: `curl -X POST http://localhost:8666/api/v1/scan -H "X-API-Key: KEY" -F "file=@test.jpg"`
 - [ ] Verify RBAC login works: `curl -X POST http://localhost:8666/api/v1/auth/login -H "Content-Type: application/json" -d '{"username":"admin","password":"..."}'`
 - [ ] Check playbook engine: `hades admin playbook status`
-- [ ] Verify no alert rules are firing in Alertmanager: `curl http://localhost:9093/api/v2/alerts`
+- [ ] If you run Alertmanager, verify no alert rules are firing: `curl http://localhost:9093/api/v2/alerts`

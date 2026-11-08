@@ -82,21 +82,7 @@ A confidence threshold of 0.5 is used by default. Campaigns below this threshold
 
 ## File Relationship Graph
 
-The `FileRelationshipGraph` maintains an adjacency list where edges represent shared indicators between files:
-
-```python
-from core.behavioral_analysis import FileRelationshipGraph
-
-graph = FileRelationshipGraph()
-graph.add_file("/path/to/file_a.jpg", scan_result_a)
-graph.add_file("/path/to/file_b.jpg", scan_result_b)
-
-# Find files related to file_a within 2 hops
-related = graph.get_related("/path/to/file_a.jpg", max_depth=2)
-
-# Extract campaign profiles
-campaigns = graph.get_campaigns()
-```
+Inside the engine, a file relationship graph keeps an adjacency list where edges represent shared indicators between files; it finds files related within a number of hops and groups them into campaign profiles. It is an internal component of the binaries, not a public Python API.
 
 Multi-hop traversal reveals indirect relationships: file A relates to file B through a shared domain, file B relates to file C through a shared IP, making A and C indirectly related.
 

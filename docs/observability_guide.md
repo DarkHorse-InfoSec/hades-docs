@@ -1,50 +1,36 @@
 # Observability Guide
 
-> **NOTICE (2026-05-06):** This guide describes observability features that have been in HADES since v0.7.1. The functionality remains accurate; only the install instructions have changed. References below to `pip install "hades-scanner[observability]"` and similar pip-extras commands no longer apply -- HADES now ships as a single Nuitka-compiled binary with all observability dependencies (`prometheus-client`, etc.) bundled inline. Customers do NOT need to install anything separately for the metrics exporter to work; it is enabled via `hades-server --metrics` or the `enable_metrics` config option. See [Installation Guide](installation.md) for current install paths (Path A direct portal download, Path B Homebrew tap).
+> **Updated 2026-11-08:** HADES ships as the `hades` and `hades-server` binaries; there is no pip package and nothing to install separately. The metrics exporter is built into the API server and is on by default when the `prometheus_client` component is present in your build; check with `hades doctor`. The Prometheus, Grafana and Alertmanager configuration files and dashboards described below are in the HADES source tree and are not distributed with the binaries: use them as a reference for your own monitoring stack. See [Installation Guide](installation.md) for the install paths.
 
-HADES v0.7.1 includes a built-in Prometheus metrics exporter, pre-configured Grafana dashboards, and alerting rules for production monitoring.
+HADES includes a built-in Prometheus metrics exporter. This guide lists its metrics and describes the dashboards and alert rules DarkHorse uses, so you can reproduce them in your own Prometheus, Grafana and Alertmanager.
 
 ## Prerequisites
 
-- Install the observability extras: `pip install "hades-scanner[observability]"` (installs `prometheus-client`)
-- Docker and Docker Compose (for the observability stack)
+- The `hades-server` (or `hades serve`) API server running, with `prometheus_client` present in your build (`hades doctor` reports it)
+- Your own Prometheus, and optionally Grafana and Alertmanager
 
 ## Quick Start
 
 ```bash
-# Start the full stack with observability
-docker compose -f docker/docker-compose.full-stack.yml up -d
+# Confirm prometheus_client is present
+hades doctor
 
-# Or add observability to an existing deployment
-docker compose -f docker/docker-compose.observability.yml up -d
+# Start the API server; metrics are on by default
+hades-server --port 8666
+
+# Check the scrape endpoint
+curl http://localhost:8666/metrics
 ```
 
-| Service | URL | Purpose |
+| Endpoint | URL | Purpose |
 |---------|-----|---------|
-| Prometheus | `http://localhost:9090` | Metric storage and alerting |
-| Grafana | `http://localhost:3000` | Dashboards (default login: admin/admin) |
-| Alertmanager | `http://localhost:9093` | Alert routing |
 | HADES `/metrics` | `http://localhost:8666/metrics` | Prometheus scrape target |
 
 ## Prometheus Metrics
 
 ### Enabling Metrics
 
-Metrics are auto-enabled when `prometheus_client` is installed. Control via CLI:
-
-```bash
-# Explicitly enable
-hades serve --metrics
-
-# Disable
-hades serve --no-metrics
-```
-
-Or via environment variable:
-
-```bash
-export HADES_METRICS_ENABLED=true
-```
+Metrics are on by default whenever `prometheus_client` is present in your build, and off when it is not. `hades doctor` shows which applies.
 
 ### Metric Reference
 
@@ -89,7 +75,7 @@ export HADES_METRICS_ENABLED=true
 
 ## Prometheus Configuration
 
-The default scrape configuration (`docker/prometheus/prometheus.yml`) scrapes the HADES API at 10-second intervals:
+An example scrape configuration that scrapes the HADES API at 10-second intervals:
 
 ```yaml
 scrape_configs:
@@ -142,7 +128,7 @@ sum by (endpoint) (rate(hades_api_requests_total[5m]))
 
 ## Grafana Dashboards
 
-Four dashboards are provisioned automatically:
+DarkHorse uses four dashboards (they are in the HADES source tree and are not distributed with the binaries):
 
 ### Overview Dashboard
 
@@ -168,7 +154,7 @@ Create custom dashboards in Grafana using the Prometheus datasource. All HADES m
 
 ### Prometheus Alert Rules
 
-Seven alert rules are defined in `docker/prometheus/alerts.yml`:
+DarkHorse defines seven alert rules (the rule file is in the HADES source tree and is not distributed with the binaries):
 
 | Alert | Condition | Severity | For |
 |-------|-----------|----------|-----|
@@ -182,7 +168,7 @@ Seven alert rules are defined in `docker/prometheus/alerts.yml`:
 
 ### Alertmanager
 
-The default Alertmanager configuration routes alerts to a webhook receiver. Configure the webhook URL via the `ALERTMANAGER_WEBHOOK_URL` environment variable, or edit `docker/alertmanager/alertmanager.yml` directly.
+Route the alerts with your own Alertmanager configuration (for example to a webhook, email or PagerDuty receiver).
 
 Critical alerts suppress matching warning alerts for the same alert name.
 
@@ -190,25 +176,21 @@ Critical alerts suppress matching warning alerts for the same alert name.
 
 ### Metrics endpoint returns empty response
 
-Verify `prometheus_client` is installed:
+Run `hades doctor` and check that `prometheus_client` is present. If it is reported missing, your build does not include it and `/metrics` answers `503` with `# Prometheus metrics disabled`; contact support@darkhorseinfosec.com.
+
+Check the endpoint directly:
 
 ```bash
-pip install prometheus-client
-```
-
-Check that metrics are enabled:
-
-```bash
-curl http://localhost:8666/metrics
+curl -i http://localhost:8666/metrics
 ```
 
 ### Prometheus cannot scrape HADES
 
-Ensure the HADES API is reachable from the Prometheus container. In Docker Compose, services share the same network. Check the target status in Prometheus at `http://localhost:9090/targets`.
+Ensure the HADES API is reachable from the Prometheus host on the API port (default 8666). Check the target status in Prometheus at `http://localhost:9090/targets`.
 
 ### Grafana dashboards show "No data"
 
-1. Verify the Prometheus datasource is configured (provisioned automatically)
+1. Verify the Prometheus datasource is configured in your Grafana
 2. Check that Prometheus is scraping successfully
 3. Generate some scan activity to produce metrics
 

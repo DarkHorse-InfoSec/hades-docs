@@ -81,10 +81,6 @@ nav:
     - Threat Intelligence: threat_intel_guide.md
     - Deep Format Analysis: deep_format_guide.md
     - Detection Depth Guide: detection_depth_guide.md
-    - Validation Report: detection_validation_report.md
-    - Forensic Detection:
-      - GAPGUIDE v1 (Techniques): GAPGUIDE.md
-      - GAPGUIDE v2 (Formats): GAPGUIDE_v2.md
   - Enterprise:
     - Deployment Guide: deployment_guide.md
     - Enterprise Deployment: enterprise_deployment_guide.md
@@ -101,16 +97,12 @@ nav:
     - Plugin Development: plugin_development_guide.md
     - Plugin Authoring: plugin_authoring_guide.md
     - Writing YARA Rules: yara_rule_writing_guide.md
-    - Python SDK (v1.0.0): sdk_design.md
-    - Testing Guide: testing_guide.md
     - Contributing: contributing.md
     - Architecture: architecture.md
   - Community:
     - YARA Repository: yara_repository.md
     - Plugin Marketplace: plugin_marketplace.md
-    - Demo Walkthrough: demo_walkthrough.md
     - Changelog: changelog.md
-    - Next Steps: next_steps.md
 
 extra:
   version:

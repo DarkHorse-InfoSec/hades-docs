@@ -51,7 +51,7 @@ The HADES plugin SDK is shipped as part of the customer-facing binary; plugins c
 1. Read `docs/plugin_development_guide.md` for the API.
 2. Develop and test your plugin against your own HADES installation.
 3. Open a PR against this repo with the plugin source under `plugins/community/<your-plugin-name>/`, including unit tests + a README describing the plugin's purpose, configuration, and usage.
-4. Sign the [Contributor License Agreement (CLA)](CLA.md) if one is provided in the repo (DarkHorse may require this before merging plugin contributions).
+4. DarkHorse may ask you to sign a contributor agreement before merging a plugin contribution; it is provided on request (there is none in this repo).
 
 DarkHorse evaluates community plugins for technical correctness, security implications, and fit with the marketplace; we may decline contributions that overlap heavily with planned first-party features.
 
@@ -61,7 +61,7 @@ If you'd like to work on HADES core (the proprietary source), DarkHorse occasion
 
 ## License
 
-By contributing to this PUBLIC docs repo, you agree that your contributions will be governed by the project's proprietary license. See [LICENSE](LICENSE) for details.
+By contributing to this PUBLIC docs repo, you agree that your contributions will be governed by the project's proprietary license. The licence terms are the [End User License Agreement](docs/legal/HADES_EULA_v1.4.0.docx).
 
 ---
 

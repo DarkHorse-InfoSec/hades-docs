@@ -2,7 +2,7 @@
 
 > **ROADMAP, not a shipped deployment option (updated 2026-09-27).** HADES currently ships as a single self-contained binary (the `hades` CLI and `hades-server`). Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap. This guide describes that planned architecture. **No throughput, scans-per-day or hardware-sizing figure in it is a measured HADES result**, and none is given; size a deployment by benchmarking on your own hardware and file mix.
 >
-> References below to `pip install "hades-scanner[full]"` or `pip install "hades-scanner[observability]"` do not apply to the shipped binary, which bundles its dependencies inline. See [Installation Guide](installation.md) for current install paths.
+> There is no pip package: HADES ships as the `hades` and `hades-server` binaries. See [Installation Guide](installation.md) for the install paths, and run `hades doctor` to see which optional components (for example `redis`, `prometheus_client`) are present in your build.
 
 This guide covers performance tuning, deployment patterns, benchmarking, and monitoring for HADES metadata forensics engine.
 
@@ -104,8 +104,6 @@ For high-availability, use Redis Sentinel (included in `docker-compose.ha.yml`).
 ### Single Server
 
 ```bash
-pip install "hades-scanner[full]"
-
 hades serve \
     --host 0.0.0.0 \
     --port 8666 \
@@ -262,16 +260,13 @@ curl -H "X-API-Key: YOUR_KEY" http://localhost:8666/api/v1/workers/status
 
 ### Prometheus Metrics and Grafana
 
-HADES includes a Prometheus metrics exporter with metrics covering scans, findings, cache, workers, API requests, and pipeline stage timing. When `prometheus_client` is installed, the `/metrics` endpoint is automatically available.
+HADES includes a Prometheus metrics exporter with metrics covering scans, findings, cache, workers, API requests, and pipeline stage timing. When `prometheus_client` is present in your build (check with `hades doctor`), the `/metrics` endpoint is on by default.
 
 ```bash
-# Install observability support
-pip install "hades-scanner[observability]"
+# Check that prometheus_client is present in your build
+hades doctor
 
-# Enable metrics on the API server
-hades serve --metrics
-
-# Prometheus scrape endpoint
+# Prometheus scrape endpoint (on by default)
 curl http://localhost:8666/metrics
 
 # JSON metrics summary
@@ -281,7 +276,7 @@ curl http://localhost:8666/api/v1/metrics/json
 curl http://localhost:8666/api/v1/metrics/alerts
 ```
 
-Four pre-built Grafana dashboards are included (`grafana/dashboards/`):
+HADES has four Grafana dashboards in its source tree; like the observability stack below they belong to the roadmap container deployments and are not distributed with the binaries:
 
 - **HADES Overview** -- scan throughput, latency, threat distribution
 - **HADES Pipeline** -- per-stage timing, bottleneck identification

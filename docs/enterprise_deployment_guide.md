@@ -1,6 +1,6 @@
 # Enterprise Deployment Guide
 
-> **NOTICE (2026-05-06):** This guide describes Enterprise features that remain in HADES, but its install instructions reference the pre-v1.4 distribution model (`pip install "hades-scanner[enterprise]"` etc.). Those commands no longer apply. HADES Enterprise tier is now activated by purchasing/upgrading your license key in the customer portal -- the same Nuitka binary that ships to all tiers becomes the Enterprise binary when the license key has Enterprise entitlements. RBAC, Redis caching, encryption at rest, multi-tenancy, and Kubernetes deployment manifests are all available (SSO and the PostgreSQL backend were removed; see [Breaking Changes](#breaking-changes)); the application code and operator-facing configuration described below remain the right setup pattern. See [Installation Guide](installation.md) for the binary-install paths (Path A portal direct download or Path B Homebrew tap), then return here for the enterprise-specific configuration.
+> **Updated 2026-11-08:** HADES Enterprise is the same `hades` and `hades-server` binaries as every tier; the Enterprise features are unlocked by a license key with Enterprise entitlements, bought or upgraded in the customer portal. There is no pip package and no container image: install with [Path A or Path B](installation.md), then return here for the enterprise configuration. Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap and are not shipped; see the [Kubernetes Guide](kubernetes_guide.md). SSO and the PostgreSQL backend were removed; see [Breaking Changes](#breaking-changes). Run `hades doctor` to see which optional components (for example `bcrypt`, `cryptography`, `redis`, `prometheus_client`) are present in your build.
 
 HADES enterprise features: RBAC, Redis, encryption at rest, multi-tenancy, license management, Prometheus observability, and Kubernetes deployment. All enterprise features are optional and backward compatible with previous deployments.
 
@@ -24,28 +24,19 @@ HADES enterprise features: RBAC, Redis, encryption at rest, multi-tenancy, licen
 
 ## Prerequisites
 
-- Python 3.8+
-- HADES v0.7.1
+- The `hades` and `hades-server` binaries ([Installation](installation.md))
+- A license key with Enterprise entitlements
 - (Optional) Redis 7+
-- (Optional) Docker and Docker Compose
-- (Optional) Kubernetes 1.24+ with Helm 3 (for Kubernetes deployments)
-- (Optional) prometheus_client (for metrics collection)
 
 ## Installation
 
-Install with enterprise dependencies:
+HADES ships as two self-contained binaries, `hades` and `hades-server`; there are no pip packages or extras to install. Install them as described in [Installation](installation.md), then check which optional components your build includes:
 
 ```bash
-pip install "hades-scanner[enterprise]"
+hades doctor
 ```
 
-Or install all features:
-
-```bash
-pip install "hades-scanner[full]"
-```
-
-Enterprise dependencies include: bcrypt, PyJWT, cryptography, redis.
+The enterprise features use bcrypt, PyJWT, cryptography and redis; `hades doctor` reports bcrypt, cryptography and redis.
 
 ---
 
@@ -320,45 +311,12 @@ hades admin license
 
 ## Docker Compose Deployment
 
-### Basic (SQLite)
+Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap and are not shipped; see the [Kubernetes Guide](kubernetes_guide.md). The compose files, profiles and scaled or high-availability stacks described in earlier versions of this guide are not distributed with the binaries. A current deployment is one `hades-server` per host:
 
 ```bash
-cd docker
-docker compose up -d
-```
-
-### Enterprise Stack (Redis)
-
-```bash
-cd docker
-
-# Set environment variables
-export HADES_REDIS_URL="redis://hades-redis:6379/0"
 export HADES_API_KEY="your-production-api-key"
-
-# Start with enterprise profile
-docker compose --profile enterprise up -d
+hades-server --host 0.0.0.0 --port 8666
 ```
-
-### Scaled Deployment (Redis + Workers)
-
-```bash
-docker compose -f docker/docker-compose.scale.yml up -d --scale hades-worker=4
-```
-
-### High-Availability Deployment (nginx + Multi-Instance)
-
-```bash
-docker compose -f docker/docker-compose.ha.yml up -d --scale hades-api=4
-```
-
-### Full Stack with Observability
-
-```bash
-docker compose -f docker/docker-compose.full-stack.yml up -d
-```
-
-Includes Redis, API server, workers, Prometheus, Grafana, and Alertmanager. See [Observability](#observability) below.
 
 ### Production Checklist
 
@@ -367,32 +325,25 @@ Includes Redis, API server, workers, Prometheus, Grafana, and Alertmanager. See 
 3. Configure resource limits for your workload
 4. Set up monitoring (health endpoint: `/api/v1/health`, metrics: `/metrics`)
 5. Enable RBAC and create admin user
-6. Enable Prometheus metrics: set `HADES_METRICS_ENABLED=true` or use `--metrics` flag
-7. Deploy Grafana dashboards for operational visibility (see [Observability](#observability))
-8. For Kubernetes deployments, configure HPA and resource limits (see [Kubernetes Deployment](#kubernetes-deployment))
+6. Confirm Prometheus metrics are available: `hades doctor` lists `prometheus_client`, and `curl http://localhost:8666/metrics` returns metrics
+7. Point your own Prometheus (and Grafana, if you use it) at `/metrics` (see [Observability](#observability))
 
 ---
 
 ## Observability
 
-HADES v0.7.1 includes built-in Prometheus metrics, Grafana dashboards, and alerting rules. Observability is opt-in and has zero overhead when disabled.
+The API server includes a Prometheus metrics exporter. Metrics are on by default and switch off automatically when the `prometheus_client` component is not present in your build.
 
 ```bash
-# Install observability support
-pip install "hades-scanner[observability]"
+# Check that prometheus_client is present in your build
+hades doctor
 
-# Enable metrics on the API server
-hades serve --metrics
+# Scrape endpoint
+curl http://localhost:8666/metrics
 
 # Run a quick health probe
 hades serve --health-check
 ```
-
-Key environment variables:
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `HADES_METRICS_ENABLED` | `true` | Enable/disable Prometheus metrics |
 
 For full setup details including Prometheus scrape configuration, Grafana dashboard walkthrough, PromQL query examples, and alerting configuration, see the **[Observability Guide](observability_guide.md)**.
 
@@ -400,84 +351,24 @@ For full setup details including Prometheus scrape configuration, Grafana dashbo
 
 ## Kubernetes Deployment
 
-HADES provides a Helm chart and Kustomize overlays for Kubernetes deployments with horizontal pod autoscaling, ingress, and ServiceMonitor integration.
-
-```bash
-# Install with Helm
-helm install hades kubernetes/helm/hades \
-  --set api.apiKey=your-secret-key \
-  --set redis.enabled=true
-
-# Kustomize (production overlay)
-kubectl apply -k kubernetes/kustomize/overlays/production
-```
-
-For the full Kubernetes deployment guide including values reference, secrets management, HPA tuning, and troubleshooting, see the **[Kubernetes Guide](kubernetes_guide.md)**.
+Kubernetes deployment (Helm chart, Kustomize overlays) is on the Enterprise roadmap and is not shipped. The [Kubernetes Guide](kubernetes_guide.md) describes the planned architecture.
 
 ---
 
 ## Migration Guide
 
-### From v0.7.0 to v0.7.1
-
-1. Update the package:
-
-```bash
-pip install --upgrade "hades-scanner[full]"
-```
-
-2. (Optional) Install observability extras:
-
-```bash
-pip install "hades-scanner[observability]"
-```
-
-3. Add the `metrics` section to `cli/hades_config.json` (optional, defaults to enabled):
-
-```json
-{
-  "metrics": {
-    "enabled": true,
-    "endpoint": "/metrics"
-  }
-}
-```
-
-4. No database migrations required. No breaking changes.
-
-### From v0.6.0 to v0.7.x
-
-1. Update the package:
-
-```bash
-pip install --upgrade "hades-scanner[full]"
-```
-
-2. Add the `distributed` config section to `cli/hades_config.json` for worker pool features (optional).
-
-3. No database migrations required. All v0.7.x features are opt-in.
-
-### From v0.5.0 to v0.6.0+
-
-1. Update the package:
-
-```bash
-pip install --upgrade "hades-scanner[full]"
-```
-
-2. Add the enterprise config sections to `cli/hades_config.json` (database, redis, encryption, auth, tenants). All default to disabled.
+Upgrade by installing the new release the same way you installed it; see [Upgrading](installation.md#upgrading). Then run `hades admin migrate` if the release notes mention schema changes. The pip-based migration steps for v0.5.0 to v0.7.1 described in earlier versions of this guide do not apply to the binaries.
 
 ### Verify After Any Migration
 
 ```bash
-# Check CLI works
-hades --help
+# Check the new version and its components
+hades --version
+hades doctor
 
-# Check API starts
+# Check the API starts and answers
 hades serve --port 8666
-
-# Run tests
-python -m pytest core/ cli/ config/ plugins/ tests/ demo/ grafana/ kubernetes/ -v --tb=short
+curl http://localhost:8666/api/v1/health
 ```
 
 ### Breaking Changes
@@ -491,11 +382,7 @@ python -m pytest core/ cli/ config/ plugins/ tests/ demo/ grafana/ kubernetes/ -
 
 ### Enterprise auth module not available
 
-Install enterprise dependencies:
-
-```bash
-pip install "hades-scanner[enterprise]"
-```
+Run `hades doctor`. If it reports `bcrypt` or `cryptography` as missing, your build does not include them and the auth module cannot load; contact support@darkhorseinfosec.com.
 
 ### Redis connection failed
 

@@ -1,5 +1,7 @@
 # Docker Guide
 
+> **ROADMAP for containers (updated 2026-11-08).** HADES currently ships as two self-contained binaries, `hades` and `hades-server` (see [Installation](installation.md)); there is no container image and no pip package. Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap, and the Docker material in this guide describes that planned architecture; the compose files and Dockerfiles it names are not distributed. Run `hades doctor` to see which optional components are present in your build.
+
 This guide covers building, configuring, and running HADES in Docker containers for production deployments.
 
 ## Production Image

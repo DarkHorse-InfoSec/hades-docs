@@ -1,11 +1,12 @@
 # HADES Deployment Guide
 
-This guide covers deploying HADES (Hidden Artifact Detection & EXIF Scanner) in production environments using Docker, Docker Compose, and direct Python installation.
+> **ROADMAP for containers (updated 2026-11-08).** HADES currently ships as two self-contained binaries, `hades` and `hades-server` (see [Installation](installation.md)); there is no container image and no pip package. Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap, and the Docker material in this guide describes that planned architecture; the compose files and Dockerfiles it names are not distributed. Run `hades doctor` to see which optional components are present in your build.
+
+This guide covers deploying HADES (Hidden Artifact Detection & EXIF Scanner) in production. For a current deployment, start with [Binary Deployment](#binary-deployment).
 
 ## Prerequisites
 
-- **Docker** 20.10+ and **Docker Compose** v2+ (for containerized deployment)
-- **Python** 3.8+ and **pip** (for direct installation)
+- The `hades` and `hades-server` binaries ([Installation](installation.md))
 - At least 2 GB RAM (4 GB recommended for ML anomaly detection)
 - Sufficient disk space for scan data, logs, and ML models
 
@@ -358,28 +359,21 @@ curl -v http://localhost:8666/api/v1/health
 
 If the health endpoint returns `"degraded"` for an engine, check:
 - YARA rules directory is present and contains valid `.yar`/`.yara` files
-- Python dependencies installed correctly (run `pip list` inside the container)
+- All required components are present: run `hades doctor`
 
 ### YARA Not Available
 
-YARA is an optional dependency. If `yara-python` fails to install (common on some platforms), the scanner operates without YARA rule matching. The health endpoint will report `enhanced_detection: degraded`.
+If `yara-python` is not available in the build (`hades doctor` reports it), the scanner operates without YARA rule matching. The health endpoint will report `enhanced_detection: degraded`.
 
 ### ML Detection Not Available
 
-If `scikit-learn` or `numpy` is not installed, ML detection endpoints return a 503 response. Install the dependencies:
+If `scikit-learn`, `numpy` or `xgboost` is missing from the build, ML detection endpoints return a 503 response. Run `hades doctor` to see which is missing and send its output to support@darkhorseinfosec.com.
+
+## Binary Deployment
+
+Install the binaries as described in [Installation](installation.md), then:
 
 ```bash
-pip install scikit-learn>=1.2.0 numpy>=1.24.0
-```
-
-## Direct Python Deployment
-
-For environments where Docker is not available:
-
-```bash
-# Clone and install
-pip install -r requirements.txt
-
 # Start the API server
 hades serve --port 8666
 
