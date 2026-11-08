@@ -3,7 +3,7 @@ Version: 1.0.0
 
 Author: DarkHorse Information Security LLC
 
-> **NOTICE (2026-05-06):** This troubleshooting guide remains accurate for runtime / configuration / scan-result issues, but its install-related sections reference the pre-v1.4 distribution model (`pip install "hades-scanner[integrations]"` etc.). Those commands no longer apply. HADES now ships as a Nuitka-compiled signed binary distributed via the customer portal (Path A) or Homebrew tap (Path B); all dependencies are bundled inline. If a troubleshooting step below tells you to install a missing optional dependency via pip, that step is stale -- the dependency is already in the binary. The actual fix is usually environment-related (license key not loaded, port already in use, RBAC misconfig, etc.). See [Installation Guide](installation.md) for install issues; everything else in this guide remains applicable.
+> **Updated 2026-11-08:** HADES ships as two self-contained binaries, `hades` and `hades-server` (see [Installation](installation.md)); there is no pip package and no container image, and installing Python packages on the host has no effect on the binaries. Sections that described pip installs and Docker builds have been rewritten or removed. When a component is reported missing, see [1.2](#12-an-optional-component-is-reported-missing).
 
 This guide covers common issues encountered when installing, configuring, and operating HADES. Each entry provides the symptom, likely root cause, and resolution steps.
 
@@ -13,14 +13,9 @@ This guide covers common issues encountered when installing, configuring, and op
 
 - [1. Installation Issues](#1-installation-issues)
   - [1.1 ExifTool Not Found](#11-exiftool-not-found)
-  - [1.2 YARA Python Compilation Failure](#12-yara-python-compilation-failure)
+  - [1.2 An Optional Component Is Reported Missing](#12-an-optional-component-is-reported-missing)
   - [1.3 YARA Rule Load Errors](#13-yara-rule-load-errors)
-  - [1.4 scikit-learn Installation Failure](#14-scikit-learn-installation-failure)
-  - [1.5 pikepdf Build Failure](#15-pikepdf-build-failure)
-  - [1.6 olefile Import Error](#16-olefile-import-error)
-  - [1.7 bcrypt or cryptography Wheel Build Failure](#17-bcrypt-or-cryptography-wheel-build-failure)
-  - [1.8 uvloop Not Available on Windows](#18-uvloop-not-available-on-windows)
-  - [1.9 py7zr Missing for Archive Extraction](#19-py7zr-missing-for-archive-extraction)
+  - [1.4 uvloop Not Available on Windows](#14-uvloop-not-available-on-windows)
 - [2. API Server Issues](#2-api-server-issues)
   - [2.1 Port Already in Use](#21-port-already-in-use)
   - [2.2 API Key Authentication Failures](#22-api-key-authentication-failures)
@@ -36,12 +31,6 @@ This guide covers common issues encountered when installing, configuring, and op
   - [3.5 Scan Cache Returns Stale Results](#35-scan-cache-returns-stale-results)
   - [3.6 Async Pipeline Deadlock](#36-async-pipeline-deadlock)
 - [4. Docker Issues](#4-docker-issues)
-  - [4.1 Build Fails at yara-python Wheel](#41-build-fails-at-yara-python-wheel)
-  - [4.2 Health Check Fails After Container Start](#42-health-check-fails-after-container-start)
-  - [4.3 Volume Mount Permission Denied](#43-volume-mount-permission-denied)
-  - [4.4 Custom YARA Rules Not Loaded](#44-custom-yara-rules-not-loaded)
-  - [4.5 Worker Container Cannot Reach Redis](#45-worker-container-cannot-reach-redis)
-  - [4.6 Container OOM Killed](#46-container-oom-killed)
 - [5. Enterprise Feature Issues](#5-enterprise-feature-issues)
   - [5.1 Redis Fallback to In-Memory](#51-redis-fallback-to-in-memory)
   - [5.2 Encryption Key Not Found](#52-encryption-key-not-found)
@@ -61,7 +50,7 @@ This guide covers common issues encountered when installing, configuring, and op
 
 **Symptom:** `ExifTool not found` error at startup, or scan results return no metadata fields.
 
-**Cause:** ExifTool is a Perl-based external binary that must be installed separately from the Python package. The `PyExifTool` wrapper expects the `exiftool` binary on `PATH`.
+**Cause:** ExifTool is an external program. It is optional for scanning (a native fallback ships in the binary) and recommended for the metadata sanitizer; HADES looks for the `exiftool` binary on `PATH`.
 
 **Solution:**
 
@@ -92,33 +81,27 @@ The persistent ExifTool process pool in `async_scanner.py` also requires this bi
 
 ---
 
-### 1.2 YARA Python Compilation Failure
+### 1.2 An Optional Component Is Reported Missing
 
-**Symptom:** `pip install yara-python` fails with C compiler errors.
+**Symptom:** A feature is unavailable, or the log says an optional module could not be imported.
 
-**Cause:** `yara-python` compiles native C extensions. Missing build tools or YARA C library headers will cause the build to fail.
+**Cause:** The `hades` and `hades-server` binaries carry their Python components inside them. Installing a Python package on the host (for example with pip) does not change what the binaries contain.
 
-**Solution:**
+**Solution:** Run `hades doctor`. It probes each component and says what is disabled when one is missing. The optional ones and their effect, as `hades doctor` reports them:
 
-```bash
-# Linux (Debian/Ubuntu)
-sudo apt-get install build-essential libssl-dev libmagic-dev
+| Component | Without it |
+|---|---|
+| `pikepdf` | Deep PDF analysis unavailable, regex-based fallback |
+| `olefile` | OLE/Office deep analysis unavailable |
+| `py7zr` | 7-Zip archive extraction unavailable, ZIP/tar only |
+| `bcrypt` | RBAC password hashing unavailable, auth module limited |
+| `cryptography` | AES-256-GCM encryption at rest unavailable |
+| `redis` | Redis state/cache unavailable, in-memory fallback used |
+| `prometheus_client` | Prometheus metrics collection disabled |
+| `watchdog` | File monitoring disabled, cannot watch directories for changes |
+| `xgboost` | Signed ML classifier cannot load (ML stage off) |
 
-# macOS
-xcode-select --install
-brew install openssl
-
-# Windows - install Visual C++ Build Tools
-# https://visualstudio.microsoft.com/visual-cpp-build-tools/
-```
-
-If compilation continues to fail, install a pre-built wheel:
-
-```bash
-pip install yara-python --only-binary=:all:
-```
-
-YARA is a core dependency but HADES degrades gracefully without it. The `YARA_AVAILABLE` flag is checked before any YARA operations. Pattern-based detection rules will be skipped, but heuristic and ML detection still function.
+If a component you need is reported missing, send the `hades doctor` output to support@darkhorseinfosec.com.
 
 ---
 
@@ -147,131 +130,13 @@ Common issues:
 
 ---
 
-### 1.4 scikit-learn Installation Failure
-
-**Symptom:** `pip install scikit-learn` fails or hangs during build, especially on ARM or minimal containers.
-
-**Cause:** scikit-learn requires NumPy and SciPy, which compile Fortran/C extensions. Minimal environments may lack BLAS/LAPACK libraries.
-
-**Solution:**
-
-```bash
-# Linux - install BLAS/LAPACK first
-sudo apt-get install libopenblas-dev liblapack-dev gfortran
-
-# Use pre-built wheels (preferred)
-pip install scikit-learn --only-binary=:all:
-```
-
-If the install environment cannot support scikit-learn (e.g., restricted build hosts), HADES operates without ML detection. The `SKLEARN_AVAILABLE` flag disables all ML paths.
-
-This scenario does NOT apply to the current v1.4.x Nuitka binary distribution -- scikit-learn and XGBoost are both bundled inline in the binary, with the signed model bundle gated by license tier (Pro+ only). The "install without ML" workaround was specific to the pre-v1.4 pip-based distribution model. Current customers who don't have ML active simply have a Free / Community tier license; the binary has the ML code but the LicenseEnforcer gates it.
-
----
-
-### 1.5 pikepdf Build Failure
-
-**Symptom:** `pip install pikepdf` fails with QPDF-related errors.
-
-**Cause:** pikepdf wraps the QPDF C++ library. Missing QPDF headers or an incompatible C++ compiler will cause the build to fail.
-
-**Solution:**
-
-```bash
-# Linux (Debian/Ubuntu)
-sudo apt-get install libqpdf-dev
-
-# macOS
-brew install qpdf
-```
-
-pikepdf is optional. Without it, PDF analysis falls back to regex-based parsing. Deep format analysis for PDF JavaScript, OpenAction, and embedded file detection still works, with slightly lower fidelity for obfuscated content.
-
-Install with integrations extra to include pikepdf:
-
-```bash
-pip install "hades-scanner[integrations]"
-```
-
----
-
-### 1.6 olefile Import Error
-
-**Symptom:** `ImportError: No module named 'olefile'` in logs during Office document scanning.
-
-**Cause:** olefile is an optional dependency for OLE2 compound document parsing (legacy .doc, .xls, .ppt formats).
-
-**Solution:**
-
-```bash
-pip install olefile
-```
-
-Or install with integrations:
-
-```bash
-pip install "hades-scanner[integrations]"
-```
-
-Without olefile, OLE-specific checks (embedded OLE objects, legacy macro streams) are skipped. OOXML (.docx, .xlsx) analysis via ZIP parsing remains fully functional.
-
----
-
-### 1.7 bcrypt or cryptography Wheel Build Failure
-
-**Symptom:** Build errors when installing `bcrypt` or `cryptography` packages.
-
-**Cause:** Both packages contain Rust and/or C extensions. Older pip versions or missing Rust toolchain can cause failures.
-
-**Solution:**
-
-```bash
-# Ensure pip is current
-pip install --upgrade pip setuptools wheel
-
-# Install Rust if needed (cryptography >= 38 requires it)
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Prefer binary wheels
-pip install bcrypt cryptography --only-binary=:all:
-```
-
-These are enterprise-tier dependencies. If not needed, the base installation works without them:
-
-```bash
-pip install hades-scanner
-# RBAC and encryption features will be unavailable
-```
-
----
-
-### 1.8 uvloop Not Available on Windows
+### 1.4 uvloop Not Available on Windows
 
 **Symptom:** Warning about uvloop at startup on Windows.
 
-**Cause:** uvloop is a Unix-only (Linux/macOS) asyncio event loop replacement. It is excluded from Windows installs via the `sys_platform != 'win32'` marker in `pyproject.toml`.
+**Cause:** uvloop is a Unix-only (Linux/macOS) asyncio event loop replacement, so it is not part of the Windows build.
 
 **Solution:** No action required. HADES uses the default asyncio event loop on Windows. This is not a bug. Performance on Windows is adequate for most workloads; for high-throughput deployments, use Linux.
-
----
-
-### 1.9 py7zr Missing for Archive Extraction
-
-**Symptom:** 7-Zip archives (`.7z`) are skipped during file ingestion.
-
-**Cause:** The `py7zr` package is an optional dependency for 7z extraction. ZIP and tar archives are handled by the Python standard library and always work.
-
-**Solution:**
-
-```bash
-pip install py7zr
-```
-
-Or install with enterprise extras:
-
-```bash
-pip install "hades-scanner[enterprise]"
-```
 
 ---
 
@@ -299,18 +164,6 @@ Kill the conflicting process or use a different port:
 
 ```bash
 hades serve --port 9000
-```
-
-In Docker, remap the host port:
-
-```bash
-docker run -p 9000:8666 hades-scanner:1.0.0
-```
-
-Or set via environment variable:
-
-```bash
-HADES_PORT=9000 docker compose -f docker/docker-compose.yml up -d
 ```
 
 ---
@@ -345,12 +198,6 @@ hades admin create-admin admin2
 
 > **Known issue in v1.7.4:** in the compiled `hades` binary, `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`) instead of running. The fix is tracked for the next release. Until then these commands cannot be used from the shipped binary.
 
-4. In Docker, pass the key via environment:
-
-```bash
-docker run -e HADES_API_KEY=your-key hades-scanner:1.0.0
-```
-
 ---
 
 ### 2.3 CORS Errors in Browser
@@ -383,19 +230,12 @@ location /api/ {
 
 **Cause:**
 
-- Missing `websockets` package.
 - Reverse proxy not configured for WebSocket upgrade.
 - API key not provided in WebSocket query parameters.
 
 **Solution:**
 
-1. Ensure the `websockets` package is installed:
-
-```bash
-pip install websockets
-```
-
-2. If behind nginx, add WebSocket upgrade support:
+1. If behind nginx, add WebSocket upgrade support:
 
 ```nginx
 location /ws {
@@ -407,13 +247,13 @@ location /ws {
 }
 ```
 
-3. Pass the API key as a query parameter:
+2. Pass the API key as a query parameter:
 
 ```
 ws://localhost:8666/ws?api_key=your-key
 ```
 
-4. Check that no firewall or load balancer is terminating long-lived connections.
+3. Check that no firewall or load balancer is terminating long-lived connections.
 
 ---
 
@@ -444,28 +284,18 @@ Common mistakes:
 
 **Symptom:** `ModuleNotFoundError` or `ImportError` when running `--serve`.
 
-**Cause:** The Python path does not include the `core/` and `cli/` directories, or a required dependency is missing.
+**Cause:** A component the server needs is missing from the build, or the binary was started from a broken or partial install.
 
 **Solution:**
 
-1. Run from the project root directory:
+1. Check the version and which components are present:
 
 ```bash
-cd /path/to/darkhorse-hades
-hades serve
+hades --version
+hades doctor
 ```
 
-2. Verify the installation:
-
-```bash
-pip install -e ".[dev]"
-```
-
-3. Check which optional modules are available:
-
-```bash
-python -c "from core.hades_api import create_app; app = create_app()"
-```
+2. If `hades doctor` reports a required component missing, reinstall the binaries (see [Installation](installation.md)); if it is still missing, send the `hades doctor` output to support@darkhorseinfosec.com.
 
 Import failures for optional modules (integrations, auth, storage) are logged as warnings but do not prevent startup. Only core modules (`enhanced_detection_engine`, `metadata_parser_engine`) are fatal.
 
@@ -670,204 +500,7 @@ hades scan --async --profile -r /evidence/
 
 ## 4. Docker Issues
 
-### 4.1 Build Fails at yara-python Wheel
-
-**Symptom:** `docker build` fails during `pip install` with yara-python compilation errors.
-
-**Cause:** The builder stage in `hades-full.dockerfile` uses `python:3.12-slim`, which includes `build-essential` but may miss specific header files.
-
-**Solution:**
-
-1. Ensure you are building from the project root (the Dockerfile expects context at `.`):
-
-```bash
-docker build -f docker/hades-full.dockerfile -t hades-scanner:1.0.0 .
-```
-
-2. If the build fails on a specific dependency, add the missing system package to the builder stage in `hades-full.dockerfile`:
-
-```dockerfile
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libmagic1 \
-    libmagic-dev \
-    libssl-dev \    # Add if needed
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-```
-
-3. For CI environments with limited resources, increase Docker memory:
-
-```bash
-docker build --memory=4g -f docker/hades-full.dockerfile -t hades-scanner:1.0.0 .
-```
-
----
-
-### 4.2 Health Check Fails After Container Start
-
-**Symptom:** Container starts but is marked `unhealthy`. Logs show the server is running but `curl` health check fails.
-
-**Cause:** The health check (`curl -f http://localhost:8666/api/v1/health`) runs before the uvicorn server finishes binding. The default `start_period` is 15 seconds, which may be insufficient for large rule sets or model loading.
-
-**Solution:**
-
-1. Increase the start period:
-
-```yaml
-healthcheck:
-  test: ["CMD", "curl", "-f", "http://localhost:8666/api/v1/health"]
-  interval: 30s
-  timeout: 10s
-  retries: 5
-  start_period: 30s
-```
-
-2. Check container logs for startup errors:
-
-```bash
-docker logs hades-api
-```
-
-3. Verify the port matches:
-
-```bash
-docker exec hades-api curl -f http://localhost:${HADES_PORT:-8666}/api/v1/health
-```
-
-4. Ensure `curl` is installed in the runtime image. The `hades-full.dockerfile` includes it, but custom images may not.
-
----
-
-### 4.3 Volume Mount Permission Denied
-
-**Symptom:** `Permission denied` errors when reading/writing to `/data/scans`, `/data/rules`, or `/data/config`.
-
-**Cause:** The HADES container runs as non-root user `hades` (UID 1000, GID 1000). Host-mounted directories may be owned by root or a different user.
-
-**Solution:**
-
-1. Set correct ownership on the host:
-
-```bash
-sudo chown -R 1000:1000 /host/path/to/scans
-sudo chown -R 1000:1000 /host/path/to/rules
-```
-
-2. Or use named volumes (Docker manages permissions):
-
-```yaml
-volumes:
-  scan-data:
-  custom-rules:
-```
-
-3. On SELinux systems, add the `:z` or `:Z` suffix:
-
-```yaml
-volumes:
-  - /host/scans:/data/scans:z
-```
-
----
-
-### 4.4 Custom YARA Rules Not Loaded
-
-**Symptom:** Custom `.yar` files mounted into `/data/rules` are not detected during scans.
-
-**Cause:** The entrypoint script copies rules from `/data/rules` to `/app/rules/` at startup. Rules added after container start are not picked up. The copy command also filters on `.yar` and `.yara` extensions only.
-
-**Solution:**
-
-1. Ensure rule files have `.yar` or `.yara` extension.
-
-2. Restart the container after adding new rules:
-
-```bash
-docker restart hades-api
-```
-
-3. Verify rules are present inside the container:
-
-```bash
-docker exec hades-api ls -la /app/rules/
-```
-
-4. Validate rule syntax before mounting:
-
-```bash
-hades rules validate
-```
-
----
-
-### 4.5 Worker Container Cannot Reach Redis
-
-**Symptom:** Worker containers log `Connection refused` to Redis. Tasks are not distributed.
-
-**Cause:** The worker connects to the Redis URL specified by `HADES_REDIS_URL`. If Redis is in a different Docker network or not yet started, the connection fails.
-
-**Solution:**
-
-1. Verify Redis is running and on the same Docker network:
-
-```bash
-docker compose -f docker/docker-compose.scale.yml ps
-```
-
-2. Check the `HADES_REDIS_URL` value:
-
-```bash
-docker exec hades-worker-1 env | grep REDIS
-```
-
-3. Use the Docker service name as the hostname:
-
-```yaml
-environment:
-  - HADES_REDIS_URL=redis://hades-redis:6379/0
-```
-
-4. If Redis requires authentication:
-
-```yaml
-- HADES_REDIS_URL=redis://:password@hades-redis:6379/0
-```
-
-Without Redis, the worker pool falls back to local multiprocessing (single-host mode).
-
----
-
-### 4.6 Container OOM Killed
-
-**Symptom:** Container exits with code 137. `dmesg` or Docker events show OOM kill.
-
-**Cause:** The default memory limit in `docker-compose.yml` is 2 GB. Large YARA rule sets, ML models, or scanning many files concurrently can exceed this.
-
-**Solution:**
-
-1. Increase the memory limit:
-
-```yaml
-deploy:
-  resources:
-    limits:
-      memory: 4G
-```
-
-2. Reduce API workers to lower per-process memory:
-
-```yaml
-environment:
-  - HADES_WORKERS=1
-```
-
-3. Monitor memory with the Prometheus metrics stack:
-
-```bash
-docker compose -f docker/docker-compose.observability.yml up -d
-# Check Grafana infrastructure dashboard for memory trends
-```
+There is no HADES container image: HADES ships as the `hades` and `hades-server` binaries (see [Installation](installation.md)). Containerized and distributed deployments (Docker Compose, Kubernetes, Helm, Redis-backed worker queues) are on the Enterprise roadmap; see the [Kubernetes Guide](kubernetes_guide.md). The Docker troubleshooting entries from earlier versions of this guide have been removed.
 
 ---
 
@@ -877,15 +510,11 @@ docker compose -f docker/docker-compose.observability.yml up -d
 
 **Symptom:** Logs show `Redis unavailable, using in-memory fallback`. Rate limiting, sessions, and distributed locks operate in-process only.
 
-**Cause:** The `redis` Python package is not installed, or the Redis server is unreachable.
+**Cause:** The `redis` component is missing from your build, or the Redis server is unreachable.
 
 **Solution:**
 
-1. Install the Redis package:
-
-```bash
-pip install redis
-```
+1. Run `hades doctor` and check that `redis` is present in your build.
 
 2. Verify Redis connectivity:
 
@@ -922,20 +551,14 @@ hades serve --generate-encryption-key
 
 This creates `config/encryption.key`. The file contains a 256-bit random key, base64-encoded.
 
-2. In Docker, pass the key via environment variable:
-
-```bash
-docker run -e HADES_ENCRYPTION_KEY=$(cat config/encryption.key) hades-scanner:1.0.0
-```
-
-3. Critical: Never commit `encryption.key` to version control. Verify `.gitignore` includes:
+2. Critical: Never commit `encryption.key` to version control. Verify `.gitignore` includes:
 
 ```
 *.key
 config/encryption.key
 ```
 
-4. Back up the key securely. Encrypted data is unrecoverable without it.
+3. Back up the key securely. Encrypted data is unrecoverable without it.
 
 ---
 

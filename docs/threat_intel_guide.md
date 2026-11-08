@@ -176,11 +176,7 @@ For environments where no external communication is permitted:
 
 ### "Cloud threat intelligence module not available"
 
-The `cloud_threat_intel.py` module could not be imported. Ensure it exists in the `core/` directory and that the `requests` Python package is installed:
-
-```bash
-pip install requests
-```
+The cloud threat intelligence module could not be loaded. Run `hades doctor`: it reports whether the `requests` component is present in your build and which threat-intel API keys are configured. If a component is reported missing, contact support@darkhorseinfosec.com.
 
 ### No results from providers
 

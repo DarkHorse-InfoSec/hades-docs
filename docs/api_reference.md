@@ -2106,21 +2106,7 @@ hades serve --port 8666
 hades-server --host 127.0.0.1 --port 5000
 ```
 
-**Programmatically:**
-
-```python
-from core.hades_api import create_app
-import uvicorn
-
-app = create_app(config_override={"api": {"api_keys": ["my-key"]}})
-uvicorn.run(app, host="0.0.0.0", port=8666)
-```
-
-**Via Docker:**
-
-```bash
-docker run -p 8666:8666 hades-scanner:0.7.1
-```
+There is no supported programmatic (Python) entry point and no container image: HADES ships as the `hades` and `hades-server` binaries (see [Installation](installation.md)).
 
 ## Playbook Engine Endpoints
 

@@ -7,7 +7,7 @@ HADES ships with 144 YARA detection rules across 55 rule files, all purpose-buil
 YARA is a pattern matching engine used in malware research. HADES uses YARA to scan file content and metadata for known threat patterns -- embedded executables, script injection, encoded payloads, polyglot constructs, and more.
 
 !!! note "YARA is optional"
-    HADES functions without `yara-python` installed. When YARA is not available, the scanner skips YARA matching and relies on heuristic and ML detection. Install YARA for best detection coverage: `pip install yara-python`.
+    When YARA is not available, the scanner skips YARA matching and relies on heuristic and ML detection. `hades doctor` reports whether YARA (`yara-python`) is available.
 
 ---
 
