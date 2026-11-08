@@ -26,13 +26,13 @@ Include a clear description of the desired capability, the use case it addresses
 
 ## Security Vulnerabilities
 
-For security vulnerabilities, email **info@darkhorsesecurity.com** directly. Do not file public issues for security-related reports.
+For security vulnerabilities, email **security@darkhorseinfosec.com** directly (see [SECURITY.md](https://github.com/DarkHorse-InfoSec/hades-docs/blob/main/SECURITY.md)). Do not file public issues for security-related reports.
 
 ---
 
 ## YARA Rule Submissions
 
-Custom YARA rules can be submitted via the issue tracker or by emailing **info@darkhorsesecurity.com**. See the [Writing YARA Rules](yara_rule_writing_guide.md) guide for naming conventions, required metadata, and testing procedures.
+Custom YARA rules can be submitted via the [issue tracker](https://github.com/DarkHorse-InfoSec/hades-docs/issues). See the [Writing YARA Rules](yara_rule_writing_guide.md) guide for naming conventions, required metadata, and testing procedures.
 
 When submitting a rule, include:
 

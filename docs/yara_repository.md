@@ -144,7 +144,7 @@ Anomalous patterns in metadata fields:
 
 ## Submitting Custom Rules
 
-Custom YARA rules can be submitted via the issue tracker at [https://github.com/DarkHorse-InfoSec/hades-docs/issues](https://github.com/DarkHorse-InfoSec/hades-docs/issues) or by emailing **info@darkhorsesecurity.com**. See the [Writing YARA Rules](yara_rule_writing_guide.md) guide for naming conventions, required metadata, and testing procedures.
+Custom YARA rules can be submitted via the issue tracker at [https://github.com/DarkHorse-InfoSec/hades-docs/issues](https://github.com/DarkHorse-InfoSec/hades-docs/issues). See the [Writing YARA Rules](yara_rule_writing_guide.md) guide for naming conventions, required metadata, and testing procedures.
 
 When submitting a rule, include:
 
