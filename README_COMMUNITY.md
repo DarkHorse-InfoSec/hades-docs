@@ -281,7 +281,7 @@ A 64-bit OS. The HADES binary is Nuitka-compiled with its Python interpreter, YA
 
 | OS | Status |
 |---|---|
-| Linux x86_64 (glibc 2.34+) | Path A + Path B (via Linuxbrew) |
+| Linux x86_64 (glibc 2.35+) | Path A + Path B (via Linuxbrew) |
 | Windows x86_64 | Path A; binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped |
 | macOS | Not yet available; no release date |
 
