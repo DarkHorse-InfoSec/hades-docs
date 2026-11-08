@@ -667,68 +667,11 @@ curl -X POST "https://hades-api.company.com/api/v1/auth/token" \
 | Professional | 500 | 10,000 | 5 |
 | Enterprise | 2,000 | 50,000 | 20 |
 
-## 🆘 Support & Resources
+## Support, Licensing and Contact (archived README)
 
-### Documentation
-- **Installation Guide**: [docs/installation.md](docs/installation.md)
-- **API Reference**: [docs/api-reference.md](docs/api-reference.md)
-- **Configuration Guide**: [docs/configuration.md](docs/configuration.md)
-- **Troubleshooting**: [docs/troubleshooting.md](docs/troubleshooting.md)
-
-### Community
-- **GitHub Issues**: https://github.com/darkhorse-infosec/hades-enhanced/issues
-- **Security Advisories**: security@darkhorse-infosec.com
-- **Feature Requests**: https://github.com/darkhorse-infosec/hades-enhanced/discussions
-
-### Enterprise Support
-- **Email**: enterprise-support@darkhorse-infosec.com
-- **Phone**: +1-555-HADES-01 (US/Canada)
-- **Emergency**: +1-555-HADES-911 (24/7 for Critical customers)
-- **Professional Services**: consulting@darkhorse-infosec.com
-
-### Training & Certification
-- **HADES Certified Analyst (HCA)**: 2-day certification program
-- **HADES Advanced Administrator (HAA)**: 3-day advanced training
-- **Custom Training**: On-site training available for enterprise customers
-
-## 📄 License & Legal
-
-### License
-HADES Enhanced Detection Engine is licensed under the Proprietary License. See [LICENSE](LICENSE) for details.
-
-### Enterprise Licensing
-Commercial licenses with additional features and support are available:
-- **Professional**: Small teams (up to 10 analysts)
-- **Enterprise**: Large organizations (unlimited users)
-- **Government**: Special pricing for government agencies
-- **Academic**: Educational institutions and research
-
-Contact: licensing@darkhorse-infosec.com
-
-### Compliance Framework Mapping
-HADES maps detection findings to the following compliance frameworks, helping organizations align forensic analysis with their regulatory requirements:
-- **NIST CSF** - Cybersecurity Framework alignment for detection and response
-- **ISO 27001** - Information security management system controls
-- **GDPR** - Data protection and privacy compliance support
-
-### Third-Party Components
-HADES includes third-party open-source components. Third-party licenses are documented in `pyproject.toml` under project dependencies.
-
----
-
-## 🎯 Conclusion
-
-HADES Enhanced Detection Engine represents the pinnacle of enterprise metadata forensics technology. With its combination of advanced threat detection, comprehensive compliance support, enterprise-grade scalability, and professional services backing, HADES provides organizations with the tools they need to defend against the most sophisticated threats.
-
-Whether you're a security analyst investigating suspicious files, an incident responder triaging a potential breach, or a forensic investigator building a case for prosecution, HADES delivers the accuracy, performance, and reliability demanded by today's cybersecurity professionals.
-
-**Ready to deploy HADES in your environment?**
-
-Contact our enterprise team today:
-- 📧 **Sales**: sales@darkhorse-infosec.com
-- 🌐 **Website**: https://www.darkhorse-infosec.com/hades
-- 📞 **Phone**: +1-555-HADES-SALES
-
----
-
-*© 2024 DarkHorse Information Security LLC. All rights reserved. HADES is a trademark of DarkHorse Information Security LLC.*
+The support channels, phone numbers, training programmes, licensing tiers and contact addresses that this
+section listed in the v0.7.1 era were not accurate and have been removed (2026-11-08). For current
+information use the [documentation home](index.md), [Installation](installation.md),
+[API Reference](api_reference.md) and [Troubleshooting](troubleshooting.md). Report security issues as
+described in [SECURITY.md](../SECURITY.md). The licence terms are the
+[End User License Agreement](legal/HADES_EULA_v1.4.0.docx).

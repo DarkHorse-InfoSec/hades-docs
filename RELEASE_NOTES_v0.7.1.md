@@ -240,7 +240,7 @@ pip install "hades-scanner[full]"
 - **GPU-accelerated ML**: CUDA/ROCm support for faster ML ensemble inference
 - **Real-time streaming analysis**: Kafka/NATS consumer for continuous file stream processing
 
-See [HADES_Competitive_Analysis_and_Roadmap.md](HADES_Competitive_Analysis_and_Roadmap.md) for the full roadmap.
+The full roadmap was an internal document and is not published here.
 
 ---
 
