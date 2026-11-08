@@ -76,11 +76,11 @@ The Nuitka-compiled binary ships its Python interpreter + all Python dependencie
 
 | OS | Status |
 |---|---|
-| Linux x86_64 (glibc 2.34+) | Path A + Path B (via Linuxbrew) |
+| Linux x86_64 (glibc 2.35+) | Path A + Path B (via Linuxbrew) |
 | Windows x86_64 | Path A; binaries are Authenticode-signed (self-signed certificate) and RFC3161-timestamped |
 | macOS | Not yet available; no release date |
 
-The glibc floor of 2.34 was measured with `objdump -T` on both shipped v1.7.4 Linux binaries (2026-11-06); it is a property of the build host (Ubuntu 22.04). Check a target with `ldd --version`.
+**Correction (2026-11-08): the Linux binaries need glibc 2.35, not 2.34.** This page said 2.34 until 2026-11-08. That figure came from the binary's small outer loader; the program it unpacks and runs needs glibc 2.35. Verified by running the shipped v1.7.3 and v1.7.4 binaries: they start on Ubuntu 22.04 (glibc 2.35) and fail on glibc 2.34 with `version 'GLIBC_2.35' not found`. Distributions on glibc 2.34, such as RHEL 9, Rocky Linux 9, AlmaLinux 9 and Amazon Linux 2023, cannot run current Linux releases. Check a target with `ldd --version | head -1`.
 
 ---
 

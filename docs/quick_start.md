@@ -14,7 +14,7 @@ HADES extracts and analyzes metadata from files -- images, documents, PDFs, arch
 
 You need a 64-bit OS and your `HADES_LICENSE_KEY` from the license email. That's it. The HADES binary is Nuitka-compiled with its Python interpreter, YARA engine, and ML model bundled inline, so the host needs no pre-installed runtime. ExifTool is optional for scanning (a native fallback ships in the binary).
 
-Linux x86_64 (glibc 2.34+) and Windows x86_64 are available today. macOS is not yet available and has no release date.
+Linux x86_64 (glibc 2.35+) and Windows x86_64 are available today. macOS is not yet available and has no release date.
 
 ---
 
