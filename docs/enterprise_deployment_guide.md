@@ -373,7 +373,7 @@ curl http://localhost:8666/api/v1/health
 
 ### Breaking Changes
 
-- **v1.7.4:** SSO (the OIDC and SAML endpoints and the `auth.sso` config section) was removed. Use RBAC users with per-user API keys.
+- **v1.7.4:** SSO (the OIDC and SAML endpoints and the `auth.sso` config section) was removed because its token validation was not safe. It could not be enabled in any shipped build, so no deployment was exposed: no release configured an identity provider, so the SSO routes only answered "not configured". Use RBAC users with per-user API keys.
 - **v1.7.3:** PostgreSQL support was removed; SQLite is the only database backend. `--db-backend postgres` and `--db-dsn` are rejected (see [Database](#database)). The ML ensemble (`--ml-ensemble`, `GET /api/v1/ml/ensemble/status`) was removed; the signed XGBoost classifier is the ML stage.
 
 ---

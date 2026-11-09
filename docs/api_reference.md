@@ -305,7 +305,7 @@ curl -X POST \
 
 ## Authentication & User Management
 
-The authentication endpoints manage user login, RBAC user administration, API key rotation and license information. (SSO, the OIDC and SAML endpoints, was removed in v1.7.4.) These endpoints are registered at `/api/v1/auth/` and require the enterprise auth module (`core/auth/`).
+The authentication endpoints manage user login, RBAC user administration, API key rotation and license information. (SSO, the OIDC and SAML endpoints, was removed in v1.7.4 because its token validation was not safe; it could not be enabled in any shipped build, so no deployment was exposed.) These endpoints are registered at `/api/v1/auth/` and require the enterprise auth module (`core/auth/`).
 
 **Requirements:** RBAC must be enabled in `cli/hades_config.json` with `auth.rbac_enabled: true`.
 
