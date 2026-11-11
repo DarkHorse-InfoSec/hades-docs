@@ -132,7 +132,7 @@ hades monitor [-h] [--webhook WEBHOOK] [--alert-threshold ALERT_THRESHOLD] [--si
 | `--siem-target TARGET` | Target: file path, host:port for syslog, or URL for http |  |
 | `--zeek-watch DIR` | Start Zeek connector watching extract_files/ directory |  |
 | `--suricata-watch DIR` | Start Suricata connector watching filestore/ directory |  |
-| `--email-gateway` | Start email attachment scanning SMTP gateway |  |
+| `--email-gateway` | Start email attachment scanning SMTP gateway. Not available in the 1.7.5 binaries (needs `aiosmtpd`); see [Features not included](installation.md#features-not-included-in-the-175-binaries) |  |
 | `--smtp-port SMTP_PORT` | SMTP listen port for email gateway (default: 10025) | `10025` |
 | `--ir-mode` | Incident-response mode: do not redact PII/PHI in alerts (log file, webhook). Default redacts, as `hades scan` does. |  |
 | `-v, --verbose` | Verbose output |  |
@@ -206,7 +206,7 @@ hades serve [-h] [--port PORT] [--host HOST] [--api-workers API_WORKERS] [--api-
 | `--encrypt` | Enable at-rest encryption |  |
 | `--generate-encryption-key` | Generate and save a new encryption key, then exit |  |
 | `--distributed` | Enable distributed worker pool (requires Redis) |  |
-| `--metrics` | Enable Prometheus metrics endpoint |  |
+| `--metrics` | Enable Prometheus metrics endpoint. Not available in the 1.7.5 binaries (needs `prometheus-client`); see [Features not included](installation.md#features-not-included-in-the-175-binaries) |  |
 | `--no-metrics` | Disable Prometheus metrics endpoint |  |
 | `--metrics-port METRICS_PORT` | Port for metrics (default: same as API at /metrics) |  |
 | `--health-check` | Run health check and exit with code 0 (healthy) or 1 (unhealthy) |  |
@@ -416,11 +416,21 @@ hades rules build [-h] [-o FILE] template
 
 ### `hades rules validate`
 
-Run strict YARA rule validation (CI-level)
+Validate YARA rules. With one or more `PATH` arguments (rule files or directories), runs the strict checks
+on your own rules: compilation, required meta fields, severity range, MITRE ATT&CK IDs, duplicate names,
+naming convention and expensive patterns. With no `PATH`, checks that the ruleset this installation scans
+with loaded completely: in the downloaded binaries it reports how many bundled rule namespaces decrypted
+and compiled (for example `55 of 55`); rule names and rule source are never shown.
+
+Exit codes: `0` pass, `2` pass with warnings, `1` errors (the worst result across all paths).
 
 ```
-hades rules validate [-h]
+hades rules validate [-h] [PATH ...]
 ```
+
+| Option | Description | Default |
+|---|---|---|
+| `PATH` | Rule file(s) or directory(ies) to validate. Omit to check the installed ruleset. |  |
 
 ### `hades rules list-templates`
 

@@ -225,8 +225,6 @@ Multiple keys are supported simultaneously, enabling zero-downtime rotation.
 hades admin create-admin admin
 ```
 
-> **Known issue in v1.7.4:** in the compiled `hades` binary, `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` exit with an internal error (`NameError`) instead of running. The fix is tracked for the next release. Until then these commands cannot be used from the shipped binary.
-
 This prompts for the password and prints the new admin's API key. The admin account can then manage other users.
 
 ### 2.3 Create Analyst and Viewer Accounts
@@ -484,8 +482,6 @@ curl http://localhost:8666/api/v1/health
 ```
 
 See [Upgrading](installation.md#upgrading) for the download commands.
-
-> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
 
 ### 6.3 Upgrade Steps (Docker)
 

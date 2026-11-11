@@ -2,6 +2,9 @@
 
 > **Updated 2026-11-08:** HADES ships as the `hades` and `hades-server` binaries; there is no pip package and nothing to install separately. The metrics exporter is built into the API server and is on by default when the `prometheus_client` component is present in your build; check with `hades doctor`. The Prometheus, Grafana and Alertmanager configuration files and dashboards described below are in the HADES source tree and are not distributed with the binaries: use them as a reference for your own monitoring stack. See [Installation Guide](installation.md) for the install paths.
 
+> **1.7.5:** the downloaded binaries do not include `prometheus-client`, so the metrics collector is
+> disabled and `/metrics` exports nothing. See [Features not included](installation.md#features-not-included-in-the-175-binaries).
+
 HADES includes a built-in Prometheus metrics exporter. This guide lists its metrics and describes the dashboards and alert rules DarkHorse uses, so you can reproduce them in your own Prometheus, Grafana and Alertmanager.
 
 ## Prerequisites

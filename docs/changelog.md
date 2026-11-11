@@ -8,7 +8,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
-## Known issues in v1.7.4
+## [1.7.5] - 2026-11-11
+
+### Security
+- Licence validation hardened.
+
+### Fixed
+- `hades admin create-admin`, `create-user`, `list-users`, `create-tenant` and `list-tenants` run in the binary.
+- `hades rules validate` runs in the binary; it now also validates your own rule files (`PATH`).
+- `hades serve --generate-encryption-key`, tenant management and the `hades monitor` Zeek / Suricata
+  connectors load in the `hades` binary, and `hades serve` serves the same storage, evidence and
+  integration routes as `hades-server`.
+- One data directory: databases no longer live in a per-version folder or the working directory, so an
+  upgrade keeps your data. See [Where HADES keeps its data](installation.md#where-hades-keeps-its-data).
+
+### Not included
+- Email gateway, GCS / Azure scanning, Slack / Teams bots and Prometheus metrics need components the 1.7.5
+  binaries do not include; see [Features not included](installation.md#features-not-included-in-the-175-binaries).
+
+## Known issues in v1.7.4 (fixed in 1.7.5)
 
 Found while checking these docs against the shipped binaries on 2026-11-06. Each was reproduced on the signed v1.7.4 Windows binary from an empty working directory:
 

@@ -41,9 +41,7 @@ When submitting a rule, include:
 3. Description of the attack technique detected
 4. MITRE ATT&CK reference (if applicable)
 5. Test evidence showing the rule triggers on malicious samples and does not trigger on clean files
-6. Validation output from `hades rules validate`
-
-> **Known issue in v1.7.4:** `hades rules validate` exits with "CI rule validator not found" in the compiled binary; the validator was not included in the build. The fix is tracked for the next release.
+6. Validation output from `hades rules validate <your_rule.yar>`
 
 ---
 

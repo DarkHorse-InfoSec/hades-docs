@@ -332,6 +332,9 @@ hades-server --host 0.0.0.0 --port 8666
 
 ## Observability
 
+> **1.7.5:** the downloaded binaries do not include `prometheus-client`, so metrics are disabled; see
+> [Features not included](installation.md#features-not-included-in-the-175-binaries).
+
 The API server includes a Prometheus metrics exporter. Metrics are on by default and switch off automatically when the `prometheus_client` component is not present in your build.
 
 ```bash
